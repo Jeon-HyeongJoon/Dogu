@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# Flutter
+app/build/
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+
+# Database (전체 DB는 git 제외, slim.db만 포함)
+backend/dogu.db
+backend/app/data/dogu.db
+
+# macOS
+.DS_Store
+
+# 디자인 에셋
+design.zip
+design/
+images/
