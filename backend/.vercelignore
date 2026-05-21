@@ -1,0 +1,11 @@
+datacrawler/
+tests/
+scripts/
+app/data/dogu.db
+dogu.db
+pyproject.toml
+README.md
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
