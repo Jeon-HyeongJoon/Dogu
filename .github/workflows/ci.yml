@@ -61,7 +61,10 @@ jobs:
         run: flutter analyze
 
       - name: Widget tests (UI behavior)
-        run: flutter test
+        # Golden snapshot tests are platform-sensitive (font/AA differences between
+        # the dev machine and CI); they are committed as image deliverables and
+        # regenerated locally, so exclude them from the cross-platform CI run.
+        run: flutter test --exclude-tags golden
 
       - name: Build web (release)
         run: flutter build web --release

@@ -1,0 +1,6 @@
+tags:
+  golden:
+    description: >-
+      Golden image snapshot tests. Platform-sensitive (font/anti-aliasing
+      differences), so committed as image deliverables and regenerated locally
+      with `flutter test --update-goldens --tags golden`; excluded from CI.

@@ -16,6 +16,24 @@ The implementation keeps the original design DNA: a 390px-like centered mobile c
   them — edit the canonical file and regenerate with `python3 ../scripts/sync_seed.py`
   from the repo root. CI fails if either drifts.
 
+## v2 design (유희왕 마법 카드 테마)
+
+A v2 visual theme — modelled on the "욕망의 항아리 (Pot of Greed)" Yu-Gi-Oh! Spell
+card (teal frame, gold trim, cream effect panels, card-frame product tiles) — lives
+alongside v1 and is reachable at the **`/v2`** route. It reuses the same data
+(`AppStore`) and mirrors the v1 home layout, and is responsive for mobile and
+tablet widths. The design system is in `lib/src/v2_theme.dart`; the page is in
+`lib/src/v2_home.dart`.
+
+Finished screens are snapshotted as golden images under `test/goldens/`
+(`v2_home_mobile.png`, `v2_home_tablet.png`). These golden tests are tagged
+`golden` and excluded from CI (font/anti-aliasing rendering differs across
+platforms); regenerate them locally with:
+
+```sh
+flutter test --update-goldens --tags golden
+```
+
 ## Backend integration
 
 The app reads catalog/home/search/newsletter data from the FastAPI backend and falls back to local seed data if the network is unavailable, so the five tabs still render offline.
