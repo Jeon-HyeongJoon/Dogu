@@ -54,6 +54,16 @@ void main() {
       });
     }
   }
+
+  for (final s in sizes) {
+    testWidgets('v2 product detail renders on ${s.name}', (tester) async {
+      await _pumpDetail(tester, s.size);
+      await expectLater(
+        find.byType(V2ProductDetailPage),
+        matchesGoldenFile('goldens/v2_detail_${s.name}.png'),
+      );
+    });
+  }
 }
 
 Future<void> _loadFont(String family, List<String> assets) async {
@@ -79,6 +89,27 @@ Future<void> _pumpShell(WidgetTester tester, Size size, int initialTab) async {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: V2Shell(initialTab: initialTab),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+Future<void> _pumpDetail(WidgetTester tester, Size size) async {
+  tester.view.devicePixelRatio = 1.0;
+  tester.view.physicalSize = size;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
+  SharedPreferences.setMockInitialValues({});
+  final store = AppStore();
+  final product = store.newProducts.first;
+  await tester.pumpWidget(
+    AppStateScope(
+      store: store,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: V2ProductDetailPage(product: product),
       ),
     ),
   );

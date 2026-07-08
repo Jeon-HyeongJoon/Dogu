@@ -23,6 +23,7 @@ part 'src/bundled_seed.g.dart';
 part 'src/v2_theme.dart';
 part 'src/v2_home.dart';
 part 'src/v2_shell.dart';
+part 'src/v2_detail.dart';
 
 const doguFontFamily = 'Pretendard';
 const doguFontAssets = <String>[

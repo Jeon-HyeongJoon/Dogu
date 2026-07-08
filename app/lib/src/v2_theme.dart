@@ -386,7 +386,7 @@ class V2ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return V2CardFrame(
-      onTap: () => openProductDetail(context, product),
+      onTap: () => openV2ProductDetail(context, product),
       padding: const EdgeInsets.all(7),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
