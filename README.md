@@ -62,6 +62,17 @@ flutter analyze
 flutter test
 ```
 
+## Seed data (single source of truth)
+
+The catalog seed has one canonical file, `backend/app/data/seed.json`. The
+Flutter app bundles a byte-for-byte mirror at `app/assets/seed.json` for its
+offline fallback. Edit the canonical file, then re-mirror and commit both:
+
+```sh
+python3 scripts/sync_seed.py          # canonical -> app mirror
+python3 scripts/sync_seed.py --check  # verify (CI's SSOT guard enforces this)
+```
+
 ## Notes
 
 - Start the backend before the frontend so Flutter can load `/api/home` from `API_BASE_URL`.

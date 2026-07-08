@@ -70,6 +70,21 @@ is absent the app serves the small `app/data/seed.json` stub (product IDs
 tests and CI run against the committed deterministic fixture
 `app/data/test_fixture.db` (regenerate with `scripts/make_test_fixture.py`).
 
+### Seed single source of truth
+
+`backend/app/data/seed.json` is the **canonical** catalog seed — edit it here.
+The Flutter app bundles a byte-for-byte mirror at `app/assets/seed.json` for its
+offline fallback (both packages deploy independently, so each needs its own
+physical copy). After editing the canonical seed, re-mirror it from the repo
+root and commit both files:
+
+```sh
+python3 scripts/sync_seed.py          # canonical -> app mirror
+python3 scripts/sync_seed.py --check  # verify in sync (CI enforces this)
+```
+
+`tests/test_ssot.py` fails if the two copies drift, so divergence can't be merged.
+
 Mutable state (orders, admin seed edits) is stored separately under
 `DOGU_STATE_DIR`, never written back into the read-only bundled data.
 
