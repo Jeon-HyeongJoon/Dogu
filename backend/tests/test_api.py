@@ -151,6 +151,17 @@ def test_order_endpoint_accepts_selected_cart_lines() -> None:
     assert payload["items"][0]["product_id"] == "89865177420"
 
 
+def test_created_orders_persist_and_are_listed(admin_auth) -> None:
+    created = client.post(
+        "/api/orders", json={"items": [{"product_id": "89865177420", "quantity": 1}]}
+    )
+    order_id = created.json()["order_id"]
+
+    listed = client.get("/api/orders", auth=admin_auth)
+    assert listed.status_code == 200
+    assert order_id in {order["order_id"] for order in listed.json()}
+
+
 def test_order_endpoint_rejects_invalid_or_missing_product() -> None:
     invalid = client.post("/api/orders", json={"items": []})
     missing = client.post("/api/orders", json={"items": [{"product_id": "missing", "quantity": 1}]})

@@ -1,14 +1,16 @@
 from functools import cached_property
 from uuid import uuid4
 
+from app import state
 from app.database import db_exists, db_get_product, db_list_categories, db_list_products, db_search_products
 from app.models import Category, HomeResponse, OrderCreateRequest, OrderLineResponse, OrderResponse, Product, SeedData
 from app.seed import load_seed_data, save_seed_data
 
 
 class CatalogRepository:
-    def __init__(self) -> None:
-        self.orders: list[OrderResponse] = []
+    @property
+    def orders(self) -> list[OrderResponse]:
+        return [OrderResponse.model_validate(row) for row in state.list_orders()]
 
     @cached_property
     def data(self) -> SeedData:
@@ -168,7 +170,7 @@ class CatalogRepository:
             total_price=total_price,
             message="주문이 접수되었습니다.",
         )
-        self.orders.insert(0, order)
+        state.add_order(order.order_id, order.model_dump(mode="json"))
         return order
 
 
