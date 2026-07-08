@@ -1,5 +1,10 @@
 from pydantic import BaseModel, Field
 
+# Single source of truth mapping the public `section` query values to the seed/DB
+# product tags they select. Used by both the DB query layer (database.py) and the
+# seedstore fallback filter (repository.py), so a section is defined in one place.
+SECTION_TAGS: dict[str, str] = {"deals": "today_deal", "new": "new_arrival"}
+
 
 class ProductArtwork(BaseModel):
     hue: int = Field(ge=0, le=360)

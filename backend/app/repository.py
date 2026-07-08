@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from app import state
 from app.database import db_exists, db_get_product, db_list_categories, db_list_products, db_search_products
-from app.models import Category, HomeResponse, OrderCreateRequest, OrderLineResponse, OrderResponse, Product, SeedData
+from app.models import SECTION_TAGS, Category, HomeResponse, OrderCreateRequest, OrderLineResponse, OrderResponse, Product, SeedData
 from app.seed import load_seed_data, save_seed_data
 
 
@@ -42,7 +42,7 @@ class CatalogRepository:
         if category_id:
             products = [p for p in products if category_id in p.category_ids]
         if section:
-            mapped = {"deals": "today_deal", "new": "new_arrival"}.get(section)
+            mapped = SECTION_TAGS.get(section)
             if mapped:
                 products = [p for p in products if mapped in p.tags]
         if tag:

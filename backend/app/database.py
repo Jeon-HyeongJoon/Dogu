@@ -3,7 +3,7 @@ import os
 import sqlite3
 from pathlib import Path
 
-from app.models import Category, Product, ProductArtwork
+from app.models import SECTION_TAGS, Category, Product, ProductArtwork
 
 _DEFAULT_DB = Path(__file__).parent / "data" / "dogu.db"
 DB_PATH = Path(os.environ.get("DOGU_DB_PATH", str(_DEFAULT_DB)))
@@ -86,7 +86,7 @@ def db_list_products(
     section: str | None = None,
     limit: int | None = None,
 ) -> list[Product]:
-    section_tag = {"deals": "today_deal", "new": "new_arrival"}.get(section or "")
+    section_tag = SECTION_TAGS.get(section or "")
     effective_tag = section_tag or tag
 
     with _conn() as conn:

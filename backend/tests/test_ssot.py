@@ -11,6 +11,8 @@ silent divergence impossible to merge. Re-sync with:
 import json
 from pathlib import Path
 
+from app.models import SECTION_TAGS
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CANONICAL = REPO_ROOT / "backend" / "app" / "data" / "seed.json"
 MIRROR = REPO_ROOT / "app" / "assets" / "seed.json"
@@ -33,3 +35,10 @@ def test_canonical_seed_is_valid_json() -> None:
     # A corrupt canonical would silently be mirrored everywhere; guard it here.
     data = json.loads(CANONICAL.read_text(encoding="utf-8"))
     assert isinstance(data, dict) and data, "canonical seed is not a non-empty object"
+
+
+def test_section_tag_mapping_is_the_single_source() -> None:
+    # The DB query layer (database.py) and the seed fallback filter (repository.py)
+    # both resolve `section` through SECTION_TAGS; pin its canonical contents so a
+    # section is defined in exactly one place.
+    assert SECTION_TAGS == {"deals": "today_deal", "new": "new_arrival"}
