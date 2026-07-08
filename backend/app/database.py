@@ -144,8 +144,14 @@ def db_search_products(query: str | None = None, category_id: str | None = None,
             params.append(category_id)
         if query:
             q = f"%{query.strip().lower()}%"
-            conditions.append("(lower(p.name) LIKE ? OR lower(p.brand) LIKE ?)")
-            params.extend([q, q])
+            # Match the seed-path search fields (name/brand/subtitle/blurb/tags)
+            # so both data sources return consistent results for the same query.
+            conditions.append(
+                "(lower(p.name) LIKE ? OR lower(p.brand) LIKE ? "
+                "OR lower(p.subtitle) LIKE ? OR lower(p.blurb) LIKE ? "
+                "OR lower(p.tags) LIKE ?)"
+            )
+            params.extend([q, q, q, q, q])
 
         if conditions:
             sql += " WHERE " + " AND ".join(conditions)
