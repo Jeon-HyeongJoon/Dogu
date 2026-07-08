@@ -133,6 +133,29 @@ void main() {
     expect(product.categoryIds, ['garden']);
   });
 
+  // ── [ssot] instant-paint fallback 카탈로그는 단일 원천 seed.json에서 파생 ──
+  // (과거엔 seed 상품을 손으로 옮겨 적은 const 리스트였다 — 이제 임베드 seed에서 파생해 중복 제거.)
+  group('fallback catalog derives from the single seed source', () {
+    test('fallback lists are non-empty (0ms paint + last-resort safety)', () {
+      expect(fallbackCategories, isNotEmpty);
+      expect(fallbackDealProducts, isNotEmpty);
+      expect(fallbackNewProducts, isNotEmpty);
+    });
+
+    test('fallback products carry seed product ids, not hand-authored ones', () {
+      // seed.json uses p01.. ids; the old transcription used deal-/new- ids.
+      expect(fallbackDealProducts.every((p) => p.id.startsWith('p')), isTrue);
+      expect(fallbackNewProducts.every((p) => p.id.startsWith('p')), isTrue);
+    });
+
+    test('fallback categories are exactly the seed category set', () {
+      expect(
+        fallbackCategories.map((c) => c.id).toSet(),
+        {'gadget', 'home', 'fashion', 'beauty', 'sports', 'kids'},
+      );
+    });
+  });
+
   testWidgets('DoguApp applies the bundled Korean font family', (tester) async {
     final store = AppStore(repository: _FakeRepository(results: const []));
 

@@ -1,0 +1,652 @@
+// GENERATED FROM backend/app/data/seed.json BY scripts/sync_seed.py — DO NOT EDIT.
+// Run `python3 scripts/sync_seed.py` to regenerate. Guarded by backend/tests/test_ssot.py.
+part of '../main.dart';
+
+const String kBundledSeedJson = r'''
+{
+  "categories": [
+    {
+      "id": "gadget",
+      "label": "전자제품",
+      "count": 186,
+      "description": "오디오 · 주방가전 · 스마트홈 · 액세서리",
+      "tone": "#2563EB",
+      "featured": true,
+      "image_url": "https://picsum.photos/seed/dogu-category-gadget/720/960"
+    },
+    {
+      "id": "home",
+      "label": "홈·리빙",
+      "count": 298,
+      "description": "주방 · 가구 · 패브릭 · 오브제 · 문구",
+      "tone": "#16A34A",
+      "featured": true,
+      "image_url": "https://picsum.photos/seed/dogu-category-home/720/960"
+    },
+    {
+      "id": "fashion",
+      "label": "의류",
+      "count": 412,
+      "description": "아우터 · 니트 · 셔츠 · 팬츠",
+      "tone": "#DB2777",
+      "featured": true,
+      "image_url": "https://picsum.photos/seed/dogu-category-fashion/720/960"
+    },
+    {
+      "id": "beauty",
+      "label": "뷰티",
+      "count": 154,
+      "description": "스킨케어 · 향수 · 바디 · 홈프래그런스",
+      "tone": "#9333EA",
+      "featured": true,
+      "image_url": "https://picsum.photos/seed/dogu-category-beauty/720/960"
+    },
+    {
+      "id": "sports",
+      "label": "스포츠",
+      "count": 87,
+      "description": "러닝 · 하이킹 · 워터 · 요가",
+      "tone": "#0891B2",
+      "featured": true,
+      "image_url": "https://picsum.photos/seed/dogu-category-sports/720/960"
+    },
+    {
+      "id": "kids",
+      "label": "키즈",
+      "count": 112,
+      "description": "의류 · 장난감 · 가구 · 식기 · 펫",
+      "tone": "#EAB308",
+      "featured": true,
+      "image_url": "https://picsum.photos/seed/dogu-category-kids/720/960"
+    }
+  ],
+  "products": [
+    {
+      "id": "p01",
+      "name": "폴더블 무선 충전 거치대 3 in 1",
+      "subtitle": "아이폰·워치·에어팟 동시충전",
+      "brand": "NovaTech",
+      "category_ids": [
+        "gadget"
+      ],
+      "price": 24900,
+      "old_price": 49000,
+      "discount_percent": 49,
+      "badge": "BEST",
+      "rating": 4.8,
+      "reviews": 12840,
+      "blurb": "한 번에 세 기기를 충전. MagSafe 호환 · 15W 고속충전 · 폴더블 디자인으로 휴대 간편.",
+      "tags": [
+        "new_arrival",
+        "best",
+        "desk_setup"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p01-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p01-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p01-1/960/960",
+        "https://picsum.photos/seed/dogu-p01-2/960/960"
+      ],
+      "artwork": {
+        "hue": 220,
+        "saturation": 25,
+        "lightness": 70,
+        "mono": "⌬",
+        "motif": "circle"
+      }
+    },
+    {
+      "id": "p02",
+      "name": "LED 무드 테이블 램프",
+      "subtitle": "터치 조광 · 3단계 밝기 · USB-C 충전",
+      "brand": "Lumio",
+      "category_ids": [
+        "home"
+      ],
+      "price": 12900,
+      "old_price": 32000,
+      "discount_percent": 60,
+      "badge": "TODAY",
+      "rating": 4.9,
+      "reviews": 4128,
+      "blurb": "무선·터치 한 번이면 ON. 따뜻한 색온도에서 백색까지 3단 조절. 야간 무드등으로 완벽.",
+      "tags": [
+        "today_deal",
+        "desk_setup"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p02-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p02-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p02-1/960/960",
+        "https://picsum.photos/seed/dogu-p02-2/960/960"
+      ],
+      "artwork": {
+        "hue": 35,
+        "saturation": 55,
+        "lightness": 78,
+        "mono": "◐",
+        "motif": "wave"
+      }
+    },
+    {
+      "id": "p03",
+      "name": "스테인리스 진공 보온병 1L",
+      "subtitle": "24시간 보온 · BPA Free",
+      "brand": "ThermoGo",
+      "category_ids": [
+        "home",
+        "sports"
+      ],
+      "price": 14500,
+      "old_price": 28000,
+      "discount_percent": 48,
+      "badge": null,
+      "rating": 4.7,
+      "reviews": 6890,
+      "blurb": "이중 진공 구조로 24시간 따뜻하게, 12시간 차갑게. 누수 방지 캡 · 식기세척기 안전.",
+      "tags": [
+        "new_arrival",
+        "summer_best"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p03-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p03-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p03-1/960/960",
+        "https://picsum.photos/seed/dogu-p03-2/960/960"
+      ],
+      "artwork": {
+        "hue": 195,
+        "saturation": 35,
+        "lightness": 55,
+        "mono": "◇",
+        "motif": "stripe"
+      }
+    },
+    {
+      "id": "p04",
+      "name": "미니 휴대용 핸디 선풍기",
+      "subtitle": "4단 풍속 · 6시간 사용",
+      "brand": "Breezy",
+      "category_ids": [
+        "gadget"
+      ],
+      "price": 9800,
+      "old_price": 19900,
+      "discount_percent": 51,
+      "badge": "NEW",
+      "rating": 4.6,
+      "reviews": 2330,
+      "blurb": "주머니에 쏙. 4단 풍속 · 6시간 연속 사용 · USB-C 고속충전. 손목 스트랩 포함.",
+      "tags": [
+        "new_arrival",
+        "summer_best"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p04-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p04-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p04-1/960/960",
+        "https://picsum.photos/seed/dogu-p04-2/960/960"
+      ],
+      "artwork": {
+        "hue": 165,
+        "saturation": 45,
+        "lightness": 70,
+        "mono": "✦",
+        "motif": "circle"
+      }
+    },
+    {
+      "id": "p05",
+      "name": "실리콘 욕실 정리 트레이 3종",
+      "subtitle": "미끄럼 방지 · 3 사이즈",
+      "brand": "TidyHome",
+      "category_ids": [
+        "home"
+      ],
+      "price": 7900,
+      "old_price": 14900,
+      "discount_percent": 47,
+      "badge": "BEST",
+      "rating": 4.9,
+      "reviews": 21040,
+      "blurb": "욕실·주방·세면대 정리에 딱. 미끄럼 방지 그립 · 식기세척기 사용 가능 · 3 사이즈 세트.",
+      "tags": [
+        "best",
+        "today_deal"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p05-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p05-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p05-1/960/960",
+        "https://picsum.photos/seed/dogu-p05-2/960/960"
+      ],
+      "artwork": {
+        "hue": 0,
+        "saturation": 0,
+        "lightness": 70,
+        "mono": "▤",
+        "motif": "stripe"
+      }
+    },
+    {
+      "id": "p06",
+      "name": "콜라겐 페이셜 크림",
+      "subtitle": "50ml · 모든 피부 타입",
+      "brand": "GlowLab",
+      "category_ids": [
+        "beauty"
+      ],
+      "price": 18000,
+      "old_price": 39000,
+      "discount_percent": 53,
+      "badge": "BEAUTY",
+      "rating": 4.8,
+      "reviews": 8560,
+      "blurb": "저분자 콜라겐 · 히알루론산 5중 복합. 자고 일어나면 탄력이 다르다는 후기 다수.",
+      "tags": [
+        "today_deal",
+        "beauty_pick"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p06-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p06-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p06-1/960/960",
+        "https://picsum.photos/seed/dogu-p06-2/960/960"
+      ],
+      "artwork": {
+        "hue": 340,
+        "saturation": 30,
+        "lightness": 86,
+        "mono": "✿",
+        "motif": "circle"
+      }
+    },
+    {
+      "id": "p07",
+      "name": "캠핑용 LED 충전식 랜턴",
+      "subtitle": "방수 IPX4 · 보조배터리 겸용",
+      "brand": "Outly",
+      "category_ids": [
+        "sports"
+      ],
+      "price": 19800,
+      "old_price": 38000,
+      "discount_percent": 48,
+      "badge": "LIMITED",
+      "rating": 4.7,
+      "reviews": 4670,
+      "blurb": "캠핑·차박 필수템. IPX4 방수 · 10,000mAh 보조배터리 · 4단 밝기 조절 · 행거 후크 포함.",
+      "tags": [
+        "today_deal",
+        "summer_best"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p07-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p07-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p07-1/960/960",
+        "https://picsum.photos/seed/dogu-p07-2/960/960"
+      ],
+      "artwork": {
+        "hue": 95,
+        "saturation": 35,
+        "lightness": 50,
+        "mono": "✺",
+        "motif": "wave"
+      }
+    },
+    {
+      "id": "p08",
+      "name": "오버사이즈 코튼 후드 집업",
+      "subtitle": "유니섹스 · 4 컬러",
+      "brand": "Daily.fits",
+      "category_ids": [
+        "fashion"
+      ],
+      "price": 22000,
+      "old_price": 45000,
+      "discount_percent": 51,
+      "badge": "NEW",
+      "rating": 4.5,
+      "reviews": 1780,
+      "blurb": "두툼한 320g 기모. 오버핏 실루엣 · 와이드 후드 · 사이드 포켓. 봄가을 데일리.",
+      "tags": [
+        "new_arrival"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p08-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p08-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p08-1/960/960",
+        "https://picsum.photos/seed/dogu-p08-2/960/960"
+      ],
+      "artwork": {
+        "hue": 30,
+        "saturation": 30,
+        "lightness": 60,
+        "mono": "◍",
+        "motif": "diamond"
+      }
+    },
+    {
+      "id": "p09",
+      "name": "무선 노이즈캔슬링 이어버드 Pro",
+      "subtitle": "ANC · 30시간 재생",
+      "brand": "NovaTech",
+      "category_ids": [
+        "gadget"
+      ],
+      "price": 39800,
+      "old_price": 89000,
+      "discount_percent": 55,
+      "badge": "BEST",
+      "rating": 4.8,
+      "reviews": 31040,
+      "blurb": "ANC 능동소음제거 -28dB · 듀얼 디바이스 페어링 · 케이스 포함 30시간 재생.",
+      "tags": [
+        "best",
+        "desk_setup"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p09-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p09-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p09-1/960/960",
+        "https://picsum.photos/seed/dogu-p09-2/960/960"
+      ],
+      "artwork": {
+        "hue": 250,
+        "saturation": 15,
+        "lightness": 25,
+        "mono": "◉",
+        "motif": "circle"
+      }
+    },
+    {
+      "id": "p10",
+      "name": "강아지 자동 노즈워크 장난감",
+      "subtitle": "간식 디스펜서 · 무소음",
+      "brand": "Pawsy",
+      "category_ids": [
+        "kids"
+      ],
+      "price": 16500,
+      "old_price": 29000,
+      "discount_percent": 43,
+      "badge": null,
+      "rating": 4.6,
+      "reviews": 3390,
+      "blurb": "버튼 하나로 자동 회전 · 간식을 천천히 흘려 노즈워크 자극. 분리불안 완화에 도움.",
+      "tags": [
+        "best"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p10-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p10-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p10-1/960/960",
+        "https://picsum.photos/seed/dogu-p10-2/960/960"
+      ],
+      "artwork": {
+        "hue": 25,
+        "saturation": 50,
+        "lightness": 65,
+        "mono": "✤",
+        "motif": "diamond"
+      }
+    },
+    {
+      "id": "p11",
+      "name": "실리콘 미끄럼방지 요가 매트 6mm",
+      "subtitle": "173 × 61 · 캐링백 포함",
+      "brand": "FlowLine",
+      "category_ids": [
+        "sports"
+      ],
+      "price": 21800,
+      "old_price": 49000,
+      "discount_percent": 56,
+      "badge": null,
+      "rating": 4.7,
+      "reviews": 6120,
+      "blurb": "6mm 두께로 무릎 보호 · 양면 미끄럼방지 텍스처 · 캐링 스트랩 포함.",
+      "tags": [
+        "new_arrival",
+        "summer_best"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p11-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p11-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p11-1/960/960",
+        "https://picsum.photos/seed/dogu-p11-2/960/960"
+      ],
+      "artwork": {
+        "hue": 280,
+        "saturation": 25,
+        "lightness": 55,
+        "mono": "▰",
+        "motif": "stripe"
+      }
+    },
+    {
+      "id": "p12",
+      "name": "오피스 인체공학 메쉬 의자",
+      "subtitle": "랜더 머리받침 · 5년 보증",
+      "brand": "ErgoSit",
+      "category_ids": [
+        "home",
+        "gadget"
+      ],
+      "price": 89000,
+      "old_price": 159000,
+      "discount_percent": 44,
+      "badge": "LIMITED",
+      "rating": 4.9,
+      "reviews": 980,
+      "blurb": "풀 메쉬 통풍 · 3D 팔걸이 · 머리받침 + 럼버 서포트. 8시간 앉아도 편한 의자.",
+      "tags": [
+        "new_arrival",
+        "desk_setup"
+      ],
+      "image_url": "https://picsum.photos/seed/dogu-p12-main/960/960",
+      "thumbnail_url": "https://picsum.photos/seed/dogu-p12-thumb/480/480",
+      "gallery": [
+        "https://picsum.photos/seed/dogu-p12-1/960/960",
+        "https://picsum.photos/seed/dogu-p12-2/960/960"
+      ],
+      "artwork": {
+        "hue": 210,
+        "saturation": 18,
+        "lightness": 35,
+        "mono": "⌂",
+        "motif": "crest"
+      }
+    }
+  ],
+  "home": {
+    "hero": {
+      "eyebrow": "● 2026 SPRING DROP · 05.12 — 05.26",
+      "title": "오늘 사고 싶은 것만, 가볍게 담아두세요.",
+      "subtitle": "새로 들어온 상품부터 오늘의 특가까지. 마음에 드는 것만 빠르게 골라 담는 쇼핑 리스트.",
+      "primary_action": "지금 둘러보기 →",
+      "secondary_action": "노트",
+      "stats": [
+        {
+          "value": "218",
+          "label": "신상품"
+        },
+        {
+          "value": "14",
+          "label": "브랜드"
+        },
+        {
+          "value": "−42%",
+          "label": "평균 할인"
+        }
+      ]
+    },
+    "ticker": [
+      "FREE SHIPPING",
+      "14-DAY RETURNS",
+      "매일 오후 2시 신상",
+      "12개월 할부",
+      "리퍼브 · 빈티지"
+    ],
+    "nav": [
+      "신상품",
+      "베스트",
+      "의류",
+      "홈·리빙",
+      "전자제품",
+      "뷰티",
+      "SALE"
+    ],
+    "deal_product_ids": [
+      "p02",
+      "p06",
+      "p07"
+    ],
+    "new_product_ids": [
+      "p01",
+      "p03",
+      "p04",
+      "p08",
+      "p12",
+      "p11"
+    ],
+    "featured_product_id": "p08",
+    "editorial": {
+      "eyebrow": "FIELD NOTE — 005",
+      "title": "\"필요한 것\"과 \"갖고 싶은 것\"의 그 사이.",
+      "description": "매주 14개의 브랜드와 218개의 상품을 다시 골라냅니다. 오래 두고 싶은 것들을 모읍니다.",
+      "meta": "EST. 2024 · SEOUL · ED. Vol.23 — 2026.05"
+    },
+    "brands": [
+      "soft·studio",
+      "ATELIER 04",
+      "good machine",
+      "objet·han",
+      "NORM /",
+      "paperhouse",
+      "flat·flat",
+      "QUIET CO.",
+      "han·gul·works",
+      "monogram",
+      "slow craft",
+      "post script",
+      "edition·k",
+      "white room"
+    ],
+    "collections": [
+      {
+        "id": "c01",
+        "title": "데스크 셋업 업그레이드",
+        "subtitle": "책상 위 작은 변화",
+        "tone": "#1F2937",
+        "accent": "#FB7701",
+        "product_ids": [
+          "p01",
+          "p09",
+          "p12",
+          "p02"
+        ]
+      },
+      {
+        "id": "c02",
+        "title": "오늘만 60% OFF",
+        "subtitle": "플래시 딜 · 24시간",
+        "tone": "#DC2626",
+        "accent": "#FFE4B5",
+        "product_ids": [
+          "p02",
+          "p06",
+          "p07",
+          "p05"
+        ]
+      },
+      {
+        "id": "c03",
+        "title": "여름맞이 베스트",
+        "subtitle": "시원하게 채워가는",
+        "tone": "#0891B2",
+        "accent": "#E0F2FE",
+        "product_ids": [
+          "p04",
+          "p03",
+          "p11",
+          "p07"
+        ]
+      }
+    ]
+  },
+  "trending": [
+    {
+      "term": "린넨 오버셔츠",
+      "movement": "▲ 12"
+    },
+    {
+      "term": "세라믹 푸어오버",
+      "movement": "▲ 4"
+    },
+    {
+      "term": "메리노 크루넥",
+      "movement": "— 유지"
+    },
+    {
+      "term": "스톤웨어 머그",
+      "movement": "▲ 8"
+    },
+    {
+      "term": "알루미늄 데스크 램프",
+      "movement": "▼ 2"
+    },
+    {
+      "term": "시더 우드 디퓨저",
+      "movement": "▲ 5"
+    },
+    {
+      "term": "유리 카라프",
+      "movement": "NEW"
+    },
+    {
+      "term": "코튼 파자마",
+      "movement": "▼ 1"
+    },
+    {
+      "term": "하드커버 노트북",
+      "movement": "▲ 3"
+    },
+    {
+      "term": "소이 캔들 220g",
+      "movement": "— 유지"
+    },
+    {
+      "term": "무선 충전기",
+      "movement": "▲ 7"
+    },
+    {
+      "term": "핸디 선풍기",
+      "movement": "▲ 6"
+    }
+  ],
+  "suggestions": [
+    "린넨 셔츠",
+    "스피커",
+    "머그컵",
+    "메리노 니트",
+    "디퓨저",
+    "soft·studio",
+    "무선 충전기",
+    "핸디 선풍기",
+    "노이즈캔슬링",
+    "요가 매트",
+    "LED 무드등",
+    "보온병",
+    "인체공학 의자",
+    "캠핑 랜턴"
+  ],
+  "newsletter": {
+    "eyebrow": "— 매주 수요일 발송",
+    "title": "조용한 신상품을 가장 먼저.",
+    "description": "매주 한 번, Dogu의 큐레이션과 드랍 소식을 이메일로 받아보세요.",
+    "cadence": "weekly",
+    "disclaimer": "언제든 한 번의 클릭으로 구독 취소"
+  }
+}
+''';

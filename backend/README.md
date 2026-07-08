@@ -73,17 +73,19 @@ tests and CI run against the committed deterministic fixture
 ### Seed single source of truth
 
 `backend/app/data/seed.json` is the **canonical** catalog seed — edit it here.
-The Flutter app bundles a byte-for-byte mirror at `app/assets/seed.json` for its
-offline fallback (both packages deploy independently, so each needs its own
-physical copy). After editing the canonical seed, re-mirror it from the repo
-root and commit both files:
+Two copies are derived from it for the Flutter app (both packages deploy
+independently, so each needs its own physical copy): `app/assets/seed.json`
+(byte-for-byte mirror bundled as an asset) and `app/lib/src/bundled_seed.g.dart`
+(the seed embedded as a Dart string so the app builds its synchronous fallback
+catalog from it). After editing the canonical seed, regenerate both from the
+repo root and commit them:
 
 ```sh
-python3 scripts/sync_seed.py          # canonical -> app mirror
+python3 scripts/sync_seed.py          # canonical -> derived copies
 python3 scripts/sync_seed.py --check  # verify in sync (CI enforces this)
 ```
 
-`tests/test_ssot.py` fails if the two copies drift, so divergence can't be merged.
+`tests/test_ssot.py` fails if any derived copy drifts, so divergence can't be merged.
 
 Mutable state (orders, admin seed edits) is stored separately under
 `DOGU_STATE_DIR`, never written back into the read-only bundled data.
