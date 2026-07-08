@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend tests (pytest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt "pytest>=8,<9"
+
+      - name: Run API tests against committed fixture DB
+        env:
+          # CI has no crawled dogu.db (26MB, git-ignored); tests run against the
+          # small deterministic fixture committed at app/data/test_fixture.db.
+          DOGU_DB_PATH: ${{ github.workspace }}/backend/app/data/test_fixture.db
+        run: pytest
+
+  frontend:
+    name: Frontend (analyze, widget tests, web build + load budget)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.0"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Static analysis (UI / code errors)
+        run: flutter analyze
+
+      - name: Widget tests (UI behavior)
+        run: flutter test
+
+      - name: Build web (release)
+        run: flutter build web --release
+
+      - name: Loading-performance budget (gzipped main.dart.js)
+        run: |
+          BUDGET_KB=1200
+          RAW=$(stat -c%s build/web/main.dart.js)
+          GZ=$(gzip -c build/web/main.dart.js | wc -c)
+          GZ_KB=$((GZ / 1024))
+          echo "main.dart.js: $((RAW / 1024)) KB raw, ${GZ_KB} KB gzipped (budget ${BUDGET_KB} KB)"
+          if [ "$GZ_KB" -gt "$BUDGET_KB" ]; then
+            echo "::error::main.dart.js gzipped ${GZ_KB} KB exceeds loading budget ${BUDGET_KB} KB"
+            exit 1
+          fi

@@ -1,7 +1,7 @@
 datacrawler/
 tests/
 scripts/
-app/data/dogu.db
+app/data/slim.db
 dogu.db
 pyproject.toml
 README.md
@@ -9,3 +9,5 @@ __pycache__/
 *.pyc
 *.egg-info/
 .pytest_cache/
+# .gitignore 에 있어도 강제 포함
+!app/data/dogu.db

@@ -29,7 +29,7 @@ def list_products(
         str | None,
         Query(description="Filter by seed tag, for example 'today_deal'."),
     ] = None,
-    limit: Annotated[int | None, Query(ge=1, le=100)] = None,
+    limit: Annotated[int, Query(ge=1, le=100)] = 100,
 ) -> ProductListResponse:
     products = repository.list_products(category_id=category_id, section=section, tag=tag, limit=limit)
     return ProductListResponse(items=products, count=len(products))

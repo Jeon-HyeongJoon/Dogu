@@ -1,0 +1,8 @@
+# Deploy built Flutter web output plus Vercel config
+*
+!build
+!build/**
+!build/web
+!build/web/**
+!vercel.json
+!.vercelignore

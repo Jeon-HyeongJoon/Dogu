@@ -19,9 +19,9 @@ def test_home_endpoint_returns_seed_sections() -> None:
     payload = response.json()
 
     assert response.status_code == 200
-    assert payload["hero"]["title"] == "조용한 것들이 가장 시끄럽게 욕망된다."
-    assert len(payload["categories"]) == 6
-    assert [product["id"] for product in payload["deals"]] == ["p02", "p06", "p07"]
+    assert payload["hero"]["title"] == "오늘 사고 싶은 것만, 가볍게 담아두세요."
+    assert len(payload["categories"]) == 27
+    assert [product["id"] for product in payload["deals"][:3]] == ["83781891828", "90975233454", "90649753925"]
     assert payload["newsletter"]["cadence"] == "weekly"
 
 
@@ -30,37 +30,48 @@ def test_categories_endpoint() -> None:
     payload = response.json()
 
     assert response.status_code == 200
-    assert payload["count"] == 6
-    assert {category["id"] for category in payload["items"]} >= {"gadget", "home", "fashion"}
+    assert payload["count"] == 27
+    assert {category["id"] for category in payload["items"]} >= {"10000129", "10000122", "10000114"}
 
 
 def test_products_endpoint_and_filters() -> None:
     all_products = client.get("/api/products")
-    home_products = client.get("/api/products", params={"category_id": "home"})
+    home_products = client.get("/api/products", params={"category_id": "10000112"})
     deal_products = client.get("/api/products", params={"tag": "today_deal"})
     section_deals = client.get("/api/products", params={"section": "deals"})
     section_new = client.get("/api/products", params={"section": "new"})
 
     assert all_products.status_code == 200
-    assert all_products.json()["count"] == 12
+    # limit 미지정 시에도 응답을 기본 100개로 제한 — 전체(수만 개) 반환 시 Vercel 서버리스 응답 한도 초과로 500이 난다
+    assert all_products.json()["count"] == 100
     assert home_products.status_code == 200
-    assert all("home" in product["category_ids"] for product in home_products.json()["items"])
+    assert all("10000112" in product["category_ids"] for product in home_products.json()["items"])
     assert deal_products.status_code == 200
-    assert {product["id"] for product in deal_products.json()["items"]} >= {"p02", "p06", "p07"}
+    assert {product["id"] for product in deal_products.json()["items"]} >= {"83781891828", "90975233454", "90649753925"}
     assert section_deals.status_code == 200
-    assert {product["id"] for product in section_deals.json()["items"]} >= {"p02", "p06", "p07"}
+    assert {product["id"] for product in section_deals.json()["items"]} >= {"83781891828", "90975233454", "90649753925"}
     assert section_new.status_code == 200
-    assert {product["id"] for product in section_new.json()["items"]} >= {"p01", "p03", "p04", "p08", "p11", "p12"}
+    assert {product["id"] for product in section_new.json()["items"]} >= {"90969885411", "91001952511", "90903501594"}
+
+
+def test_products_default_limit_is_capped_to_avoid_oversized_response() -> None:
+    # limit 미지정 시 전체 카탈로그(수만 개, ~25MB)를 반환하면 서버리스 응답 한도를 초과해 500이 난다.
+    default = client.get("/api/products")
+    assert default.status_code == 200
+    assert default.json()["count"] <= 100
+    # 상한(100)을 넘는 명시적 요청은 검증 오류(422)로 막는다.
+    over = client.get("/api/products", params={"limit": 1000})
+    assert over.status_code == 422
 
 
 def test_product_detail_endpoint_uses_stable_id() -> None:
-    response = client.get("/api/products/p01")
+    response = client.get("/api/products/89865177420")
     payload = response.json()
 
     assert response.status_code == 200
-    assert payload["id"] == "p01"
-    assert payload["brand"] == "NovaTech"
-    assert payload["name"] == "폴더블 무선 충전 거치대 3 in 1"
+    assert payload["id"] == "89865177420"
+    assert payload["brand"] == "서플라이루트"
+    assert payload["name"] == "건지울른스 슈퍼 파인 메리노울 라운드넥 가디건 - 네이비"
 
 
 def test_missing_product_returns_404() -> None:
@@ -76,7 +87,7 @@ def test_search_endpoint() -> None:
     assert response.status_code == 200
     assert payload["query"] == "선풍기"
     assert payload["count"] >= 1
-    assert payload["items"][0]["id"] == "p04"
+    assert payload["items"][0]["id"] == "83142579120"
 
 
 def test_trending_and_suggestions_endpoints() -> None:
@@ -110,8 +121,8 @@ def test_order_endpoint_accepts_selected_cart_lines() -> None:
         "/api/orders",
         json={
             "items": [
-                {"product_id": "p01", "quantity": 2},
-                {"product_id": "p02", "quantity": 1},
+                {"product_id": "89865177420", "quantity": 2},
+                {"product_id": "83781891828", "quantity": 1},
             ]
         },
     )
@@ -121,8 +132,8 @@ def test_order_endpoint_accepts_selected_cart_lines() -> None:
     assert response.status_code == 202
     assert payload["accepted"] is True
     assert payload["item_count"] == 3
-    assert payload["total_price"] == (24900 * 2) + 12900
-    assert payload["items"][0]["product_id"] == "p01"
+    assert payload["total_price"] == (142400 * 2) + 49900
+    assert payload["items"][0]["product_id"] == "89865177420"
 
 
 def test_order_endpoint_rejects_invalid_or_missing_product() -> None:
@@ -163,4 +174,4 @@ def test_cors_allows_flutter_web_localhost() -> None:
     )
 
     assert response.status_code == 200
-    assert response.headers["access-control-allow-origin"] == "http://localhost:8080"
+    assert response.headers["access-control-allow-origin"] == "*"

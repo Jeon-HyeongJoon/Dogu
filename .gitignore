@@ -19,7 +19,23 @@ backend/app/data/dogu.db
 # macOS
 .DS_Store
 
+# Tooling / local sessions
+.claude/
+.omo/
+
+# Vercel
+.vercel/
+app/.vercel/
+backend/.vercel/
+
+# Preview screenshots (scratch)
+vercel-*.png
+
 # 디자인 에셋
 design.zip
 design/
 images/
+
+# Local environment overrides
+backend/.env.local
+app/.env.local

@@ -1,0 +1,36 @@
+name: dogu_mobile_shop
+description: Flutter source port of the 욕망의장바구니 five-tab mobile shopping app.
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo-square.png
+    - assets/seed.json
+    # 폰트를 fonts:가 아닌 assets:로 등록 — 엔진 FontManifest 프리로드(웹 첫 페인트 차단/이중 로드)를 피하고
+    # 런타임 FontLoader로만 'Pretendard'를 등록한다. (bootstrap이 첫 프레임 이후 비차단 로드)
+    - assets/fonts/pretendard/Pretendard-Regular.otf
+    - assets/fonts/pretendard/Pretendard-SemiBold.otf
+    - assets/fonts/pretendard/Pretendard-Bold.otf
+    - assets/fonts/pretendard/Pretendard-ExtraBold.otf
+    # NanumSquareRound도 Pretendard와 동일하게 assets:로만 등록 → 런타임 FontLoader가 굵기별로 로드
+    # (fonts:로 등록 시 웹 CanvasKit에서 다중 굵기 매칭이 어긋나 굵기가 적용되지 않는 문제 회피)
+    - assets/fonts/nanumsquareround/NanumSquareRoundL.ttf
+    - assets/fonts/nanumsquareround/NanumSquareRoundR.ttf
+    - assets/fonts/nanumsquareround/NanumSquareRoundB.ttf
+    - assets/fonts/nanumsquareround/NanumSquareRoundEB.ttf

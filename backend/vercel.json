@@ -4,13 +4,10 @@
     {
       "src": "api/index.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "50mb" }
+      "config": { "maxLambdaSize": "150mb" }
     }
   ],
   "routes": [
     { "src": "/(.*)", "dest": "api/index.py" }
-  ],
-  "env": {
-    "DOGU_DB_PATH": "app/data/slim.db"
-  }
+  ]
 }
