@@ -12,7 +12,8 @@ app/.dart_tool/
 app/.flutter-plugins
 app/.flutter-plugins-dependencies
 
-# Database (전체 DB는 git 제외, slim.db만 포함)
+# Database — the full crawled DB is git-excluded; CI/tests use the small
+# committed app/data/test_fixture.db instead.
 backend/dogu.db
 backend/app/data/dogu.db
 

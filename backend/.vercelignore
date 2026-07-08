@@ -1,7 +1,6 @@
 datacrawler/
 tests/
 scripts/
-app/data/slim.db
 dogu.db
 pyproject.toml
 README.md
