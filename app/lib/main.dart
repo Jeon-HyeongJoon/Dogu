@@ -5,8 +5,12 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'src/url_strategy_stub.dart'
+    if (dart.library.html) 'src/url_strategy_web.dart';
 
 
 part 'src/core.dart';
@@ -55,6 +59,7 @@ Future<void> bootstrap({
   Future<void> Function()? loadEssentialFont,
 }) async {
   WidgetsFlutterBinding.ensureInitialized();
+  configureUrlStrategy();
   // 한글 두부 박스 방지: 필수 폰트는 첫 페인트 전에 등록(실패해도 fallback으로 계속)
   await (loadEssentialFont ?? loadDoguEssentialFont)().catchError(_onFontLoadError);
   runner(const DoguApp());

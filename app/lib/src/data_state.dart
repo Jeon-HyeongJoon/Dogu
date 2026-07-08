@@ -715,105 +715,100 @@ class AppStateScope extends InheritedNotifier<AppStore> {
 }
 
 class AppShell extends StatefulWidget {
-  const AppShell({this.initialIndex = 0, super.key});
+  const AppShell({required this.navigationShell, super.key});
 
-  final int initialIndex;
+  // go_router StatefulShellRoute가 제공하는 탭(IndexedStack) 셸.
+  final StatefulNavigationShell navigationShell;
 
   @override
   State<AppShell> createState() => _AppShellState();
 }
 
 class _AppShellState extends State<AppShell> {
-  late int _currentIndex;
-  // 방문한 탭 순서 기록 — 뒤로가기로 이전 탭을 복원하기 위함
-  late List<int> _tabHistory;
+  int get _currentIndex => widget.navigationShell.currentIndex;
+
+  // 방문한 탭 순서 — 시스템/브라우저 뒤로가기로 이전 탭을 복원하기 위함.
+  // go_router가 탭별 URL(딥링크)을 관리하고, 이 히스토리가 앱 내 뒤로가기를 처리한다.
+  late final List<int> _tabHistory = [_currentIndex];
 
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialIndex;
-    _tabHistory = [widget.initialIndex];
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _syncCheckoutBar();
-    });
+    _scheduleCheckoutBarSync();
+  }
+
+  @override
+  void didUpdateWidget(AppShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 탭이 바뀌면(라우터가 새 navigationShell을 전달) 결제바 노출 상태를 다시 맞춘다.
+    _scheduleCheckoutBarSync();
   }
 
   // 결제바(CheckoutBar) 노출 여부를 스토어에 반영 — 전역 토스트 위치 결정에 사용
-  void _syncCheckoutBar() {
-    AppStateScope.read(context).setCheckoutBarVisible(_currentIndex == 4);
-  }
-
-  // 탭 전환 — 히스토리에 쌓아 뒤로가기로 되돌아갈 수 있게 한다
-  void _goToTab(int index) {
-    if (index == _currentIndex) return;
-    setState(() {
-      _tabHistory.add(index);
-      _currentIndex = index;
+  void _scheduleCheckoutBarSync() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        AppStateScope.read(context).setCheckoutBarVisible(_currentIndex == 4);
+      }
     });
-    _syncCheckoutBar();
   }
 
-  // 뒤로가기: 탭 히스토리가 남아 있으면 이전 탭으로 복원(앱을 벗어나지 않음)
+  // 탭 전환 — go_router 브랜치로 이동(URL이 바뀌어 브라우저 뒤로가기가 동작한다).
+  // 같은 탭을 다시 누르면 해당 탭을 초기 위치로 리셋한다.
+  void _goToTab(int index) {
+    if (index != _currentIndex) {
+      _tabHistory.add(index);
+    }
+    widget.navigationShell.goBranch(index, initialLocation: index == _currentIndex);
+  }
+
+  // 뒤로가기: 방문 히스토리가 남아 있으면 이전 탭으로 복원(앱을 벗어나지 않음)
   void _handleBack(bool didPop, Object? result) {
     if (didPop || _tabHistory.length <= 1) return;
-    setState(() {
-      _tabHistory.removeLast();
-      _currentIndex = _tabHistory.last;
-    });
-    _syncCheckoutBar();
+    setState(() => _tabHistory.removeLast());
+    widget.navigationShell.goBranch(_tabHistory.last);
   }
 
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
-    final contentBottomPadding = AppSpace.tabHeight + bottomInset + 18;
-    final cartBottomPadding = contentBottomPadding + AppSpace.checkoutHeight + 18;
 
     return PopScope(
       // 탭 히스토리가 남아 있으면 뒤로가기를 가로채 이전 탭으로 복원
       canPop: _tabHistory.length <= 1,
       onPopInvokedWithResult: _handleBack,
       child: Scaffold(
-      body: Container(
-        color: AppColors.bg,
-        child: SafeArea(
-          top: true,
-          bottom: false,
-          child: AppNavigationScope(
-            selectTab: _goToTab,
-            currentTab: _currentIndex,
-            child: Stack(
-              children: [
-                IndexedStack(
-                  index: _currentIndex,
-                  children: [
-                    HomePage(bottomPadding: contentBottomPadding),
-                    CategoryTabPage(bottomPadding: contentBottomPadding),
-                    SearchTabPage(bottomPadding: contentBottomPadding),
-                    WishTabPage(bottomPadding: contentBottomPadding),
-                    CartTabPage(bottomPadding: cartBottomPadding),
-                  ],
-                ),
-                if (_currentIndex == 4)
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: AppSpace.tabHeight + bottomInset,
-                    child: const CheckoutBar(),
+        body: Container(
+          color: AppColors.bg,
+          child: SafeArea(
+            top: true,
+            bottom: false,
+            child: AppNavigationScope(
+              selectTab: _goToTab,
+              currentTab: _currentIndex,
+              child: Stack(
+                children: [
+                  widget.navigationShell,
+                  if (_currentIndex == 4)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: AppSpace.tabHeight + bottomInset,
+                      child: const CheckoutBar(),
+                    ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: BottomTabs(
+                      currentIndex: _currentIndex,
+                      bottomInset: bottomInset,
+                      onTap: _goToTab,
+                    ),
                   ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: BottomTabs(
-                    currentIndex: _currentIndex,
-                    bottomInset: bottomInset,
-                    onTap: _goToTab,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
