@@ -392,32 +392,32 @@ class ProductItem {
   bool get hasDiscount => numericOldPrice > numericPrice;
 }
 
+/// Canonical category-key aliases — the single source of truth mapping every
+/// raw seed id, English key, and Korean display name to its canonical key.
+/// Both `_normalizeCategoryKey` (id/name → key) and the category-list name
+/// lookup derive from this map, so a new category is declared in exactly one
+/// place instead of being duplicated across normalization helpers.
+const Map<String, String> _categoryKeyByAlias = {
+  'fashion': 'clothing',
+  'clothing': 'clothing',
+  '의류': 'clothing',
+  'gadget': 'tech',
+  'tech': 'tech',
+  '전자제품': 'tech',
+  'home': 'home',
+  'home_living': 'home',
+  '홈·리빙': 'home',
+  'beauty': 'beauty',
+  '뷰티': 'beauty',
+  'sports': 'sports',
+  '스포츠': 'sports',
+  'kids': 'kids',
+  '키즈': 'kids',
+};
+
 String _normalizeCategoryKey(String raw) {
-  switch (raw.trim().toLowerCase()) {
-    case 'fashion':
-    case 'clothing':
-    case '의류':
-      return 'clothing';
-    case 'gadget':
-    case 'tech':
-    case '전자제품':
-      return 'tech';
-    case 'home':
-    case 'home_living':
-    case '홈·리빙':
-      return 'home';
-    case 'beauty':
-    case '뷰티':
-      return 'beauty';
-    case 'sports':
-    case '스포츠':
-      return 'sports';
-    case 'kids':
-    case '키즈':
-      return 'kids';
-    default:
-      return raw.trim().toLowerCase();
-  }
+  final key = raw.trim().toLowerCase();
+  return _categoryKeyByAlias[key] ?? key;
 }
 
 String _inferCategoryKey(String name, String brand) {

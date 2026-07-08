@@ -9,7 +9,7 @@ class CategoryListBlock extends StatelessWidget {
     final selectedCategoryKey = AppStateScope.watch(context).selectedCategoryKey;
     final visibleRows = selectedCategoryKey == null
         ? rows
-        : rows.where((row) => (row.id.isEmpty ? _categoryKeyFromName(row.name) : _normalizeCategoryKey(row.id)) == selectedCategoryKey).toList();
+        : rows.where((row) => _normalizeCategoryKey(row.id.isEmpty ? row.name : row.id) == selectedCategoryKey).toList();
     return Column(
       children: [
         for (var i = 0; i < visibleRows.length; i++)
@@ -17,7 +17,7 @@ class CategoryListBlock extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             onTap: () {
               AppStateScope.read(context).setCategoryQuickFilter('all');
-              AppStateScope.read(context).selectCategoryBrowse(visibleRows[i].id.isEmpty ? _categoryKeyFromName(visibleRows[i].name) : _normalizeCategoryKey(visibleRows[i].id));
+              AppStateScope.read(context).selectCategoryBrowse(_normalizeCategoryKey(visibleRows[i].id.isEmpty ? visibleRows[i].name : visibleRows[i].id));
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad, vertical: 14),
@@ -46,21 +46,6 @@ class CategoryListBlock extends StatelessWidget {
           ),
       ],
     );
-  }
-}
-
-String? _categoryKeyFromName(String name) {
-  switch (name) {
-    case '의류':
-      return 'clothing';
-    case '홈·리빙':
-      return 'home';
-    case '전자제품':
-      return 'tech';
-    case '뷰티':
-      return 'beauty';
-    default:
-      return null;
   }
 }
 
