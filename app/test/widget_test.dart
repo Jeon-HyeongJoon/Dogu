@@ -88,6 +88,51 @@ void main() {
     expect(product.artwork?.motif, 'circle');
   });
 
+  // ── [ssot] 카테고리 키 매핑 단일 원천 ──
+  // raw seed id·영문 키·한글 표시명이 모두 하나의 정규 키로 매핑되는지 public API로 고정.
+  // (과거 `_categoryKeyFromName` 중복 구현은 스포츠/키즈 한글명을 누락했다 — 통일 후 회귀 방지.)
+  test('normalizes every category alias to its canonical key via ProductItem.fromJson', () {
+    const expected = <String, String>{
+      'fashion': 'clothing',
+      'clothing': 'clothing',
+      '의류': 'clothing',
+      'gadget': 'tech',
+      'tech': 'tech',
+      '전자제품': 'tech',
+      'home': 'home',
+      'home_living': 'home',
+      '홈·리빙': 'home',
+      'beauty': 'beauty',
+      '뷰티': 'beauty',
+      'sports': 'sports',
+      '스포츠': 'sports',
+      'kids': 'kids',
+      '키즈': 'kids',
+    };
+    expected.forEach((alias, key) {
+      final product = ProductItem.fromJson({
+        'id': 'p-$alias',
+        'name': 'x',
+        'brand': 'y',
+        'price': 1000,
+        'category_ids': [alias],
+      });
+      expect(product.categoryIds, [key], reason: 'alias "$alias" should normalize to "$key"');
+      expect(product.categoryKey, key, reason: 'categoryKey for "$alias" should be "$key"');
+    });
+  });
+
+  test('unknown category alias falls back to its lowercased raw value', () {
+    final product = ProductItem.fromJson(const {
+      'id': 'p-unknown',
+      'name': 'x',
+      'brand': 'y',
+      'price': 1000,
+      'category_ids': ['GARDEN'],
+    });
+    expect(product.categoryIds, ['garden']);
+  });
+
   testWidgets('DoguApp applies the bundled Korean font family', (tester) async {
     final store = AppStore(repository: _FakeRepository(results: const []));
 
