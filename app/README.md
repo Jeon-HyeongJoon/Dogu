@@ -19,16 +19,20 @@ The implementation keeps the original design DNA: a 390px-like centered mobile c
 ## v2 design (유희왕 마법 카드 테마)
 
 A v2 visual theme — modelled on the "욕망의 항아리 (Pot of Greed)" Yu-Gi-Oh! Spell
-card (teal frame, gold trim, cream effect panels, card-frame product tiles) — lives
-alongside v1 and is reachable at the **`/v2`** route. It reuses the same data
-(`AppStore`) and mirrors the v1 home layout, and is responsive for mobile and
-tablet widths. The design system is in `lib/src/v2_theme.dart`; the page is in
-`lib/src/v2_home.dart`.
+card (teal frame, gold trim, cream effect panels, card-frame product tiles,
+attribute badges, bracketed type-lines, corner set-codes) — lives alongside v1 and
+is reachable at the **`/v2`** route. It is a full five-tab app (홈·카테고리·검색·
+찜·장바구니) with a card-styled bottom tab bar, reuses the same data (`AppStore`),
+mirrors the v1 layout, and is responsive for mobile and tablet widths. Files:
+
+- `lib/src/v2_theme.dart` — design tokens (`V2Colors`/`V2Space`/`V2Text`) + card-frame component kit.
+- `lib/src/v2_home.dart` — v2 home body.
+- `lib/src/v2_shell.dart` — v2 shell, bottom tab bar, and the category/search/wish/cart tab bodies.
 
 Finished screens are snapshotted as golden images under `test/goldens/`
-(`v2_home_mobile.png`, `v2_home_tablet.png`). These golden tests are tagged
-`golden` and excluded from CI (font/anti-aliasing rendering differs across
-platforms); regenerate them locally with:
+(`v2_{home,category,search,wish,cart}_{mobile,tablet}.png`). These golden tests
+are tagged `golden` and excluded from CI (font/anti-aliasing rendering differs
+across platforms); regenerate them locally with:
 
 ```sh
 flutter test --update-goldens --tags golden
