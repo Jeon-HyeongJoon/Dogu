@@ -59,15 +59,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   void _goToCart() {
-    final onGoToCart = widget.onGoToCart;
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
+    // 상세는 루트 네비게이터에 push된 라우트이므로 /cart로 이동하면 상세가 닫히고
+    // 장바구니 탭이 열린다. 라우터가 없는 단독 테스트 환경에선 콜백으로 폴백한다.
+    if (GoRouter.maybeOf(context) != null) {
+      context.go('/cart');
+      return;
     }
-    if (onGoToCart != null) {
-      onGoToCart();
-    } else {
-      AppNavigationScope.select(context, 4);
-    }
+    widget.onGoToCart?.call();
   }
 
   @override

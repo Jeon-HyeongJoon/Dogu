@@ -1,5 +1,17 @@
 part of '../main.dart';
 
+// 상품 상세로 이동. 라우터가 있으면 딥링크 가능한 /product/:id 로 push하고,
+// (단독 위젯 테스트처럼) 라우터가 없으면 로컬 Navigator로 폴백한다.
+void openProductDetail(BuildContext context, ProductItem product) {
+  if (GoRouter.maybeOf(context) != null) {
+    context.push('/product/${product.id}', extra: product);
+  } else {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ProductDetailPage(product: product)),
+    );
+  }
+}
+
 class HomePage extends StatelessWidget {
   const HomePage({required this.bottomPadding, super.key});
   final double bottomPadding;
@@ -501,16 +513,7 @@ class FeaturedCard extends StatelessWidget {
             padding: const EdgeInsets.all(14),
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ProductDetailPage(
-                      product: featured,
-                      onGoToCart: () => AppNavigationScope.select(context, 4),
-                    ),
-                  ),
-                );
-              },
+              onTap: () => openProductDetail(context, featured),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -1110,14 +1113,7 @@ class _ProductCardState extends State<ProductCard> {
   bool _pressed = false;
 
   void _openDetail(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ProductDetailPage(
-          product: widget.product,
-          onGoToCart: () => AppNavigationScope.select(context, 4),
-        ),
-      ),
-    );
+    openProductDetail(context, widget.product);
   }
 
   @override

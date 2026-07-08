@@ -16,9 +16,26 @@ class DoguApp extends StatefulWidget {
   State<DoguApp> createState() => _DoguAppState();
 }
 
+// 5개 탭 라우트 경로 — 인덱스(0=홈 … 4=장바구니)와 1:1로 대응한다.
+const List<String> kTabPaths = ['/', '/category', '/search', '/wish', '/cart'];
+
+String pathForTabIndex(int index) =>
+    (index >= 0 && index < kTabPaths.length) ? kTabPaths[index] : kTabPaths.first;
+
+// 탭 콘텐츠 하단 여백 — 하단 탭바(+세이프에어리어)만큼 확보한다.
+double _tabContentBottomPadding(BuildContext context) {
+  final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+  return AppSpace.tabHeight + bottomInset + 18;
+}
+
+// 장바구니 탭은 결제바 높이만큼 여백을 더 준다.
+double _cartContentBottomPadding(BuildContext context) =>
+    _tabContentBottomPadding(context) + AppSpace.checkoutHeight + 18;
+
 class _DoguAppState extends State<DoguApp> {
   late final AppStore _store;
   late final bool _ownsStore;
+  late final GoRouter _router;
 
   @override
   void initState() {
@@ -28,10 +45,47 @@ class _DoguAppState extends State<DoguApp> {
     if (widget.initializeStore) {
       unawaited(_store.initialize());
     }
+    _router = _buildRouter(pathForTabIndex(widget.initialTabIndex));
+  }
+
+  GoRouter _buildRouter(String initialLocation) {
+    StatefulShellBranch tab(String path, Widget Function(BuildContext) build) {
+      return StatefulShellBranch(
+        routes: [GoRoute(path: path, builder: (context, state) => build(context))],
+      );
+    }
+
+    return GoRouter(
+      initialLocation: initialLocation,
+      routes: [
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) =>
+              AppShell(navigationShell: navigationShell),
+          branches: [
+            tab('/', (c) => HomePage(bottomPadding: _tabContentBottomPadding(c))),
+            tab('/category', (c) => CategoryTabPage(bottomPadding: _tabContentBottomPadding(c))),
+            tab('/search', (c) => SearchTabPage(bottomPadding: _tabContentBottomPadding(c))),
+            tab('/wish', (c) => WishTabPage(bottomPadding: _tabContentBottomPadding(c))),
+            tab('/cart', (c) => CartTabPage(bottomPadding: _cartContentBottomPadding(c))),
+          ],
+        ),
+        GoRoute(
+          path: '/product/:id',
+          builder: (context, state) {
+            final extra = state.extra;
+            final product = extra is ProductItem
+                ? extra
+                : AppStateScope.read(context).productById(state.pathParameters['id']!);
+            return ProductDetailPage(product: product);
+          },
+        ),
+      ],
+    );
   }
 
   @override
   void dispose() {
+    _router.dispose();
     if (_ownsStore) {
       _store.dispose();
     }
@@ -42,7 +96,7 @@ class _DoguAppState extends State<DoguApp> {
   Widget build(BuildContext context) {
     return AppStateScope(
       store: _store,
-      child: MaterialApp(
+      child: MaterialApp.router(
         title: '욕망의장바구니',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -57,7 +111,7 @@ class _DoguAppState extends State<DoguApp> {
             bodyMedium: TextStyle(color: AppColors.ink, height: 1.5),
           ),
         ),
-        home: AppShell(initialIndex: widget.initialTabIndex),
+        routerConfig: _router,
         // 전역 장바구니 토스트 — 모든 라우트 위에 떠서 결제바 유무에 따라 위치가 움직인다
         builder: (context, child) {
           return Stack(
