@@ -1,0 +1,498 @@
+part of '../main.dart';
+
+class DoguApp extends StatefulWidget {
+  const DoguApp({
+    super.key,
+    this.store,
+    this.initializeStore = true,
+    this.initialTabIndex = 0,
+  });
+
+  final AppStore? store;
+  final bool initializeStore;
+  final int initialTabIndex;
+
+  @override
+  State<DoguApp> createState() => _DoguAppState();
+}
+
+class _DoguAppState extends State<DoguApp> {
+  late final AppStore _store;
+  late final bool _ownsStore;
+
+  @override
+  void initState() {
+    super.initState();
+    _store = widget.store ?? AppStore();
+    _ownsStore = widget.store == null;
+    if (widget.initializeStore) {
+      unawaited(_store.initialize());
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_ownsStore) {
+      _store.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AppStateScope(
+      store: _store,
+      child: MaterialApp(
+        title: '욕망의장바구니',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          scaffoldBackgroundColor: AppColors.bg,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.accent,
+            surface: AppColors.bg,
+          ),
+          fontFamily: doguFontFamily,
+          textTheme: const TextTheme(
+            bodyMedium: TextStyle(color: AppColors.ink, height: 1.5),
+          ),
+        ),
+        home: AppShell(initialIndex: widget.initialTabIndex),
+        // 전역 장바구니 토스트 — 모든 라우트 위에 떠서 결제바 유무에 따라 위치가 움직인다
+        builder: (context, child) {
+          return Stack(
+            children: [
+              if (child != null) child,
+              const CartToast(),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class AppColors {
+  static const bg = Color(0xffffffff);
+  static const bgSoft = Color(0xfffafafa);
+  static const bgAlt = Color(0xfff4f4f3);
+  static const shell = Color(0xffededeb);
+  static const ink = Color(0xff0a0a0a);
+  static const ink2 = Color(0xff2a2a2a);
+  static const ink3 = Color(0xff6b6b6b);
+  static const ink4 = Color(0xffa3a3a3);
+  static const line = Color(0xffe6e6e5);
+  static const lineSoft = Color(0xffefefee);
+  static const accent = Color(0xff13402d);
+  static const accentSoft = Color(0xffeef4f0);
+  static const accentBright = Color(0xff1f8a5b);
+  static const accentDeep = Color(0xff14533a);
+  static const alert = Color(0xffff3b1f);
+  static const invert = Color(0xfffafafa);
+  // 메인 광고(히어로) 전용 — 진한 회색 배경 위 밝은 회색 글씨
+  static const heroBg = Color(0xff1c1c1c);
+  static const heroInk = Color(0xffd6d6d6);
+  static const heroInk2 = Color(0xffc2c2c2);
+  static const heroInk3 = Color(0xff9a9a9a);
+  static const heroLine = Color(0xff3a3a3a);
+  // eyebrow 태그(2026 SPRING DROP) — 밝은 회색 배경 + 검은 글씨
+  static const heroChip = Color(0xffd6d6d6);
+}
+
+
+class AppSpace {
+  static const pad = 20.0;
+  static const maxMobileWidth = 390.0;
+  static const tabHeight = 70.0;
+  static const checkoutHeight = 83.0;
+  // 상단 헤더 높이: IconBox(38) + 위 패딩 10 + 아래 패딩 4 — 메뉴 드롭다운이 타이틀 구간 아래로 내려오도록 기준
+  static const headerHeight = 52.0;
+}
+
+const monoStyle = TextStyle(
+  fontFamily: 'monospace',
+  fontFamilyFallback: [doguFontFamily],
+  letterSpacing: 0.1,
+);
+
+enum PatternKind { dots, grid, lines, checker, cross, wave, diag, halftone }
+
+class ApiConfig {
+  static String get baseUrl {
+    const override = String.fromEnvironment('API_BASE_URL');
+    if (override.isNotEmpty) return override;
+    return kIsWeb ? 'http://localhost:8000' : 'http://10.0.2.2:8000';
+  }
+
+  static String imageUrl(String? url) {
+    final trimmed = url?.trim() ?? '';
+    final uri = Uri.tryParse(trimmed);
+    final host = uri?.host.toLowerCase() ?? '';
+    if (host.endsWith('pstatic.net')) {
+      final base = Uri.parse(baseUrl);
+      return base.replace(path: '/api/proxy/image', queryParameters: {'url': trimmed}).toString();
+    }
+    return trimmed;
+  }
+
+  static bool canLoadImageDirectly(String? url) {
+    final host = Uri.tryParse(url?.trim() ?? '')?.host.toLowerCase() ?? '';
+    return host.isNotEmpty;
+  }
+}
+
+String formatWon(num value) {
+  final text = value.round().toString();
+  final buffer = StringBuffer();
+  for (var i = 0; i < text.length; i++) {
+    if (i > 0 && (text.length - i) % 3 == 0) buffer.write(',');
+    buffer.write(text[i]);
+  }
+  return '₩$buffer';
+}
+
+String? readString(Map<String, dynamic> json, List<String> keys) {
+  for (final key in keys) {
+    final value = json[key];
+    if (value != null && value.toString().trim().isNotEmpty) return value.toString();
+  }
+  return null;
+}
+
+num? readNum(Map<String, dynamic> json, List<String> keys) {
+  for (final key in keys) {
+    final value = json[key];
+    if (value is num) return value;
+    if (value is String) {
+      final parsed = num.tryParse(value.replaceAll(RegExp(r'[^0-9.]'), ''));
+      if (parsed != null) return parsed;
+    }
+  }
+  return null;
+}
+
+List<dynamic> readList(dynamic json, List<String> keys) {
+  if (json is List) return json;
+  if (json is Map<String, dynamic>) {
+    for (final key in keys) {
+      final value = json[key];
+      if (value is List) return value;
+    }
+  }
+  return const [];
+}
+
+PatternKind patternFor(String seed) {
+  final patterns = PatternKind.values;
+  return patterns[seed.codeUnits.fold<int>(0, (sum, code) => sum + code) % patterns.length];
+}
+
+class CategoryItem {
+  const CategoryItem(this.name, this.count, this.pattern, {this.id = '', this.description = '', this.tone = '', this.featured = false, this.imageUrl});
+  final String id;
+  final String name;
+  final String count;
+  final PatternKind pattern;
+  final String description;
+  final String tone;
+  final bool featured;
+  final String? imageUrl;
+
+  factory CategoryItem.fromJson(Map<String, dynamic> json) {
+    final id = readString(json, ['id', 'category_id', 'slug', 'key']) ?? '';
+    final name = readString(json, ['name', 'title', 'label', 'category']) ?? '카테고리';
+    final count = readString(json, ['count', 'product_count', 'products_count']) ?? '0';
+    return CategoryItem(
+      name,
+      count,
+      patternFor(id.isEmpty ? name : id),
+      id: id,
+      description: readString(json, ['description', 'subtitle', 'summary']) ?? '',
+      tone: readString(json, ['tone']) ?? '',
+      featured: json['featured'] == true,
+      imageUrl: readString(json, ['image_url', 'imageUrl', 'image']),
+    );
+  }
+}
+
+class ProductArtwork {
+  const ProductArtwork({
+    required this.hue,
+    required this.saturation,
+    required this.lightness,
+    required this.mono,
+    required this.motif,
+  });
+
+  final int hue;
+  final int saturation;
+  final int lightness;
+  final String mono;
+  final String motif;
+
+  factory ProductArtwork.fromJson(Map<String, dynamic> json) {
+    return ProductArtwork(
+      hue: (json['hue'] as num?)?.round() ?? 0,
+      saturation: (json['saturation'] as num?)?.round() ?? 0,
+      lightness: (json['lightness'] as num?)?.round() ?? 70,
+      mono: readString(json, ['mono']) ?? '◦',
+      motif: readString(json, ['motif']) ?? 'circle',
+    );
+  }
+}
+
+class SearchTrend {
+  const SearchTrend({required this.term, required this.movement});
+
+  final String term;
+  final String movement;
+
+  factory SearchTrend.fromJson(Map<String, dynamic> json) {
+    return SearchTrend(
+      term: readString(json, ['term', 'query', 'name', 'title']) ?? '',
+      movement: readString(json, ['movement', 'delta', 'change']) ?? '— 유지',
+    );
+  }
+}
+
+class ProductItem {
+  const ProductItem({
+    required this.id,
+    required this.brand,
+    required this.name,
+    required this.price,
+    required this.oldPrice,
+    required this.discount,
+    required this.pattern,
+    this.categoryKey = 'all',
+    this.categoryIds = const [],
+    this.imageUrl,
+    this.badge,
+    this.subtitle = '',
+    this.blurb = '',
+    this.rating = 4.8,
+    this.reviews = 0,
+    this.tags = const [],
+    this.artwork,
+    this.meta = '4.8 · 12K',
+  });
+
+  final String id;
+  final String brand;
+  final String name;
+  final String price;
+  final String oldPrice;
+  final String discount;
+  final PatternKind pattern;
+  final String categoryKey;
+  final List<String> categoryIds;
+  final String? imageUrl;
+  final String? badge;
+  final String subtitle;
+  final String blurb;
+  final double rating;
+  final int reviews;
+  final List<String> tags;
+  final ProductArtwork? artwork;
+  final String meta;
+
+  factory ProductItem.fromJson(Map<String, dynamic> json) {
+    final id = readString(json, ['id', 'product_id', 'sku', 'slug']) ?? readString(json, ['name', 'title']) ?? 'product';
+    final name = readString(json, ['name', 'title', 'product_name']) ?? '이름 없는 상품';
+    final brand = readString(json, ['brand', 'brand_name', 'maker', 'vendor']) ?? 'Dogu';
+    final subtitle = readString(json, ['subtitle', 'summary', 'sub_title']) ?? '';
+    final salePrice = readString(json, ['price_text', 'sale_price_text']) ?? formatWon(readNum(json, ['sale_price', 'price', 'current_price']) ?? 0);
+    final oldPrice = readString(json, ['old_price_text', 'original_price_text', 'compare_at_price_text']) ?? formatWon(readNum(json, ['old_price', 'original_price', 'compare_at_price']) ?? readNum(json, ['sale_price', 'price', 'current_price']) ?? 0);
+    final discountText = readString(json, ['discount_text', 'discount', 'discount_label']);
+    final discountNum = readNum(json, ['discount_percent', 'discount_rate']);
+    final categoryIds = readList(json, ['category_ids', 'categories']).map((item) => item.toString()).where((id) => id.isNotEmpty).toList();
+    final normalizedCategoryIds = categoryIds.map(_normalizeCategoryKey).toList();
+    final rating = (readNum(json, ['rating']) ?? 4.8).toDouble();
+    final reviews = (readNum(json, ['reviews', 'review_count']) ?? 0).round();
+    final tags = readList(json, ['tags']).map((item) => item.toString()).where((tag) => tag.isNotEmpty).toList();
+    final artworkJson = json['artwork'];
+    return ProductItem(
+      id: id,
+      brand: brand,
+      name: name,
+      price: salePrice,
+      oldPrice: oldPrice,
+      discount: discountText ?? (discountNum == null ? '-0%' : '-${discountNum.round()}%'),
+      pattern: patternFor(id),
+      categoryKey: readString(json, ['cat', 'category_key', 'categoryKey', 'category'])?.trim().toLowerCase() ?? (normalizedCategoryIds.isNotEmpty ? normalizedCategoryIds.first : _inferCategoryKey(name, brand)),
+      categoryIds: normalizedCategoryIds,
+      imageUrl: readString(json, ['image_url', 'imageUrl', 'image', 'thumbnail_url', 'thumbnail', 'photo_url', 'photo']),
+      badge: readString(json, ['badge', 'label', 'tag']),
+      subtitle: subtitle,
+      blurb: readString(json, ['blurb', 'description', 'body']) ?? '',
+      rating: rating,
+      reviews: reviews,
+      tags: tags,
+      artwork: artworkJson is Map ? ProductArtwork.fromJson(Map<String, dynamic>.from(artworkJson)) : null,
+      meta: readString(json, ['meta', 'rating_text']) ?? '${rating.toStringAsFixed(1)} · ${reviews > 0 ? '$reviews reviews' : (subtitle.isNotEmpty ? subtitle : 'NEW')}',
+    );
+  }
+
+  int get numericPrice => int.tryParse(price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+  int get numericOldPrice => int.tryParse(oldPrice.replaceAll(RegExp(r'[^0-9]'), '')) ?? numericPrice;
+  bool get hasDiscount => numericOldPrice > numericPrice;
+}
+
+String _normalizeCategoryKey(String raw) {
+  switch (raw.trim().toLowerCase()) {
+    case 'fashion':
+    case 'clothing':
+    case '의류':
+      return 'clothing';
+    case 'gadget':
+    case 'tech':
+    case '전자제품':
+      return 'tech';
+    case 'home':
+    case 'home_living':
+    case '홈·리빙':
+      return 'home';
+    case 'beauty':
+    case '뷰티':
+      return 'beauty';
+    case 'sports':
+    case '스포츠':
+      return 'sports';
+    case 'kids':
+    case '키즈':
+      return 'kids';
+    default:
+      return raw.trim().toLowerCase();
+  }
+}
+
+String _inferCategoryKey(String name, String brand) {
+  final haystack = '$name $brand'.toLowerCase();
+  if (RegExp(r'셔츠|후드|니트|티|집업|beanie|hoodie|crew|overshirt').hasMatch(haystack)) return 'clothing';
+  if (RegExp(r'머그|디퓨저|노트|의자|lamp|mug|diffuser|notebook|desk|홈|리빙').hasMatch(haystack)) return 'home';
+  if (RegExp(r'충전|speaker|이어|모니터|fan|bottle|tech|스피커|보온병|선풍기').hasMatch(haystack)) return 'tech';
+  if (RegExp(r'cream|beauty|페이셜|크림').hasMatch(haystack)) return 'beauty';
+  return 'all';
+}
+
+const fallbackCategories = [
+  CategoryItem('의류', '412', PatternKind.dots),
+  CategoryItem('전자제품', '186', PatternKind.grid),
+  CategoryItem('홈·리빙', '298', PatternKind.lines),
+  CategoryItem('뷰티', '154', PatternKind.checker),
+  CategoryItem('스포츠', '87', PatternKind.cross),
+  CategoryItem('키즈', '112', PatternKind.wave),
+];
+
+const fallbackDealProducts = [
+  ProductItem(
+    id: 'deal-lumio-lamp',
+    brand: 'Lumio',
+    name: 'LED 무드 테이블 램프',
+    price: '₩12,900',
+    oldPrice: '₩32,000',
+    discount: '-60%',
+    pattern: PatternKind.grid,
+    categoryKey: 'home',
+    badge: 'TODAY',
+    meta: '07:42 left',
+  ),
+  ProductItem(
+    id: 'deal-glowlab-cream',
+    brand: 'GlowLab',
+    name: '콜라겐 페이셜 크림',
+    price: '₩18,000',
+    oldPrice: '₩39,000',
+    discount: '-53%',
+    pattern: PatternKind.dots,
+    categoryKey: 'beauty',
+    badge: 'BEAUTY',
+    meta: '8560 reviews',
+  ),
+  ProductItem(
+    id: 'deal-outly-lantern',
+    brand: 'Outly',
+    name: '캠핑용 LED 충전식 랜턴',
+    price: '₩19,800',
+    oldPrice: '₩38,000',
+    discount: '-48%',
+    pattern: PatternKind.wave,
+    categoryKey: 'tech',
+    badge: 'LIMITED',
+    meta: 'IPX4',
+  ),
+];
+
+const fallbackNewProducts = [
+  ProductItem(
+    id: 'new-novatech-charger',
+    brand: 'NovaTech',
+    name: '폴더블 무선 충전 거치대 3 in 1',
+    price: '₩24,900',
+    oldPrice: '₩49,000',
+    discount: '-49%',
+    pattern: PatternKind.cross,
+    categoryKey: 'tech',
+    badge: 'BEST',
+    meta: '4.8 · 12K',
+  ),
+  ProductItem(
+    id: 'new-thermogo-bottle',
+    brand: 'ThermoGo',
+    name: '스테인리스 진공 보온병 1L',
+    price: '₩14,500',
+    oldPrice: '₩28,000',
+    discount: '-48%',
+    pattern: PatternKind.lines,
+    categoryKey: 'tech',
+    meta: '24H warm',
+  ),
+  ProductItem(
+    id: 'new-breezy-fan',
+    brand: 'Breezy',
+    name: '미니 휴대용 핸디 선풍기',
+    price: '₩9,800',
+    oldPrice: '₩19,900',
+    discount: '-51%',
+    pattern: PatternKind.dots,
+    categoryKey: 'tech',
+    badge: 'NEW',
+    meta: '6h battery',
+  ),
+  ProductItem(
+    id: 'new-dailyfits-hoodie',
+    brand: 'Daily.fits',
+    name: '오버사이즈 코튼 후드 집업',
+    price: '₩22,000',
+    oldPrice: '₩45,000',
+    discount: '-51%',
+    pattern: PatternKind.checker,
+    categoryKey: 'clothing',
+    badge: 'NEW',
+    meta: 'unisex',
+  ),
+  ProductItem(
+    id: 'new-ergosit-chair',
+    brand: 'ErgoSit',
+    name: '오피스 인체공학 메쉬 의자',
+    price: '₩89,000',
+    oldPrice: '₩159,000',
+    discount: '-44%',
+    pattern: PatternKind.diag,
+    categoryKey: 'home',
+    badge: 'LIMITED',
+    meta: '5yr care',
+  ),
+  ProductItem(
+    id: 'new-flowline-yoga-mat',
+    brand: 'FlowLine',
+    name: '실리콘 미끄럼방지 요가 매트 6mm',
+    price: '₩21,800',
+    oldPrice: '₩49,000',
+    discount: '-56%',
+    pattern: PatternKind.wave,
+    categoryKey: 'beauty',
+    meta: '6mm',
+  ),
+];
+
