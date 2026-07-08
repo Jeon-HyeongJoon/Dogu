@@ -429,124 +429,42 @@ String _inferCategoryKey(String name, String brand) {
   return 'all';
 }
 
-const fallbackCategories = [
-  CategoryItem('의류', '412', PatternKind.dots),
-  CategoryItem('전자제품', '186', PatternKind.grid),
-  CategoryItem('홈·리빙', '298', PatternKind.lines),
-  CategoryItem('뷰티', '154', PatternKind.checker),
-  CategoryItem('스포츠', '87', PatternKind.cross),
-  CategoryItem('키즈', '112', PatternKind.wave),
-];
+// instant-paint 0ms 첫 프레임 + seed·backend 모두 빈/실패 시의 최후 방어용 fallback 카탈로그.
+// 손으로 옮겨 적던 카탈로그 중복을 없애고 단일 원천 seed.json에서 파생한다:
+// bundled_seed.g.dart(sync_seed.py가 canonical seed.json에서 생성)의 임베드 JSON을
+// 동기 파싱해 기존 fromJson으로 만든다(분류/분할 로직은 LocalSeedSource와 동일).
+final Map<String, dynamic> _bundledSeed = () {
+  final decoded = jsonDecode(kBundledSeedJson);
+  return decoded is Map<String, dynamic> ? decoded : <String, dynamic>{};
+}();
 
-const fallbackDealProducts = [
-  ProductItem(
-    id: 'deal-lumio-lamp',
-    brand: 'Lumio',
-    name: 'LED 무드 테이블 램프',
-    price: '₩12,900',
-    oldPrice: '₩32,000',
-    discount: '-60%',
-    pattern: PatternKind.grid,
-    categoryKey: 'home',
-    badge: 'TODAY',
-    meta: '07:42 left',
-  ),
-  ProductItem(
-    id: 'deal-glowlab-cream',
-    brand: 'GlowLab',
-    name: '콜라겐 페이셜 크림',
-    price: '₩18,000',
-    oldPrice: '₩39,000',
-    discount: '-53%',
-    pattern: PatternKind.dots,
-    categoryKey: 'beauty',
-    badge: 'BEAUTY',
-    meta: '8560 reviews',
-  ),
-  ProductItem(
-    id: 'deal-outly-lantern',
-    brand: 'Outly',
-    name: '캠핑용 LED 충전식 랜턴',
-    price: '₩19,800',
-    oldPrice: '₩38,000',
-    discount: '-48%',
-    pattern: PatternKind.wave,
-    categoryKey: 'tech',
-    badge: 'LIMITED',
-    meta: 'IPX4',
-  ),
-];
+Map<String, Map<String, dynamic>> _bundledSeedProductsById() {
+  final result = <String, Map<String, dynamic>>{};
+  for (final raw in readList(_bundledSeed, ['products']).whereType<Map>()) {
+    final map = Map<String, dynamic>.from(raw);
+    final id = readString(map, ['id', 'product_id', 'sku', 'slug']);
+    if (id != null) result[id] = map;
+  }
+  return result;
+}
 
-const fallbackNewProducts = [
-  ProductItem(
-    id: 'new-novatech-charger',
-    brand: 'NovaTech',
-    name: '폴더블 무선 충전 거치대 3 in 1',
-    price: '₩24,900',
-    oldPrice: '₩49,000',
-    discount: '-49%',
-    pattern: PatternKind.cross,
-    categoryKey: 'tech',
-    badge: 'BEST',
-    meta: '4.8 · 12K',
-  ),
-  ProductItem(
-    id: 'new-thermogo-bottle',
-    brand: 'ThermoGo',
-    name: '스테인리스 진공 보온병 1L',
-    price: '₩14,500',
-    oldPrice: '₩28,000',
-    discount: '-48%',
-    pattern: PatternKind.lines,
-    categoryKey: 'tech',
-    meta: '24H warm',
-  ),
-  ProductItem(
-    id: 'new-breezy-fan',
-    brand: 'Breezy',
-    name: '미니 휴대용 핸디 선풍기',
-    price: '₩9,800',
-    oldPrice: '₩19,900',
-    discount: '-51%',
-    pattern: PatternKind.dots,
-    categoryKey: 'tech',
-    badge: 'NEW',
-    meta: '6h battery',
-  ),
-  ProductItem(
-    id: 'new-dailyfits-hoodie',
-    brand: 'Daily.fits',
-    name: '오버사이즈 코튼 후드 집업',
-    price: '₩22,000',
-    oldPrice: '₩45,000',
-    discount: '-51%',
-    pattern: PatternKind.checker,
-    categoryKey: 'clothing',
-    badge: 'NEW',
-    meta: 'unisex',
-  ),
-  ProductItem(
-    id: 'new-ergosit-chair',
-    brand: 'ErgoSit',
-    name: '오피스 인체공학 메쉬 의자',
-    price: '₩89,000',
-    oldPrice: '₩159,000',
-    discount: '-44%',
-    pattern: PatternKind.diag,
-    categoryKey: 'home',
-    badge: 'LIMITED',
-    meta: '5yr care',
-  ),
-  ProductItem(
-    id: 'new-flowline-yoga-mat',
-    brand: 'FlowLine',
-    name: '실리콘 미끄럼방지 요가 매트 6mm',
-    price: '₩21,800',
-    oldPrice: '₩49,000',
-    discount: '-56%',
-    pattern: PatternKind.wave,
-    categoryKey: 'beauty',
-    meta: '6mm',
-  ),
-];
+List<ProductItem> _bundledHomeProducts(String idsKey) {
+  final home = _bundledSeed['home'] is Map
+      ? Map<String, dynamic>.from(_bundledSeed['home'] as Map)
+      : const <String, dynamic>{};
+  final byId = _bundledSeedProductsById();
+  return readList(home, [idsKey])
+      .map((e) => byId[e.toString()])
+      .whereType<Map<String, dynamic>>()
+      .map(ProductItem.fromJson)
+      .toList();
+}
+
+final List<CategoryItem> fallbackCategories = readList(_bundledSeed, ['categories'])
+    .whereType<Map>()
+    .map((e) => CategoryItem.fromJson(Map<String, dynamic>.from(e)))
+    .toList();
+
+final List<ProductItem> fallbackDealProducts = _bundledHomeProducts('deal_product_ids');
+final List<ProductItem> fallbackNewProducts = _bundledHomeProducts('new_product_ids');
 

@@ -19,6 +19,7 @@ part 'src/home_widgets.dart';
 part 'src/pages.dart';
 part 'src/blocks.dart';
 part 'src/misc_widgets.dart';
+part 'src/bundled_seed.g.dart';
 
 const doguFontFamily = 'Pretendard';
 const doguFontAssets = <String>[

@@ -64,9 +64,11 @@ flutter test
 
 ## Seed data (single source of truth)
 
-The catalog seed has one canonical file, `backend/app/data/seed.json`. The
-Flutter app bundles a byte-for-byte mirror at `app/assets/seed.json` for its
-offline fallback. Edit the canonical file, then re-mirror and commit both:
+The catalog seed has one canonical file, `backend/app/data/seed.json`. Two
+build-time copies are derived from it (never hand-edited): `app/assets/seed.json`
+(the bundled async offline source) and `app/lib/src/bundled_seed.g.dart` (the
+same JSON embedded so the app can build its synchronous fallback catalog). Edit
+the canonical file, then regenerate the derived copies and commit them:
 
 ```sh
 python3 scripts/sync_seed.py          # canonical -> app mirror

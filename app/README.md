@@ -9,10 +9,12 @@ The implementation keeps the original design DNA: a 390px-like centered mobile c
 - `pubspec.yaml` declares the Flutter app, logo asset, `http`, and `shared_preferences`.
 - `lib/main.dart` contains the safe-area tab shell, five visual pages, design tokens, API models/repository, local persisted app state, fallback seed data, widgets, and custom pattern painters.
 - `assets/logo-square.png` is copied from `../design/assets/logo-square.png`.
-- `assets/seed.json` is a **generated mirror** of the canonical backend seed
-  (`../backend/app/data/seed.json`), used for the offline instant-paint
-  fallback. Do not hand-edit it — edit the canonical file and re-mirror with
-  `python3 ../scripts/sync_seed.py` from the repo root. CI fails if it drifts.
+- `assets/seed.json` and `lib/src/bundled_seed.g.dart` are **generated** from the
+  canonical backend seed (`../backend/app/data/seed.json`) for the offline
+  instant-paint fallback (the asset is the async source; the `.g.dart` embeds the
+  JSON for the synchronous 0ms/last-resort fallback catalog). Do not hand-edit
+  them — edit the canonical file and regenerate with `python3 ../scripts/sync_seed.py`
+  from the repo root. CI fails if either drifts.
 
 ## Backend integration
 
