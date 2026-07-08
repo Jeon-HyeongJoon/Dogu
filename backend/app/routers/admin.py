@@ -1,11 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import HTMLResponse
 
 from app.models import SeedData
 from app.repository import repository
+from app.security import require_admin
 
 
-router = APIRouter(tags=["admin"])
+router = APIRouter(tags=["admin"], dependencies=[Depends(require_admin)])
 
 
 @router.get("/admin", response_class=HTMLResponse)
@@ -45,7 +46,7 @@ def admin_page() -> str:
     </div>
     <p>아래 Seed JSON에서 <code>home.hero</code>, <code>home.featured_product_id</code>, <code>home.collections</code>를 수정하면 홈 상단 드랍 광고 영역에 반영됩니다.</p>
     <h2>Seed JSON 관리</h2>
-    <p>인증 없이 현재 시드 데이터를 보고 저장할 수 있습니다.</p>
+    <p>관리자 인증(HTTP Basic) 후 현재 시드 데이터를 보고 저장할 수 있습니다.</p>
     <textarea id=\"seed-editor\"></textarea>
     <p><button id=\"save-seed\">시드 저장</button></p>
     <h2>최근 주문</h2>

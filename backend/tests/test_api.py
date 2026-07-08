@@ -1,9 +1,24 @@
+import pytest
 from fastapi.testclient import TestClient
 
+from app.config import get_settings
 from app.main import app
 
 
 client = TestClient(app)
+
+ADMIN_KEY = "test-admin-key"
+
+
+@pytest.fixture
+def admin_auth(monkeypatch):
+    """Enable the admin surface with a known key and return Basic-auth creds."""
+    monkeypatch.setenv("ADMIN_API_KEY", ADMIN_KEY)
+    get_settings.cache_clear()
+    try:
+        yield ("admin", ADMIN_KEY)
+    finally:
+        get_settings.cache_clear()
 
 
 def test_health_endpoint() -> None:
@@ -144,14 +159,14 @@ def test_order_endpoint_rejects_invalid_or_missing_product() -> None:
     assert missing.status_code == 404
 
 
-def test_admin_page_and_seed_management_endpoints() -> None:
-    admin = client.get("/admin")
-    seed = client.get("/api/manage/seed")
+def test_admin_page_and_seed_management_endpoints(admin_auth) -> None:
+    admin = client.get("/admin", auth=admin_auth)
+    seed = client.get("/api/manage/seed", auth=admin_auth)
     payload = seed.json()
     original_title = payload["newsletter"]["title"]
     try:
         payload["newsletter"]["title"] = "관리페이지 저장 테스트"
-        saved = client.post("/api/manage/seed", json=payload)
+        saved = client.post("/api/manage/seed", json=payload, auth=admin_auth)
 
         assert admin.status_code == 200
         assert "text/html" in admin.headers["content-type"]
@@ -161,7 +176,31 @@ def test_admin_page_and_seed_management_endpoints() -> None:
         assert saved.json()["newsletter"]["title"] == "관리페이지 저장 테스트"
     finally:
         payload["newsletter"]["title"] = original_title
-        client.post("/api/manage/seed", json=payload)
+        client.post("/api/manage/seed", json=payload, auth=admin_auth)
+
+
+def test_admin_surface_requires_authentication(admin_auth) -> None:
+    # No credentials -> 401 with a Basic challenge.
+    for path in ("/admin", "/api/manage/seed"):
+        unauth = client.get(path)
+        assert unauth.status_code == 401
+        assert unauth.headers.get("www-authenticate") == "Basic"
+
+    # Wrong password is rejected.
+    assert client.get("/api/manage/seed", auth=("admin", "wrong")).status_code == 401
+    # Listing orders is admin-only too.
+    assert client.get("/api/orders").status_code == 401
+    assert client.get("/api/orders", auth=admin_auth).status_code == 200
+
+
+def test_admin_disabled_when_key_unset() -> None:
+    # With ADMIN_API_KEY unset the whole admin surface fails closed (503),
+    # never falling back to being world-writable.
+    get_settings.cache_clear()
+    try:
+        assert client.get("/api/manage/seed", auth=("admin", "anything")).status_code == 503
+    finally:
+        get_settings.cache_clear()
 
 
 def test_cors_allows_flutter_web_localhost() -> None:
@@ -174,4 +213,4 @@ def test_cors_allows_flutter_web_localhost() -> None:
     )
 
     assert response.status_code == 200
-    assert response.headers["access-control-allow-origin"] == "*"
+    assert response.headers["access-control-allow-origin"] == "http://localhost:8080"

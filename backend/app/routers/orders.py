@@ -1,13 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.models import OrderCreateRequest, OrderResponse
 from app.repository import repository
+from app.security import require_admin
 
 
 router = APIRouter(prefix="/api/orders", tags=["orders"])
 
 
-@router.get("", response_model=list[OrderResponse])
+@router.get("", response_model=list[OrderResponse], dependencies=[Depends(require_admin)])
 def list_orders() -> list[OrderResponse]:
     return repository.orders
 
