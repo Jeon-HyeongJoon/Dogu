@@ -64,11 +64,17 @@ class CatalogRepository:
             new_arrivals = db_list_products(section="new", limit=10)
             all_products = db_list_products(limit=1)
             featured = all_products[0] if all_products else None
+            # Seed collection product_ids reference the p01-style seed catalog,
+            # not the DB's real product ids, so they never resolve here. Back the
+            # editorial collections with real DB products instead of returning
+            # empty lists (previously home collections were blank in DB mode).
+            collection_products = self._db_collection_products(len(home.collections))
         else:
             categories = self.data.categories
             deals = self.products_for_ids(home.deal_product_ids)
             new_arrivals = self.products_for_ids(home.new_product_ids)
             featured = self.get_product(home.featured_product_id)
+            collection_products = [self.products_for_ids(c.product_ids) for c in home.collections]
         return HomeResponse(
             hero=home.hero,
             ticker=home.ticker,
@@ -86,15 +92,24 @@ class CatalogRepository:
                     "subtitle": c.subtitle,
                     "tone": c.tone,
                     "accent": c.accent,
-                    "products": self.products_for_ids(c.product_ids) if not db_exists() else [],
+                    "products": collection_products[index],
                 }
-                for c in home.collections
+                for index, c in enumerate(home.collections)
             ],
             newsletter=self.data.newsletter,
         )
 
     def products_for_ids(self, product_ids: list[str]) -> list[Product]:
         return [product for product_id in product_ids if (product := self.get_product(product_id))]
+
+    def _db_collection_products(self, count: int, per: int = 6) -> list[list[Product]]:
+        """Back each editorial collection with a distinct slice of real DB
+        products (deterministic rowid order), since seed collection ids do not
+        exist in the DB."""
+        if count <= 0:
+            return []
+        pool = db_list_products(limit=count * per)
+        return [pool[i * per:(i + 1) * per] for i in range(count)]
 
     def search_products(self, query: str | None = None, category_id: str | None = None, limit: int = 20) -> list[Product]:
         if db_exists():

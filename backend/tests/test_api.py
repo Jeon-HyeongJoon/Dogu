@@ -40,6 +40,16 @@ def test_home_endpoint_returns_seed_sections() -> None:
     assert payload["newsletter"]["cadence"] == "weekly"
 
 
+def test_home_collections_are_populated_from_catalog() -> None:
+    # Regression for the DB-mode divergence where home collections were empty.
+    collections = client.get("/api/home").json()["collections"]
+    assert len(collections) >= 1
+    for collection in collections:
+        assert len(collection["products"]) >= 1
+        product_id = collection["products"][0]["id"]
+        assert client.get(f"/api/products/{product_id}").status_code == 200
+
+
 def test_categories_endpoint() -> None:
     response = client.get("/api/categories")
     payload = response.json()
