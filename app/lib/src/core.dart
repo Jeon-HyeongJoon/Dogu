@@ -79,8 +79,8 @@ class _DoguAppState extends State<DoguApp> {
             return ProductDetailPage(product: product);
           },
         ),
-        // v2 디자인(유희왕 마법 카드 테마) 미리보기 라우트. v1과 병존.
-        GoRoute(path: '/v2', builder: (context, state) => const V2HomePage()),
+        // v2 디자인(유희왕 마법 카드 테마) 5탭 앱. v1과 병존.
+        GoRoute(path: '/v2', builder: (context, state) => const V2Shell()),
       ],
     );
   }

@@ -1,6 +1,8 @@
 @Tags(['golden'])
 library;
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,42 +10,50 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:dogu_mobile_shop/main.dart';
 
-// v2(유희왕 마법 카드 테마) 화면을 이미지로 스냅샷하는 golden 테스트.
+// v2(유희왕 마법 카드 테마) 5탭을 모바일/태블릿 뷰포트로 이미지 스냅샷한다.
 // 크로스플랫폼 렌더 차이가 있어 CI의 flutter test는 `--exclude-tags golden`으로 제외한다.
-// 이미지 (재)생성:
-//   flutter test --update-goldens --tags golden
+// 이미지 (재)생성:  flutter test --update-goldens --tags golden
 void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
-    await _loadFont('Pretendard', const [
-      'assets/fonts/pretendard/Pretendard-Regular.otf',
-      'assets/fonts/pretendard/Pretendard-SemiBold.otf',
-      'assets/fonts/pretendard/Pretendard-Bold.otf',
-      'assets/fonts/pretendard/Pretendard-ExtraBold.otf',
-    ]);
-    await _loadFont('NanumSquareRound', const [
-      'assets/fonts/nanumsquareround/NanumSquareRoundL.ttf',
-      'assets/fonts/nanumsquareround/NanumSquareRoundR.ttf',
-      'assets/fonts/nanumsquareround/NanumSquareRoundB.ttf',
-      'assets/fonts/nanumsquareround/NanumSquareRoundEB.ttf',
-    ]);
+    // 앱 폰트는 pubspec `fonts:`가 아니라 런타임 FontLoader로 등록되어 FontManifest에
+    // 없으므로, 앱의 폰트 상수로 직접 로드한다(한글 글리프 보장).
+    await _loadFont(doguFontFamily, doguFontAssets);
+    await _loadFont(doguHeroFontFamily, doguHeroFontAssets);
+    // MaterialIcons 등 프레임워크/pubspec 등록 폰트는 FontManifest에서 로드(아이콘 글리프).
+    final manifest = json.decode(await rootBundle.loadString('FontManifest.json')) as List<dynamic>;
+    for (final entry in manifest.cast<Map<String, dynamic>>()) {
+      final loader = FontLoader(entry['family'] as String);
+      for (final font in (entry['fonts'] as List).cast<Map<String, dynamic>>()) {
+        loader.addFont(rootBundle.load(font['asset'] as String));
+      }
+      await loader.load();
+    }
   });
 
-  testWidgets('v2 home renders on a mobile viewport', (tester) async {
-    await _pumpV2Home(tester, const Size(390, 844));
-    await expectLater(
-      find.byType(V2HomePage),
-      matchesGoldenFile('goldens/v2_home_mobile.png'),
-    );
-  });
+  const tabs = <({int index, String name})>[
+    (index: 0, name: 'home'),
+    (index: 1, name: 'category'),
+    (index: 2, name: 'search'),
+    (index: 3, name: 'wish'),
+    (index: 4, name: 'cart'),
+  ];
+  const sizes = <({String name, Size size})>[
+    (name: 'mobile', size: Size(390, 844)),
+    (name: 'tablet', size: Size(834, 1112)),
+  ];
 
-  testWidgets('v2 home renders on a tablet viewport', (tester) async {
-    await _pumpV2Home(tester, const Size(834, 1112));
-    await expectLater(
-      find.byType(V2HomePage),
-      matchesGoldenFile('goldens/v2_home_tablet.png'),
-    );
-  });
+  for (final tab in tabs) {
+    for (final s in sizes) {
+      testWidgets('v2 ${tab.name} tab renders on ${s.name}', (tester) async {
+        await _pumpShell(tester, s.size, tab.index);
+        await expectLater(
+          find.byType(V2Shell),
+          matchesGoldenFile('goldens/v2_${tab.name}_${s.name}.png'),
+        );
+      });
+    }
+  }
 }
 
 Future<void> _loadFont(String family, List<String> assets) async {
@@ -54,7 +64,7 @@ Future<void> _loadFont(String family, List<String> assets) async {
   await loader.load();
 }
 
-Future<void> _pumpV2Home(WidgetTester tester, Size size) async {
+Future<void> _pumpShell(WidgetTester tester, Size size, int initialTab) async {
   tester.view.devicePixelRatio = 1.0;
   tester.view.physicalSize = size;
   addTearDown(tester.view.resetPhysicalSize);
@@ -66,9 +76,9 @@ Future<void> _pumpV2Home(WidgetTester tester, Size size) async {
   await tester.pumpWidget(
     AppStateScope(
       store: store,
-      child: const MaterialApp(
+      child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: V2HomePage(),
+        home: V2Shell(initialTab: initialTab),
       ),
     ),
   );

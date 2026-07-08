@@ -265,6 +265,87 @@ class V2Artwork extends StatelessWidget {
   }
 }
 
+/// 반응형 스크롤 바디 — 콘텐츠 최대폭 중앙 정렬 + 하단 여백. 모든 v2 탭이 공유한다.
+/// builder는 현재 폭에 맞는 상품 그리드 열 수(columns)를 받아 섹션 리스트를 반환.
+class V2ScrollBody extends StatelessWidget {
+  const V2ScrollBody({required this.builder, super.key});
+  final List<Widget> Function(BuildContext context, int columns) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth = V2Space.contentMaxWidth(constraints.maxWidth);
+        final cols = V2Space.productColumns(constraints.maxWidth);
+        return SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxWidth),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ...builder(context, cols),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// 빈 상태 — 크림 패널 안에 안내 문구(찜/장바구니/검색 결과 없음).
+class V2EmptyState extends StatelessWidget {
+  const V2EmptyState({required this.title, required this.message, super.key});
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(V2Space.pad, 28, V2Space.pad, 0),
+      child: V2Panel(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
+        child: Column(
+          children: [
+            const V2AttributeBadge(categoryKey: 'greed', size: 40),
+            const SizedBox(height: 14),
+            Text(title, style: V2Text.title.copyWith(fontSize: 16), textAlign: TextAlign.center),
+            const SizedBox(height: 6),
+            Text(message, style: V2Text.body.copyWith(fontSize: 12.5), textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 태그 칩 — 최근 검색/추천 브랜드 등.
+class V2TagChip extends StatelessWidget {
+  const V2TagChip(this.label, {this.onTap, super.key});
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+        decoration: BoxDecoration(
+          color: V2Colors.cream,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: V2Colors.creamBorder),
+        ),
+        child: Text(label, style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 12, fontWeight: FontWeight.w600)),
+      ),
+    );
+  }
+}
+
 /// 섹션 헤더 — 인덱스 + 제목 + 브래킷 타입라인(TCG 카드 상단 느낌).
 class V2SectionHeader extends StatelessWidget {
   const V2SectionHeader({required this.index, required this.title, required this.typeLine, super.key});

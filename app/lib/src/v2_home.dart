@@ -1,57 +1,29 @@
 part of '../main.dart';
 
-/// v2 홈 — v1과 동일한 섹션 구성(헤더·히어로·카테고리·특가·신상·브랜드·푸터)을
-/// 유희왕 마법 카드 디자인으로 미러링한다. 모바일/태블릿 폭에 반응형.
-class V2HomePage extends StatelessWidget {
-  const V2HomePage({super.key});
+/// v2 홈 바디 — v1과 동일한 섹션 구성(히어로·카테고리·특가·신상·브랜드·푸터)을
+/// 유희왕 마법 카드 디자인으로 미러링한다. 상단 헤더/하단 탭바는 V2Shell이 제공한다.
+class V2HomeBody extends StatelessWidget {
+  const V2HomeBody({super.key});
 
   @override
   Widget build(BuildContext context) {
     final store = AppStateScope.watch(context);
-    return Scaffold(
-      backgroundColor: V2Colors.parchment,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            const V2Header(),
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final maxWidth = V2Space.contentMaxWidth(constraints.maxWidth);
-                  final cols = V2Space.productColumns(constraints.maxWidth);
-                  return SingleChildScrollView(
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: maxWidth),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            V2HeroCard(store: store),
-                            V2CategoryStrip(categories: store.categories),
-                            const V2SectionHeader(index: '01', title: '오늘의 특가', typeLine: '속공 마법'),
-                            V2ProductGrid(products: store.dealProducts, columns: cols),
-                            const V2SectionHeader(index: '02', title: '신상 드로우', typeLine: '일반 마법'),
-                            V2ProductGrid(products: store.newProducts, columns: cols),
-                            const V2SectionHeader(index: '03', title: 'THIS WEEK', typeLine: '금지 · 제한'),
-                            V2BrandPanel(
-                              brands: {
-                                for (final p in [...store.dealProducts, ...store.newProducts]) p.brand,
-                              }.toList(),
-                            ),
-                            const V2Footer(),
-                            const SizedBox(height: 32),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+    return V2ScrollBody(
+      builder: (context, cols) => [
+        V2HeroCard(store: store),
+        V2CategoryStrip(categories: store.categories),
+        const V2SectionHeader(index: '01', title: '오늘의 특가', typeLine: '속공 마법'),
+        V2ProductGrid(products: store.dealProducts, columns: cols),
+        const V2SectionHeader(index: '02', title: '신상 드로우', typeLine: '일반 마법'),
+        V2ProductGrid(products: store.newProducts, columns: cols),
+        const V2SectionHeader(index: '03', title: 'THIS WEEK', typeLine: '금지 · 제한'),
+        V2BrandPanel(
+          brands: {
+            for (final p in [...store.dealProducts, ...store.newProducts]) p.brand,
+          }.toList(),
         ),
-      ),
+        const V2Footer(),
+      ],
     );
   }
 }
@@ -116,15 +88,21 @@ class V2HeroCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Row(
+            Wrap(
+              spacing: 16,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                for (final stat in store.heroStats) ...[
-                  // U+2212(−) 등 번들 폰트에 없는 기호는 ASCII로 정규화해 두부를 막는다.
-                  Text(stat.$1.replaceAll('−', '-'), style: V2Text.title.copyWith(color: V2Colors.goldLight, fontSize: 18)),
-                  const SizedBox(width: 4),
-                  Text(stat.$2, style: V2Text.body.copyWith(color: V2Colors.tealInk, fontSize: 11)),
-                  const SizedBox(width: 16),
-                ],
+                for (final stat in store.heroStats)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // U+2212(−) 등 번들 폰트에 없는 기호는 ASCII로 정규화해 두부를 막는다.
+                      Text(stat.$1.replaceAll('−', '-'), style: V2Text.title.copyWith(color: V2Colors.goldLight, fontSize: 18)),
+                      const SizedBox(width: 4),
+                      Text(stat.$2, style: V2Text.body.copyWith(color: V2Colors.tealInk, fontSize: 11)),
+                    ],
+                  ),
               ],
             ),
           ],
