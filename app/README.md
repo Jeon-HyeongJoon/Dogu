@@ -28,9 +28,10 @@ mirrors the v1 layout, and is responsive for mobile and tablet widths. Files:
 - `lib/src/v2_theme.dart` — design tokens (`V2Colors`/`V2Space`/`V2Text`) + card-frame component kit.
 - `lib/src/v2_home.dart` — v2 home body.
 - `lib/src/v2_shell.dart` — v2 shell, bottom tab bar, and the category/search/wish/cart tab bodies.
+- `lib/src/v2_detail.dart` — v2 product detail page (v2 cards open it in-theme).
 
 Finished screens are snapshotted as golden images under `test/goldens/`
-(`v2_{home,category,search,wish,cart}_{mobile,tablet}.png`). These golden tests
+(`v2_{home,category,search,wish,cart,detail}_{mobile,tablet}.png`). These golden tests
 are tagged `golden` and excluded from CI (font/anti-aliasing rendering differs
 across platforms); regenerate them locally with:
 
