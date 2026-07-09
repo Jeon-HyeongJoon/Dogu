@@ -60,4 +60,23 @@ void main() {
     await tester.pump();
     expect(store.recentSearches, isEmpty);
   });
+
+  testWidgets('v2 detail add-to-cart adds the product and offers go-to-cart', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final store = AppStore();
+    final product = store.newProducts.first;
+    await tester.pumpWidget(
+      AppStateScope(
+        store: store,
+        child: MaterialApp(home: V2ProductDetailPage(product: product, onGoToCart: () {})),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('장바구니에 담기'));
+    await tester.pumpAndSettle();
+    expect(store.cartQuantities[product.id], 1);
+    expect(find.text('장바구니 보기'), findsOneWidget);
+    // showCartToast가 건 3초 타이머를 소진해 teardown의 pending-timer 검사를 통과시킨다.
+    await tester.pump(const Duration(seconds: 4));
+  });
 }

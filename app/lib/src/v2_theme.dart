@@ -354,7 +354,14 @@ class V2ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final wished = AppStateScope.watch(context).wishlistIds.contains(product.id);
     return V2CardFrame(
-      onTap: () => openV2ProductDetail(context, product),
+      onTap: () => openV2ProductDetail(
+        context,
+        product,
+        onGoToCart: () {
+          Navigator.of(context, rootNavigator: true).maybePop();
+          V2NavScope.go(context, 4);
+        },
+      ),
       padding: const EdgeInsets.all(7),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
