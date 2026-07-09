@@ -52,9 +52,14 @@ const doguHeroFontAssets = <String>[
 
 // 상단 브랜드 타이틀('욕망의 장바구니') 전용 손글씨체 HSBombaram(봄바람).
 const doguTitleFontFamily = 'HSBombaram';
+// 타이틀은 이 손글씨체가 primary라, 미등록 상태로 첫 페인트되면 CanvasKit이 폴백 대신
+// 두부(⊠)를 그린다. 그래서 타이틀 Regular는 필수 폰트와 함께 첫 페인트 전에 로드한다.
+const doguTitleEssentialFontAssets = <String>[
+  'assets/fonts/hsbombaram/HSBombaram-Regular.otf',
+];
+// 가벼운 Thin 굵기는 첫 페인트 이후 비차단으로 지연 로드.
 const doguTitleFontAssets = <String>[
   'assets/fonts/hsbombaram/HSBombaram-Thin.otf',
-  'assets/fonts/hsbombaram/HSBombaram-Regular.otf',
 ];
 
 typedef AppRunner = void Function(Widget app);
@@ -87,8 +92,13 @@ void _onFontLoadError(Object error, StackTrace stack) {
   }
 }
 
-Future<void> loadDoguEssentialFont() {
-  return _loadFontFamily(doguFontFamily, doguEssentialFontAssets);
+Future<void> loadDoguEssentialFont() async {
+  // 첫 페인트 전에 함께 로드: 본문 한글(Pretendard Regular) + 브랜드 타이틀(HSBombaram Regular).
+  // 둘 다 등록된 뒤 첫 프레임을 그리므로 본문·타이틀 어디에도 두부(⊠) 깜빡임이 없다.
+  await Future.wait([
+    _loadFontFamily(doguFontFamily, doguEssentialFontAssets),
+    _loadFontFamily(doguTitleFontFamily, doguTitleEssentialFontAssets),
+  ]);
 }
 
 Future<void> loadDoguFonts() async {
