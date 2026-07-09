@@ -22,6 +22,13 @@ Future<AppStore> _pumpShell(WidgetTester tester, int tab, {Map<String, int>? car
 }
 
 void main() {
+  testWidgets('DoguApp(useV2: true) opens the v2 shell as the default route', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(const DoguApp(useV2: true, initializeStore: false));
+    await tester.pump();
+    expect(find.byType(V2Shell), findsOneWidget);
+  });
+
   testWidgets('v2 category quick filter updates the store', (tester) async {
     final store = await _pumpShell(tester, 1);
     expect(store.categoryQuickFilter, 'all');

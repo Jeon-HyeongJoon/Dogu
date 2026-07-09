@@ -6,11 +6,14 @@ class DoguApp extends StatefulWidget {
     this.store,
     this.initializeStore = true,
     this.initialTabIndex = 0,
+    this.useV2 = false,
   });
 
   final AppStore? store;
   final bool initializeStore;
   final int initialTabIndex;
+  // 실제 앱은 v2(유희왕 마법 카드 테마)를 기본으로 띄운다. 테스트는 기본값(v1)을 쓴다.
+  final bool useV2;
 
   @override
   State<DoguApp> createState() => _DoguAppState();
@@ -45,10 +48,29 @@ class _DoguAppState extends State<DoguApp> {
     if (widget.initializeStore) {
       unawaited(_store.initialize());
     }
-    _router = _buildRouter(pathForTabIndex(widget.initialTabIndex));
+    _router = _buildRouter(widget.useV2 ? '/' : pathForTabIndex(widget.initialTabIndex));
   }
 
   GoRouter _buildRouter(String initialLocation) {
+    if (widget.useV2) {
+      return GoRouter(
+        initialLocation: initialLocation,
+        routes: [
+          GoRoute(path: '/', builder: (context, state) => const V2Shell()),
+          GoRoute(
+            path: '/product/:id',
+            builder: (context, state) {
+              final extra = state.extra;
+              final product = extra is ProductItem
+                  ? extra
+                  : AppStateScope.read(context).productById(state.pathParameters['id']!);
+              return V2ProductDetailPage(product: product);
+            },
+          ),
+        ],
+      );
+    }
+
     StatefulShellBranch tab(String path, Widget Function(BuildContext) build) {
       return StatefulShellBranch(
         routes: [GoRoute(path: path, builder: (context, state) => build(context))],
@@ -114,8 +136,10 @@ class _DoguAppState extends State<DoguApp> {
           ),
         ),
         routerConfig: _router,
-        // 전역 장바구니 토스트 — 모든 라우트 위에 떠서 결제바 유무에 따라 위치가 움직인다
+        // 전역 장바구니 토스트 — 모든 라우트 위에 떠서 결제바 유무에 따라 위치가 움직인다.
+        // v2 모드에선 V2Shell이 자체 v2 토스트를 그리므로 v1 토스트를 얹지 않는다.
         builder: (context, child) {
+          if (widget.useV2) return child ?? const SizedBox.shrink();
           return Stack(
             children: [
               if (child != null) child,
