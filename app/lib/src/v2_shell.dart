@@ -139,19 +139,77 @@ class V2BottomBar extends StatelessWidget {
   }
 }
 
-/// 카테고리 탭 — 번호 매긴 카테고리 리스트(v1 CategoryListBlock 미러) + 브랜드 패널.
+/// 카테고리 탭 — 빠른 필터 + 카테고리 선택(→ 필터된 상품) + 브랜드 패널(v1 CategoryTabPage 미러).
 class V2CategoryBody extends StatelessWidget {
   const V2CategoryBody({super.key});
+
+  static const _filters = <(String, String)>[
+    ('all', '전체'),
+    ('new', '신상'),
+    ('best', '베스트'),
+    ('sale', '세일'),
+    ('deal', '딜'),
+  ];
 
   @override
   Widget build(BuildContext context) {
     final store = AppStateScope.watch(context);
     final categories = store.categories;
+    final browsing = store.selectedCategoryKey != null || store.categoryQuickFilter != 'all';
     return V2ScrollBody(
       builder: (context, cols) => [
         const V2SectionHeader(index: '00', title: '카테고리', typeLine: '전체 카드'),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: V2Space.pad),
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final f in _filters)
+                _V2FilterChip(
+                  label: f.$2,
+                  active: store.categoryQuickFilter == f.$1,
+                  onTap: () => store.setCategoryQuickFilter(f.$1),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
         for (var i = 0; i < categories.length; i++)
-          V2CategoryRow(index: i + 1, item: categories[i]),
+          V2CategoryRow(
+            index: i + 1,
+            item: categories[i],
+            selected: store.selectedCategoryKey ==
+                _normalizeCategoryKey(categories[i].id.isEmpty ? categories[i].name : categories[i].id),
+            onTap: () {
+              store.setCategoryQuickFilter('all');
+              store.selectCategoryBrowse(
+                _normalizeCategoryKey(categories[i].id.isEmpty ? categories[i].name : categories[i].id),
+              );
+            },
+          ),
+        if (browsing) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(V2Space.pad, 18, V2Space.pad, 8),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                store.selectCategoryBrowse(null);
+                store.setCategoryQuickFilter('all');
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.chevron_left_rounded, size: 18, color: V2Colors.teal),
+                  Text('전체 카테고리', style: V2Text.body.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: V2Colors.teal)),
+                ],
+              ),
+            ),
+          ),
+          if (store.categoryBrowseProducts.isEmpty)
+            const V2EmptyState(title: '해당 카드가 없어요', message: '다른 카테고리나 필터를 골라 보세요.')
+          else
+            V2ProductGrid(products: store.categoryBrowseProducts, columns: cols),
+        ],
         const V2SectionHeader(index: '04', title: 'SHOP BY BRAND', typeLine: '덱 리스트'),
         V2BrandPanel(brands: {for (final p in store.catalogProducts) p.brand}.toList()),
       ],
@@ -159,18 +217,60 @@ class V2CategoryBody extends StatelessWidget {
   }
 }
 
+/// 선택 가능한 빠른 필터 칩.
+class _V2FilterChip extends StatelessWidget {
+  const _V2FilterChip({required this.label, required this.active, required this.onTap});
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: active ? V2Colors.teal : V2Colors.cream,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: active ? V2Colors.goldDark : V2Colors.creamBorder),
+        ),
+        child: Text(
+          label,
+          style: V2Text.body.copyWith(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w700,
+            color: active ? V2Colors.goldLight : V2Colors.inkSoft,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class V2CategoryRow extends StatelessWidget {
-  const V2CategoryRow({required this.index, required this.item, super.key});
+  const V2CategoryRow({required this.index, required this.item, this.selected = false, this.onTap, super.key});
   final int index;
   final CategoryItem item;
+  final bool selected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(V2Space.pad, 0, V2Space.pad, 10),
-      child: V2Panel(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        child: Row(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            color: V2Colors.cream,
+            borderRadius: BorderRadius.circular(V2Space.artRadius),
+            border: Border.all(color: selected ? V2Colors.teal : V2Colors.creamBorder, width: selected ? 2 : 1),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          child: Row(
           children: [
             SizedBox(
               width: 26,
@@ -194,6 +294,7 @@ class V2CategoryRow extends StatelessWidget {
             const SizedBox(width: 4),
             const Icon(Icons.chevron_right_rounded, size: 20, color: V2Colors.teal),
           ],
+          ),
         ),
       ),
     );
