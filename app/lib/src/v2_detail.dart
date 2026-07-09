@@ -1,16 +1,17 @@
 part of '../main.dart';
 
 /// v2 상품 상세를 셸 위(루트 네비게이터)로 띄운다 — v2 카드 → v2 상세로 일관 유지.
-void openV2ProductDetail(BuildContext context, ProductItem product) {
+void openV2ProductDetail(BuildContext context, ProductItem product, {VoidCallback? onGoToCart}) {
   Navigator.of(context, rootNavigator: true).push(
-    MaterialPageRoute<void>(builder: (_) => V2ProductDetailPage(product: product)),
+    MaterialPageRoute<void>(builder: (_) => V2ProductDetailPage(product: product, onGoToCart: onGoToCart)),
   );
 }
 
 /// v2 상품 상세 — 한 장의 큰 마법 카드로 상품을 보여준다(v1 ProductDetailPage 미러).
 class V2ProductDetailPage extends StatefulWidget {
-  const V2ProductDetailPage({required this.product, super.key});
+  const V2ProductDetailPage({required this.product, this.onGoToCart, super.key});
   final ProductItem product;
+  final VoidCallback? onGoToCart;
 
   @override
   State<V2ProductDetailPage> createState() => _V2ProductDetailPageState();
@@ -18,6 +19,7 @@ class V2ProductDetailPage extends StatefulWidget {
 
 class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
   int _quantity = 1;
+  bool _added = false;
 
   void _changeQuantity(int delta) => setState(() => _quantity = (_quantity + delta).clamp(1, 99));
 
@@ -26,6 +28,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
     store.cacheProduct(widget.product);
     await store.changeCartQuantity(widget.product.id, _quantity);
     if (!mounted) return;
+    setState(() => _added = true);
     store.showCartToast('${widget.product.name} $_quantity장을 장바구니에 담았습니다.');
   }
 
@@ -212,7 +215,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
           const SizedBox(width: 12),
           Expanded(
             child: GestureDetector(
-              onTap: _addToCart,
+              onTap: (_added && widget.onGoToCart != null) ? widget.onGoToCart : _addToCart,
               child: Container(
                 height: 52,
                 alignment: Alignment.center,
@@ -221,7 +224,10 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                   borderRadius: BorderRadius.circular(V2Space.artRadius),
                   border: Border.all(color: V2Colors.goldDark, width: V2Space.goldBorder),
                 ),
-                child: Text('장바구니에 담기', style: V2Text.title.copyWith(color: V2Colors.goldLight, fontSize: 16)),
+                child: Text(
+                  (_added && widget.onGoToCart != null) ? '장바구니 보기' : '장바구니에 담기',
+                  style: V2Text.title.copyWith(color: V2Colors.goldLight, fontSize: 16),
+                ),
               ),
             ),
           ),
