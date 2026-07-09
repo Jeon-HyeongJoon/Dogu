@@ -25,19 +25,56 @@ class _V2ShellState extends State<V2Shell> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: V2Colors.parchment,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            const V2Header(),
-            Expanded(child: IndexedStack(index: _tab, children: _bodies)),
-          ],
-        ),
+      body: Stack(
+        children: [
+          SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                const V2Header(),
+                Expanded(child: IndexedStack(index: _tab, children: _bodies)),
+              ],
+            ),
+          ),
+          const Positioned(left: 0, right: 0, bottom: 16, child: V2CartToast()),
+        ],
       ),
       bottomNavigationBar: V2BottomBar(
         current: _tab,
         onTap: (index) => setState(() => _tab = index),
       ),
+    );
+  }
+}
+
+/// v2 장바구니 토스트 — store.cartToastMessage를 청록/금색 배너로 표시(3초 후 자동 소멸).
+class V2CartToast extends StatelessWidget {
+  const V2CartToast({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final message = AppStateScope.watch(context).cartToastMessage;
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: message == null
+          ? const SizedBox.shrink()
+          : Padding(
+              key: ValueKey(message),
+              padding: const EdgeInsets.symmetric(horizontal: V2Space.pad),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: V2Colors.teal,
+                  borderRadius: BorderRadius.circular(V2Space.artRadius),
+                  border: Border.all(color: V2Colors.goldDark, width: 1.5),
+                  boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 3))],
+                ),
+                child: Text(
+                  message,
+                  style: V2Text.body.copyWith(color: V2Colors.tealInk, fontSize: 13, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
     );
   }
 }
@@ -275,34 +312,98 @@ class V2WishBody extends StatelessWidget {
   }
 }
 
-/// 장바구니 탭 — 담긴 상품 라인 + 합계 패널(비어 있으면 빈 상태).
+/// 장바구니 탭 — v1 기능(선택·수량 변경·삭제·합계·결제)을 v2 테마로 배선.
 class V2CartBody extends StatelessWidget {
   const V2CartBody({super.key});
+
+  void _checkout(BuildContext context) {
+    final store = AppStateScope.read(context);
+    if (store.selectedCartLines.isEmpty) {
+      store.showCartToast('선택된 상품이 없습니다.');
+      return;
+    }
+    // 결제는 UI-only(로컬 모의 주문 요약) — 실제 PG 연동 없음.
+    store.rememberOrderSummary({
+      'item_count': store.selectedCartCount,
+      'total_price': store.selectedCartTotal,
+    });
+    store.showCartToast('${store.selectedCartCount}장 · ${formatWon(store.selectedCartTotal)} 결제가 완료되었습니다 (데모).');
+  }
 
   @override
   Widget build(BuildContext context) {
     final store = AppStateScope.watch(context);
     final lines = store.cartLines;
+    final selected = store.selectedCartIds;
+    final allSelected = lines.isNotEmpty && selected.length == lines.length;
     return V2ScrollBody(
       builder: (context, cols) => [
         const V2SectionHeader(index: '담', title: '장바구니', typeLine: '드로우 예정'),
         if (lines.isEmpty)
           const V2EmptyState(title: '장바구니가 비어 있어요', message: '담고 싶은 카드를 골라 장바구니에 추가해 보세요.')
         else ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(V2Space.pad, 0, V2Space.pad, 10),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: store.toggleAllCartSelection,
+              child: Row(
+                children: [
+                  _V2Check(checked: allSelected),
+                  const SizedBox(width: 8),
+                  Text('전체 선택', style: V2Text.body.copyWith(fontSize: 13, fontWeight: FontWeight.w700, color: V2Colors.ink)),
+                  const Spacer(),
+                  Text('${selected.length}/${lines.length}', style: V2Text.mono.copyWith(fontSize: 12)),
+                ],
+              ),
+            ),
+          ),
           for (final line in lines)
             Padding(
               padding: const EdgeInsets.fromLTRB(V2Space.pad, 0, V2Space.pad, 10),
-              child: V2CartLineRow(product: line.product, quantity: line.quantity),
+              child: V2CartLineRow(
+                product: line.product,
+                quantity: line.quantity,
+                selected: selected.contains(line.product.id),
+              ),
             ),
           Padding(
             padding: const EdgeInsets.fromLTRB(V2Space.pad, 6, V2Space.pad, 0),
             child: V2Panel(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              padding: const EdgeInsets.all(14),
+              child: Column(
                 children: [
-                  Text('합계 (${store.cartCount})', style: V2Text.title.copyWith(fontSize: 15)),
-                  Text(formatWon(store.selectedCartTotal), style: V2Text.title.copyWith(fontSize: 18, color: V2Colors.maroon)),
+                  _summaryRow('상품 금액', formatWon(store.selectedCartOldTotal)),
+                  const SizedBox(height: 6),
+                  _summaryRow('할인', '-${formatWon(store.selectedCartDiscount)}', color: V2Colors.maroon),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Divider(height: 1, color: V2Colors.creamBorder),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('결제 금액 (${store.selectedCartCount})', style: V2Text.title.copyWith(fontSize: 15)),
+                      Text(formatWon(store.selectedCartTotal), style: V2Text.title.copyWith(fontSize: 20, color: V2Colors.maroon)),
+                    ],
+                  ),
                 ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(V2Space.pad, 12, V2Space.pad, 0),
+            child: GestureDetector(
+              onTap: () => _checkout(context),
+              child: Container(
+                height: 52,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: V2Colors.teal,
+                  borderRadius: BorderRadius.circular(V2Space.artRadius),
+                  border: Border.all(color: V2Colors.goldDark, width: V2Space.goldBorder),
+                ),
+                child: Text('결제하기', style: V2Text.title.copyWith(color: V2Colors.goldLight, fontSize: 16)),
               ),
             ),
           ),
@@ -310,20 +411,38 @@ class V2CartBody extends StatelessWidget {
       ],
     );
   }
+
+  Widget _summaryRow(String label, String value, {Color color = V2Colors.inkSoft}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: V2Text.body.copyWith(fontSize: 13)),
+        Text(value, style: V2Text.body.copyWith(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
+      ],
+    );
+  }
 }
 
 class V2CartLineRow extends StatelessWidget {
-  const V2CartLineRow({required this.product, required this.quantity, super.key});
+  const V2CartLineRow({required this.product, required this.quantity, required this.selected, super.key});
   final ProductItem product;
   final int quantity;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
+    final store = AppStateScope.read(context);
     return V2Panel(
       padding: const EdgeInsets.all(10),
       child: Row(
         children: [
-          SizedBox(width: 56, height: 56, child: V2Artwork(product: product)),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => store.toggleCartSelection(product.id),
+            child: _V2Check(checked: selected),
+          ),
+          const SizedBox(width: 10),
+          SizedBox(width: 52, height: 52, child: V2Artwork(product: product)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -331,13 +450,45 @@ class V2CartLineRow extends StatelessWidget {
               children: [
                 Text(product.brand, style: V2Text.body.copyWith(fontSize: 11, color: V2Colors.inkFaint, fontWeight: FontWeight.w700)),
                 Text(product.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: V2Text.title.copyWith(fontSize: 14)),
-                const SizedBox(height: 2),
-                Text('${product.price}  ·  $quantity장', style: V2Text.body.copyWith(fontSize: 12, color: V2Colors.maroon, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Text(product.price, style: V2Text.body.copyWith(fontSize: 13, color: V2Colors.maroon, fontWeight: FontWeight.w700)),
+                    const Spacer(),
+                    _QtyButton(icon: Icons.remove_rounded, onTap: () => store.changeCartQuantity(product.id, -1)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text('$quantity', style: V2Text.title.copyWith(fontSize: 15)),
+                    ),
+                    _QtyButton(icon: Icons.add_rounded, onTap: () => store.changeCartQuantity(product.id, 1)),
+                  ],
+                ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// v2 체크박스 — 선택 표시(금테 사각 + 체크).
+class _V2Check extends StatelessWidget {
+  const _V2Check({required this.checked});
+  final bool checked;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 22,
+      height: 22,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: checked ? V2Colors.teal : V2Colors.cream,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: checked ? V2Colors.goldDark : V2Colors.creamBorder, width: 1.4),
+      ),
+      child: checked ? const Icon(Icons.check_rounded, size: 15, color: V2Colors.goldLight) : null,
     );
   }
 }
