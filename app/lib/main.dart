@@ -67,7 +67,7 @@ Future<void> bootstrap({
   configureUrlStrategy();
   // 한글 두부 박스 방지: 필수 폰트는 첫 페인트 전에 등록(실패해도 fallback으로 계속)
   await (loadEssentialFont ?? loadDoguEssentialFont)().catchError(_onFontLoadError);
-  runner(const DoguApp(useV2: true));
+  runner(const DoguApp());
   WidgetsBinding.instance.addPostFrameCallback((_) {
     unawaited((loadFonts ?? loadDoguFonts)().catchError(_onFontLoadError));
   });
