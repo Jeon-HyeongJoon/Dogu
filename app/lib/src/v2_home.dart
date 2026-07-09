@@ -10,6 +10,7 @@ class V2HomeBody extends StatelessWidget {
     final store = AppStateScope.watch(context);
     return V2ScrollBody(
       builder: (context, cols) => [
+        const V2HomeSearchEntry(),
         V2HeroCard(store: store),
         V2CategoryStrip(categories: store.categories),
         const V2SectionHeader(index: '01', title: '오늘의 특가', typeLine: '속공 마법'),
@@ -22,6 +23,8 @@ class V2HomeBody extends StatelessWidget {
             for (final p in [...store.dealProducts, ...store.newProducts]) p.brand,
           }.toList(),
         ),
+        const V2SectionHeader(index: '04', title: '뉴스레터', typeLine: '구독'),
+        const V2NewsletterBlock(),
         const V2Footer(),
       ],
     );
@@ -55,6 +58,112 @@ class V2Header extends StatelessWidget {
             decoration: const BoxDecoration(color: V2Colors.goldLight, shape: BoxShape.circle),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 홈 검색 진입바 — 탭하면 검색 탭으로 이동.
+class V2HomeSearchEntry extends StatelessWidget {
+  const V2HomeSearchEntry({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(V2Space.pad, V2Space.pad, V2Space.pad, 0),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => V2NavScope.go(context, 2),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: V2Colors.cream,
+            borderRadius: BorderRadius.circular(V2Space.artRadius),
+            border: Border.all(color: V2Colors.creamBorder),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.search_rounded, size: 20, color: V2Colors.teal),
+              const SizedBox(width: 10),
+              Text('어떤 카드를 찾으시나요?', style: V2Text.body.copyWith(fontSize: 13.5, color: V2Colors.inkFaint)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 뉴스레터 구독 — 이메일 입력 + 구독(store.subscribeNewsletter). 결과는 토스트.
+class V2NewsletterBlock extends StatefulWidget {
+  const V2NewsletterBlock({super.key});
+
+  @override
+  State<V2NewsletterBlock> createState() => _V2NewsletterBlockState();
+}
+
+class _V2NewsletterBlockState extends State<V2NewsletterBlock> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _subscribe() async {
+    final email = _controller.text.trim();
+    final store = AppStateScope.read(context);
+    if (!email.contains('@')) {
+      store.showCartToast('이메일 주소를 확인해 주세요.');
+      return;
+    }
+    _controller.clear();
+    store.showCartToast('$email 구독 신청이 접수되었습니다.');
+    try {
+      await DoguRepository().subscribeNewsletter(email);
+    } catch (_) {
+      // 백엔드 미가용이어도 UI 피드백은 유지(v1 NewsletterSection과 동일 동작).
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: V2Space.pad),
+      child: V2Panel(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 13),
+                cursorColor: V2Colors.teal,
+                decoration: InputDecoration(
+                  isDense: true,
+                  border: InputBorder.none,
+                  hintText: '이메일로 신상 드로우 소식 받기',
+                  hintStyle: V2Text.body.copyWith(color: V2Colors.inkFaint, fontSize: 13),
+                ),
+                onSubmitted: (_) => _subscribe(),
+              ),
+            ),
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: _subscribe,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: V2Colors.teal,
+                  borderRadius: BorderRadius.circular(V2Space.artRadius),
+                  border: Border.all(color: V2Colors.goldDark),
+                ),
+                child: Text('구독', style: V2Text.title.copyWith(color: V2Colors.goldLight, fontSize: 13)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -128,14 +237,21 @@ class V2CategoryStrip extends StatelessWidget {
         runSpacing: 10,
         children: [
           for (final c in categories)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: V2Colors.cream,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: V2Colors.creamBorder),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                V2NavScope.go(context, 1);
+                AppStateScope.read(context).selectCategoryBrowse(_normalizeCategoryKey(c.id.isEmpty ? c.name : c.id));
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: V2Colors.cream,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: V2Colors.creamBorder),
+                ),
+                child: Text(c.name, style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 12.5, fontWeight: FontWeight.w700)),
               ),
-              child: Text(c.name, style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 12.5, fontWeight: FontWeight.w700)),
             ),
         ],
       ),

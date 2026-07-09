@@ -23,28 +23,43 @@ class _V2ShellState extends State<V2Shell> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: V2Colors.parchment,
-      body: Stack(
-        children: [
-          SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                const V2Header(),
-                Expanded(child: IndexedStack(index: _tab, children: _bodies)),
-              ],
+    return V2NavScope(
+      goToTab: (index) => setState(() => _tab = index),
+      child: Scaffold(
+        backgroundColor: V2Colors.parchment,
+        body: Stack(
+          children: [
+            SafeArea(
+              bottom: false,
+              child: Column(
+                children: [
+                  const V2Header(),
+                  Expanded(child: IndexedStack(index: _tab, children: _bodies)),
+                ],
+              ),
             ),
-          ),
-          const Positioned(left: 0, right: 0, bottom: 16, child: V2CartToast()),
-        ],
-      ),
-      bottomNavigationBar: V2BottomBar(
-        current: _tab,
-        onTap: (index) => setState(() => _tab = index),
+            const Positioned(left: 0, right: 0, bottom: 16, child: V2CartToast()),
+          ],
+        ),
+        bottomNavigationBar: V2BottomBar(
+          current: _tab,
+          onTap: (index) => setState(() => _tab = index),
+        ),
       ),
     );
   }
+}
+
+/// v2 탭 전환 스코프 — 바디(홈 검색바·카테고리 칩 등)가 다른 탭으로 이동을 요청한다.
+class V2NavScope extends InheritedWidget {
+  const V2NavScope({required this.goToTab, required super.child, super.key});
+  final void Function(int index) goToTab;
+
+  static void go(BuildContext context, int index) =>
+      context.getInheritedWidgetOfExactType<V2NavScope>()?.goToTab(index);
+
+  @override
+  bool updateShouldNotify(V2NavScope oldWidget) => false;
 }
 
 /// v2 장바구니 토스트 — store.cartToastMessage를 청록/금색 배너로 표시(3초 후 자동 소멸).
@@ -372,7 +387,12 @@ class _V2SearchBodyState extends State<V2SearchBody> {
           else
             V2ProductGrid(products: store.searchResults, columns: cols),
         ],
-        const V2SectionHeader(index: '01', title: '최근 검색', typeLine: '히스토리'),
+        V2SectionHeader(
+          index: '01',
+          title: '최근 검색',
+          typeLine: '전체 삭제',
+          onTypeLineTap: store.recentSearches.isEmpty ? null : () => store.clearRecentSearches(),
+        ),
         _chips(context, store.recentSearches),
         const V2SectionHeader(index: '02', title: '추천 브랜드', typeLine: '서치'),
         _chips(context, store.suggestions),
