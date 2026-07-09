@@ -174,8 +174,8 @@ class Header extends StatelessWidget {
                 ClipOval(
                   child: Image.asset(
                     'assets/logo-square.png',
-                    width: 30,
-                    height: 30,
+                    width: 26,
+                    height: 26,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -186,8 +186,9 @@ class Header extends StatelessWidget {
                     fontFamily: doguTitleFontFamily,
                     fontFamilyFallback: [doguHeroFontFamily, doguFontFamily],
                     color: AppColors.accent,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w400,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w100,
+                    height: 1.0,
                     letterSpacing: 0.2,
                   ),
                 ),

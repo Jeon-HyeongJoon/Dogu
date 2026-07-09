@@ -50,15 +50,11 @@ const doguHeroFontAssets = <String>[
   'assets/fonts/nanumsquareround/NanumSquareRoundEB.ttf',
 ];
 
-// 상단 브랜드 타이틀('욕망의 장바구니') 전용 손글씨체 HSBombaram(봄바람).
+// 상단 브랜드 타이틀('욕망의 장바구니') 전용 손글씨체 HSBombaram(봄바람) — 가벼운 Thin 굵기.
 const doguTitleFontFamily = 'HSBombaram';
 // 타이틀은 이 손글씨체가 primary라, 미등록 상태로 첫 페인트되면 CanvasKit이 폴백 대신
-// 두부(⊠)를 그린다. 그래서 타이틀 Regular는 필수 폰트와 함께 첫 페인트 전에 로드한다.
+// 두부(⊠)를 그린다. 그래서 타이틀 굵기(Thin)를 필수 폰트와 함께 첫 페인트 전에 로드한다.
 const doguTitleEssentialFontAssets = <String>[
-  'assets/fonts/hsbombaram/HSBombaram-Regular.otf',
-];
-// 가벼운 Thin 굵기는 첫 페인트 이후 비차단으로 지연 로드.
-const doguTitleFontAssets = <String>[
   'assets/fonts/hsbombaram/HSBombaram-Thin.otf',
 ];
 
@@ -105,7 +101,6 @@ Future<void> loadDoguFonts() async {
   await Future.wait([
     _loadFontFamily(doguFontFamily, doguFontAssets),
     _loadFontFamily(doguHeroFontFamily, doguHeroFontAssets),
-    _loadFontFamily(doguTitleFontFamily, doguTitleFontAssets),
   ]);
 }
 
