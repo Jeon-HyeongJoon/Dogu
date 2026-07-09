@@ -44,7 +44,7 @@ class V2Header extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            '욕망의 항아리',
+            '욕망의장바구니',
             style: V2Text.display.copyWith(color: V2Colors.tealInk, fontSize: 20),
           ),
           const SizedBox(width: 8),
@@ -214,7 +214,7 @@ class V2Footer extends StatelessWidget {
         children: [
           V2SetCode('55144522'),
           Spacer(),
-          V2SetCode('© 욕망의 항아리 · TCG EDITION'),
+          V2SetCode('© 2026 욕망의장바구니'),
         ],
       ),
     );
