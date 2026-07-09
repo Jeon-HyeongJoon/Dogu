@@ -12,7 +12,7 @@ class DoguApp extends StatefulWidget {
   final AppStore? store;
   final bool initializeStore;
   final int initialTabIndex;
-  // 실제 앱은 v2(유희왕 마법 카드 테마)를 기본으로 띄운다. 테스트는 기본값(v1)을 쓴다.
+  // 기본은 v1. v2(유희왕 마법 카드 테마)는 `/v2` 라우트 또는 useV2:true로 접근한다.
   final bool useV2;
 
   @override
