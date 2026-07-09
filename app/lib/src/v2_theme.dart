@@ -11,26 +11,26 @@ part of '../main.dart';
 // ─────────────────────────────────────────────────────────────────────────
 
 class V2Colors {
-  static const parchment = Color(0xfff3ebd7); // 페이지 배경(종이 질감)
-  static const parchmentSoft = Color(0xffece1c6);
+  static const parchment = Color(0xfff5f1e8); // 페이지 배경(깨끗한 웜 오프화이트)
+  static const parchmentSoft = Color(0xffece4d3);
 
-  static const teal = Color(0xff147d6b); // 마법 카드 프레임
-  static const tealDark = Color(0xff0c4e43);
-  static const tealLight = Color(0xff2ba189);
-  static const tealInk = Color(0xffeafaf4); // 청록 위 밝은 글씨
+  static const teal = Color(0xff0e6e5b); // 카드 프레임(깊은 에메랄드-그린)
+  static const tealDark = Color(0xff083f35);
+  static const tealLight = Color(0xff2f9f88);
+  static const tealInk = Color(0xfff2f9f4); // 그린 위 밝은 글씨
 
-  static const gold = Color(0xffc7a24c); // 아트워크 금색 트림
-  static const goldDark = Color(0xff8c6e22);
-  static const goldLight = Color(0xffe3c877);
+  static const gold = Color(0xffcaa348); // 아트워크 금색 트림
+  static const goldDark = Color(0xff8a6a1e);
+  static const goldLight = Color(0xffeccf7f);
 
-  static const cream = Color(0xfff6efdc); // 효과 텍스트 박스
-  static const creamBorder = Color(0xffd9c89a);
+  static const cream = Color(0xfff9f4e8); // 효과 텍스트 박스
+  static const creamBorder = Color(0xffd6c69a);
 
   static const ink = Color(0xff1b140c);
   static const inkSoft = Color(0xff5a4e3c);
-  static const inkFaint = Color(0xff8a7c64);
+  static const inkFaint = Color(0xff90816a);
 
-  static const maroon = Color(0xff7e2426); // 아트 배경 적색 포인트
+  static const maroon = Color(0xff8f2b28); // 가격/할인 포인트(적색)
 }
 
 class V2Space {
@@ -88,52 +88,7 @@ class V2Text {
   );
 }
 
-/// 유희왕 카드의 속성 원형 배지 — 카테고리를 상징 글리프로 표현.
-class V2AttributeBadge extends StatelessWidget {
-  const V2AttributeBadge({required this.categoryKey, this.size = 26, super.key});
-  final String categoryKey;
-  final double size;
-
-  // 한자는 한글 번들 폰트에 없어 두부가 되므로 한글 이니셜을 속성 마크로 쓴다.
-  static const Map<String, String> _glyphs = {
-    'clothing': '의',
-    'tech': '기',
-    'home': '홈',
-    'beauty': '뷰',
-    'sports': '스',
-    'kids': '키',
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    final glyph = _glyphs[categoryKey] ?? '욕';
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [V2Colors.goldLight, V2Colors.gold, V2Colors.goldDark],
-          stops: [0.0, 0.6, 1.0],
-        ),
-        border: Border.fromBorderSide(BorderSide(color: V2Colors.goldDark, width: 1.2)),
-      ),
-      child: Text(
-        glyph,
-        style: TextStyle(
-          fontFamily: doguHeroFontFamily,
-          fontWeight: FontWeight.w800,
-          fontSize: size * 0.5,
-          color: V2Colors.ink,
-          height: 1.0,
-        ),
-      ),
-    );
-  }
-}
-
-/// `[마법 카드]`식 브래킷 타입라인 — 섹션/카테고리 라벨에 사용.
+/// `[ … ]`식 브래킷 타입라인 — 섹션 라벨에 사용.
 class V2TypeLine extends StatelessWidget {
   const V2TypeLine(this.label, {this.color = V2Colors.inkSoft, super.key});
   final String label;
@@ -310,8 +265,12 @@ class V2EmptyState extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
         child: Column(
           children: [
-            const V2AttributeBadge(categoryKey: 'greed', size: 40),
-            const SizedBox(height: 14),
+            Container(
+              width: 44,
+              height: 3,
+              decoration: BoxDecoration(color: V2Colors.gold, borderRadius: BorderRadius.circular(2)),
+            ),
+            const SizedBox(height: 16),
             Text(title, style: V2Text.title.copyWith(fontSize: 16), textAlign: TextAlign.center),
             const SizedBox(height: 6),
             Text(message, style: V2Text.body.copyWith(fontSize: 12.5), textAlign: TextAlign.center),
@@ -392,21 +351,14 @@ class V2ProductCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 이름판: 브랜드 + 속성 배지
+          // 이름판: 브랜드
           Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    product.brand,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: V2Text.title.copyWith(color: V2Colors.tealInk, fontSize: 12.5),
-                  ),
-                ),
-                V2AttributeBadge(categoryKey: product.categoryKey, size: 22),
-              ],
+            padding: const EdgeInsets.only(bottom: 6, left: 2, right: 2),
+            child: Text(
+              product.brand,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: V2Text.title.copyWith(color: V2Colors.tealInk, fontSize: 12.5),
             ),
           ),
           // 금테 아트워크 + 코너 배지들
