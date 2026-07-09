@@ -11,8 +11,7 @@ const String kBundledSeedJson = r'''
       "count": 186,
       "description": "오디오 · 주방가전 · 스마트홈 · 액세서리",
       "tone": "#2563EB",
-      "featured": true,
-      "image_url": "https://picsum.photos/seed/dogu-category-gadget/720/960"
+      "featured": true
     },
     {
       "id": "home",
@@ -20,8 +19,7 @@ const String kBundledSeedJson = r'''
       "count": 298,
       "description": "주방 · 가구 · 패브릭 · 오브제 · 문구",
       "tone": "#16A34A",
-      "featured": true,
-      "image_url": "https://picsum.photos/seed/dogu-category-home/720/960"
+      "featured": true
     },
     {
       "id": "fashion",
@@ -29,8 +27,7 @@ const String kBundledSeedJson = r'''
       "count": 412,
       "description": "아우터 · 니트 · 셔츠 · 팬츠",
       "tone": "#DB2777",
-      "featured": true,
-      "image_url": "https://picsum.photos/seed/dogu-category-fashion/720/960"
+      "featured": true
     },
     {
       "id": "beauty",
@@ -38,8 +35,7 @@ const String kBundledSeedJson = r'''
       "count": 154,
       "description": "스킨케어 · 향수 · 바디 · 홈프래그런스",
       "tone": "#9333EA",
-      "featured": true,
-      "image_url": "https://picsum.photos/seed/dogu-category-beauty/720/960"
+      "featured": true
     },
     {
       "id": "sports",
@@ -47,8 +43,7 @@ const String kBundledSeedJson = r'''
       "count": 87,
       "description": "러닝 · 하이킹 · 워터 · 요가",
       "tone": "#0891B2",
-      "featured": true,
-      "image_url": "https://picsum.photos/seed/dogu-category-sports/720/960"
+      "featured": true
     },
     {
       "id": "kids",
@@ -56,8 +51,7 @@ const String kBundledSeedJson = r'''
       "count": 112,
       "description": "의류 · 장난감 · 가구 · 식기 · 펫",
       "tone": "#EAB308",
-      "featured": true,
-      "image_url": "https://picsum.photos/seed/dogu-category-kids/720/960"
+      "featured": true
     }
   ],
   "products": [
@@ -80,12 +74,6 @@ const String kBundledSeedJson = r'''
         "new_arrival",
         "best",
         "desk_setup"
-      ],
-      "image_url": "https://picsum.photos/seed/dogu-p01-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p01-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p01-1/960/960",
-        "https://picsum.photos/seed/dogu-p01-2/960/960"
       ],
       "artwork": {
         "hue": 220,
@@ -113,12 +101,6 @@ const String kBundledSeedJson = r'''
       "tags": [
         "today_deal",
         "desk_setup"
-      ],
-      "image_url": "https://picsum.photos/seed/dogu-p02-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p02-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p02-1/960/960",
-        "https://picsum.photos/seed/dogu-p02-2/960/960"
       ],
       "artwork": {
         "hue": 35,
@@ -148,12 +130,6 @@ const String kBundledSeedJson = r'''
         "new_arrival",
         "summer_best"
       ],
-      "image_url": "https://picsum.photos/seed/dogu-p03-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p03-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p03-1/960/960",
-        "https://picsum.photos/seed/dogu-p03-2/960/960"
-      ],
       "artwork": {
         "hue": 195,
         "saturation": 35,
@@ -180,12 +156,6 @@ const String kBundledSeedJson = r'''
       "tags": [
         "new_arrival",
         "summer_best"
-      ],
-      "image_url": "https://picsum.photos/seed/dogu-p04-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p04-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p04-1/960/960",
-        "https://picsum.photos/seed/dogu-p04-2/960/960"
       ],
       "artwork": {
         "hue": 165,
@@ -214,12 +184,6 @@ const String kBundledSeedJson = r'''
         "best",
         "today_deal"
       ],
-      "image_url": "https://picsum.photos/seed/dogu-p05-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p05-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p05-1/960/960",
-        "https://picsum.photos/seed/dogu-p05-2/960/960"
-      ],
       "artwork": {
         "hue": 0,
         "saturation": 0,
@@ -246,12 +210,6 @@ const String kBundledSeedJson = r'''
       "tags": [
         "today_deal",
         "beauty_pick"
-      ],
-      "image_url": "https://picsum.photos/seed/dogu-p06-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p06-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p06-1/960/960",
-        "https://picsum.photos/seed/dogu-p06-2/960/960"
       ],
       "artwork": {
         "hue": 340,
@@ -280,12 +238,6 @@ const String kBundledSeedJson = r'''
         "today_deal",
         "summer_best"
       ],
-      "image_url": "https://picsum.photos/seed/dogu-p07-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p07-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p07-1/960/960",
-        "https://picsum.photos/seed/dogu-p07-2/960/960"
-      ],
       "artwork": {
         "hue": 95,
         "saturation": 35,
@@ -311,12 +263,6 @@ const String kBundledSeedJson = r'''
       "blurb": "두툼한 320g 기모. 오버핏 실루엣 · 와이드 후드 · 사이드 포켓. 봄가을 데일리.",
       "tags": [
         "new_arrival"
-      ],
-      "image_url": "https://picsum.photos/seed/dogu-p08-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p08-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p08-1/960/960",
-        "https://picsum.photos/seed/dogu-p08-2/960/960"
       ],
       "artwork": {
         "hue": 30,
@@ -345,12 +291,6 @@ const String kBundledSeedJson = r'''
         "best",
         "desk_setup"
       ],
-      "image_url": "https://picsum.photos/seed/dogu-p09-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p09-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p09-1/960/960",
-        "https://picsum.photos/seed/dogu-p09-2/960/960"
-      ],
       "artwork": {
         "hue": 250,
         "saturation": 15,
@@ -376,12 +316,6 @@ const String kBundledSeedJson = r'''
       "blurb": "버튼 하나로 자동 회전 · 간식을 천천히 흘려 노즈워크 자극. 분리불안 완화에 도움.",
       "tags": [
         "best"
-      ],
-      "image_url": "https://picsum.photos/seed/dogu-p10-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p10-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p10-1/960/960",
-        "https://picsum.photos/seed/dogu-p10-2/960/960"
       ],
       "artwork": {
         "hue": 25,
@@ -410,12 +344,6 @@ const String kBundledSeedJson = r'''
         "new_arrival",
         "summer_best"
       ],
-      "image_url": "https://picsum.photos/seed/dogu-p11-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p11-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p11-1/960/960",
-        "https://picsum.photos/seed/dogu-p11-2/960/960"
-      ],
       "artwork": {
         "hue": 280,
         "saturation": 25,
@@ -443,12 +371,6 @@ const String kBundledSeedJson = r'''
       "tags": [
         "new_arrival",
         "desk_setup"
-      ],
-      "image_url": "https://picsum.photos/seed/dogu-p12-main/960/960",
-      "thumbnail_url": "https://picsum.photos/seed/dogu-p12-thumb/480/480",
-      "gallery": [
-        "https://picsum.photos/seed/dogu-p12-1/960/960",
-        "https://picsum.photos/seed/dogu-p12-2/960/960"
       ],
       "artwork": {
         "hue": 210,
