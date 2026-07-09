@@ -183,12 +183,12 @@ class Header extends StatelessWidget {
                 const Text(
                   '욕망의 장바구니',
                   style: TextStyle(
-                    fontFamily: doguHeroFontFamily,
-                    fontFamilyFallback: [doguFontFamily],
+                    fontFamily: doguTitleFontFamily,
+                    fontFamilyFallback: [doguHeroFontFamily, doguFontFamily],
                     color: AppColors.accent,
-                    fontSize: 21,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.1,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 0.2,
                   ),
                 ),
               ],

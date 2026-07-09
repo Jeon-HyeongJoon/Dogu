@@ -166,14 +166,14 @@ void main() {
   });
 
   // ── [ui] 폰트 적용: 브랜드 타이틀=둥근 고딕(NanumSquareRound), 광고 헤드라인=각진 Pretendard ──
-  testWidgets('brand title uses rounded font; hero headline uses the angular base font', (tester) async {
+  testWidgets('brand title uses the handwriting font; hero headline uses the angular base font', (tester) async {
     final store = AppStore(repository: _FakeRepository(results: const []));
     store.dealProducts = const [];
     await tester.pumpWidget(DoguApp(store: store, initializeStore: false));
 
-    // 상단 브랜드 타이틀은 둥근 굴림체(NanumSquareRound)
+    // 상단 브랜드 타이틀은 손글씨체(HSBombaram/봄바람)
     final brandTitle = tester.widget<Text>(find.text('욕망의 장바구니'));
-    expect(brandTitle.style?.fontFamily, doguHeroFontFamily);
+    expect(brandTitle.style?.fontFamily, doguTitleFontFamily);
 
     // 광고 메인 문구(44px 헤드라인)는 각진 기본 폰트(Pretendard)
     final heroHeadline = tester

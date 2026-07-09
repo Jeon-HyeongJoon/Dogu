@@ -37,3 +37,6 @@ flutter:
     - assets/fonts/nanumsquareround/NanumSquareRoundR.ttf
     - assets/fonts/nanumsquareround/NanumSquareRoundB.ttf
     - assets/fonts/nanumsquareround/NanumSquareRoundEB.ttf
+    # HSBombaram(봄바람) 손글씨체 — 상단 브랜드 타이틀 전용. assets: + 런타임 FontLoader.
+    - assets/fonts/hsbombaram/HSBombaram-Regular.otf
+    - assets/fonts/hsbombaram/HSBombaram-Thin.otf
