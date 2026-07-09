@@ -43,15 +43,17 @@ class V2Header extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Expanded(
-            child: Text(
-              '욕망의 항아리',
-              style: V2Text.display.copyWith(color: V2Colors.tealInk, fontSize: 20),
-            ),
+          Text(
+            '욕망의 항아리',
+            style: V2Text.display.copyWith(color: V2Colors.tealInk, fontSize: 20),
           ),
-          const V2TypeLine('마법 카드', color: V2Colors.goldLight),
-          const SizedBox(width: 10),
-          const V2AttributeBadge(categoryKey: 'greed', size: 30),
+          const SizedBox(width: 8),
+          Container(
+            margin: const EdgeInsets.only(top: 2),
+            width: 6,
+            height: 6,
+            decoration: const BoxDecoration(color: V2Colors.goldLight, shape: BoxShape.circle),
+          ),
         ],
       ),
     );
@@ -127,27 +129,18 @@ class V2CategoryStrip extends StatelessWidget {
         children: [
           for (final c in categories)
             Container(
-              padding: const EdgeInsets.fromLTRB(6, 5, 12, 5),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 color: V2Colors.cream,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: V2Colors.creamBorder),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  V2AttributeBadge(categoryKey: _categoryKeyOf(c), size: 22),
-                  const SizedBox(width: 7),
-                  Text(c.name, style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 12.5, fontWeight: FontWeight.w700)),
-                ],
-              ),
+              child: Text(c.name, style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 12.5, fontWeight: FontWeight.w700)),
             ),
         ],
       ),
     );
   }
-
-  String _categoryKeyOf(CategoryItem c) => _normalizeCategoryKey(c.id.isEmpty ? c.name : c.id);
 }
 
 /// 반응형 상품 그리드 — Wrap 기반이라 셀 높이가 콘텐츠에 맞춰져 오버플로 없음.

@@ -139,8 +139,7 @@ class V2CategoryRow extends StatelessWidget {
               width: 26,
               child: Text(index.toString().padLeft(2, '0'), style: V2Text.mono.copyWith(fontSize: 12, color: V2Colors.inkFaint)),
             ),
-            V2AttributeBadge(categoryKey: _normalizeCategoryKey(item.id.isEmpty ? item.name : item.id), size: 26),
-            const SizedBox(width: 12),
+            const SizedBox(width: 4),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

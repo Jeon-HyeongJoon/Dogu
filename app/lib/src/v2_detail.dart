@@ -63,14 +63,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(product.brand, style: V2Text.title.copyWith(color: V2Colors.tealInk, fontSize: 14)),
-                              ),
-                              V2AttributeBadge(categoryKey: product.categoryKey, size: 28),
-                            ],
-                          ),
+                          Text(product.brand, style: V2Text.title.copyWith(color: V2Colors.tealInk, fontSize: 14)),
                           const SizedBox(height: 8),
                           Stack(
                             children: [
