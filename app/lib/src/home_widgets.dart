@@ -174,22 +174,26 @@ class Header extends StatelessWidget {
                 ClipOval(
                   child: Image.asset(
                     'assets/logo-square.png',
-                    width: 28,
-                    height: 28,
+                    width: 34,
+                    height: 34,
                     fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Text(
-                  '욕망의 장바구니',
-                  style: TextStyle(
-                    fontFamily: doguTitleFontFamily,
-                    fontFamilyFallback: [doguHeroFontFamily, doguFontFamily],
-                    color: AppColors.accent,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w100,
-                    height: 1.0,
-                    letterSpacing: 0.2,
+                // 타이틀만 위쪽으로 2 여백을 더하고 아래쪽을 2 줄인 효과(=아래로 2px 이동, 높이 유지).
+                Transform.translate(
+                  offset: const Offset(0, 2),
+                  child: const Text(
+                    '욕망의 장바구니',
+                    style: TextStyle(
+                      fontFamily: doguTitleFontFamily,
+                      fontFamilyFallback: [doguHeroFontFamily, doguFontFamily],
+                      color: AppColors.accent,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w100,
+                      height: 1.0,
+                      letterSpacing: 0.2,
+                    ),
                   ),
                 ),
               ],
