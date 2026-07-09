@@ -1,0 +1,46 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:dogu_mobile_shop/main.dart';
+
+// v2 화면의 상호작용이 v1과 동일하게 공유 AppStore에 배선됐는지 CI에서 검증한다.
+// (골든과 달리 폰트/플랫폼 렌더에 의존하지 않으므로 CI에서 그대로 실행된다.)
+Future<AppStore> _pumpShell(WidgetTester tester, int tab, {Map<String, int>? cart}) async {
+  SharedPreferences.setMockInitialValues({});
+  final store = AppStore();
+  if (cart != null) store.cartQuantities = cart;
+  await tester.pumpWidget(
+    AppStateScope(
+      store: store,
+      child: MaterialApp(home: V2Shell(initialTab: tab)),
+    ),
+  );
+  await tester.pump();
+  return store;
+}
+
+void main() {
+  testWidgets('v2 category quick filter updates the store', (tester) async {
+    final store = await _pumpShell(tester, 1);
+    expect(store.categoryQuickFilter, 'all');
+    await tester.tap(find.text('딜'));
+    await tester.pump();
+    expect(store.categoryQuickFilter, 'deal');
+  });
+
+  testWidgets('v2 cart quantity stepper increments the cart', (tester) async {
+    final store = await _pumpShell(tester, 4, cart: {'p01': 1});
+    await tester.tap(find.byIcon(Icons.add_rounded).first);
+    await tester.pump();
+    expect(store.cartQuantities['p01'], 2);
+  });
+
+  testWidgets('v2 cart select-all toggles selection', (tester) async {
+    final store = await _pumpShell(tester, 4, cart: {'p01': 1, 'p03': 1});
+    expect(store.selectedCartIds.length, 2);
+    await tester.tap(find.text('전체 선택'));
+    await tester.pump();
+    expect(store.selectedCartIds, isEmpty);
+  });
+}
