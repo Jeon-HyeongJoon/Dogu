@@ -171,18 +171,22 @@ class Header extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ClipOval(
-                  child: Image.asset(
-                    'assets/logo-square.png',
-                    width: 34,
-                    height: 34,
-                    fit: BoxFit.cover,
+                // 로고는 2px 위로 올린다(높이 유지).
+                Transform.translate(
+                  offset: const Offset(0, -2),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/logo-square.png',
+                      width: 36,
+                      height: 36,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                // 타이틀만 위쪽으로 2 여백을 더하고 아래쪽을 2 줄인 효과(=아래로 2px 이동, 높이 유지).
+                const SizedBox(width: 6),
+                // 타이틀은 아래로 4px 이동(높이 유지).
                 Transform.translate(
-                  offset: const Offset(0, 2),
+                  offset: const Offset(0, 4),
                   child: const Text(
                     '욕망의 장바구니',
                     style: TextStyle(
