@@ -307,10 +307,11 @@ class V2TagChip extends StatelessWidget {
 
 /// 섹션 헤더 — 인덱스 + 제목 + 브래킷 타입라인(TCG 카드 상단 느낌).
 class V2SectionHeader extends StatelessWidget {
-  const V2SectionHeader({required this.index, required this.title, required this.typeLine, super.key});
+  const V2SectionHeader({required this.index, required this.title, required this.typeLine, this.onTypeLineTap, super.key});
   final String index;
   final String title;
   final String typeLine;
+  final VoidCallback? onTypeLineTap;
 
   @override
   Widget build(BuildContext context) {
@@ -330,7 +331,14 @@ class V2SectionHeader extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(child: Text(title, style: V2Text.title.copyWith(fontSize: 21))),
-          V2TypeLine(typeLine),
+          if (onTypeLineTap == null)
+            V2TypeLine(typeLine)
+          else
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onTypeLineTap,
+              child: V2TypeLine(typeLine, color: V2Colors.maroon),
+            ),
         ],
       ),
     );

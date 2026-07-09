@@ -6,10 +6,11 @@ import 'package:dogu_mobile_shop/main.dart';
 
 // v2 화면의 상호작용이 v1과 동일하게 공유 AppStore에 배선됐는지 CI에서 검증한다.
 // (골든과 달리 폰트/플랫폼 렌더에 의존하지 않으므로 CI에서 그대로 실행된다.)
-Future<AppStore> _pumpShell(WidgetTester tester, int tab, {Map<String, int>? cart}) async {
+Future<AppStore> _pumpShell(WidgetTester tester, int tab, {Map<String, int>? cart, List<String>? recent}) async {
   SharedPreferences.setMockInitialValues({});
   final store = AppStore();
   if (cart != null) store.cartQuantities = cart;
+  if (recent != null) store.recentSearches = recent;
   await tester.pumpWidget(
     AppStateScope(
       store: store,
@@ -50,5 +51,13 @@ void main() {
     await tester.tap(find.byIcon(Icons.favorite_border_rounded).first);
     await tester.pump();
     expect(store.wishlistIds, isNotEmpty);
+  });
+
+  testWidgets('v2 search "전체 삭제" clears recent searches', (tester) async {
+    final store = await _pumpShell(tester, 2, recent: const ['린넨 셔츠', '스피커']);
+    expect(store.recentSearches, isNotEmpty);
+    await tester.tap(find.textContaining('전체 삭제'));
+    await tester.pump();
+    expect(store.recentSearches, isEmpty);
   });
 }
