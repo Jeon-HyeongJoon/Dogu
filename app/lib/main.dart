@@ -50,6 +50,13 @@ const doguHeroFontAssets = <String>[
   'assets/fonts/nanumsquareround/NanumSquareRoundEB.ttf',
 ];
 
+// 상단 브랜드 타이틀('욕망의 장바구니') 전용 손글씨체 HSBombaram(봄바람).
+const doguTitleFontFamily = 'HSBombaram';
+const doguTitleFontAssets = <String>[
+  'assets/fonts/hsbombaram/HSBombaram-Thin.otf',
+  'assets/fonts/hsbombaram/HSBombaram-Regular.otf',
+];
+
 typedef AppRunner = void Function(Widget app);
 
 void main() => bootstrap();
@@ -88,6 +95,7 @@ Future<void> loadDoguFonts() async {
   await Future.wait([
     _loadFontFamily(doguFontFamily, doguFontAssets),
     _loadFontFamily(doguHeroFontFamily, doguHeroFontAssets),
+    _loadFontFamily(doguTitleFontFamily, doguTitleFontAssets),
   ]);
 }
 
