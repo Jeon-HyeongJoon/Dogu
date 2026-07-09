@@ -174,19 +174,19 @@ class Header extends StatelessWidget {
                 ClipOval(
                   child: Image.asset(
                     'assets/logo-square.png',
-                    width: 26,
-                    height: 26,
+                    width: 22,
+                    height: 22,
                     fit: BoxFit.cover,
                   ),
                 ),
-                const SizedBox(width: 9),
+                const SizedBox(width: 8),
                 const Text(
                   '욕망의 장바구니',
                   style: TextStyle(
                     fontFamily: doguTitleFontFamily,
                     fontFamilyFallback: [doguHeroFontFamily, doguFontFamily],
                     color: AppColors.accent,
-                    fontSize: 30,
+                    fontSize: 24,
                     fontWeight: FontWeight.w100,
                     height: 1.0,
                     letterSpacing: 0.2,
