@@ -395,19 +395,45 @@ class _V2SearchBodyState extends State<V2SearchBody> {
 }
 
 /// 찜 탭 — 위시리스트 상품 그리드(비어 있으면 빈 상태).
-class V2WishBody extends StatelessWidget {
+/// 찜 탭 — 위시리스트 그리드 + 전체/세일 필터(v1 WishTabPage 미러). 카드 하트로 담기/빼기.
+class V2WishBody extends StatefulWidget {
   const V2WishBody({super.key});
 
   @override
+  State<V2WishBody> createState() => _V2WishBodyState();
+}
+
+class _V2WishBodyState extends State<V2WishBody> {
+  String _filter = 'all';
+
+  @override
   Widget build(BuildContext context) {
-    final wish = AppStateScope.watch(context).wishlistProducts;
+    final all = AppStateScope.watch(context).wishlistProducts;
+    final items = _filter == 'sale' ? all.where((p) => p.hasDiscount).toList() : all;
     return V2ScrollBody(
       builder: (context, cols) => [
         const V2SectionHeader(index: '찜', title: '찜한 카드', typeLine: '마이 컬렉션'),
-        if (wish.isEmpty)
+        if (all.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: V2Space.pad),
+            child: Row(
+              children: [
+                _V2FilterChip(label: '전체', active: _filter == 'all', onTap: () => setState(() => _filter = 'all')),
+                const SizedBox(width: 8),
+                _V2FilterChip(label: '세일', active: _filter == 'sale', onTap: () => setState(() => _filter = 'sale')),
+                const Spacer(),
+                Text('${all.length} 카드', style: V2Text.mono.copyWith(fontSize: 12)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        if (all.isEmpty)
           const V2EmptyState(title: '찜한 카드가 없어요', message: '마음에 드는 상품의 하트를 눌러 컬렉션에 담아보세요.')
+        else if (items.isEmpty)
+          const V2EmptyState(title: '세일 중인 찜이 없어요', message: '전체 보기로 찜한 카드를 모두 확인하세요.')
         else
-          V2ProductGrid(products: wish, columns: cols),
+          V2ProductGrid(products: items, columns: cols),
       ],
     );
   }

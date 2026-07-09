@@ -344,6 +344,7 @@ class V2ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final wished = AppStateScope.watch(context).wishlistIds.contains(product.id);
     return V2CardFrame(
       onTap: () => openV2ProductDetail(context, product),
       padding: const EdgeInsets.all(7),
@@ -376,6 +377,26 @@ class V2ProductCard extends StatelessWidget {
                   ),
                 ),
               Positioned(right: 4, bottom: 4, child: V2SetCode(product.id, color: Colors.white70)),
+              Positioned(
+                right: 4,
+                top: 4,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => AppStateScope.read(context).toggleWishlist(product),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: V2Colors.tealDark.withValues(alpha: 0.55),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      wished ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                      size: 16,
+                      color: wished ? V2Colors.goldLight : Colors.white,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),
