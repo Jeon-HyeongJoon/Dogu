@@ -43,4 +43,12 @@ void main() {
     await tester.pump();
     expect(store.selectedCartIds, isEmpty);
   });
+
+  testWidgets('v2 product card heart toggles the wishlist', (tester) async {
+    final store = await _pumpShell(tester, 0);
+    expect(store.wishlistIds, isEmpty);
+    await tester.tap(find.byIcon(Icons.favorite_border_rounded).first);
+    await tester.pump();
+    expect(store.wishlistIds, isNotEmpty);
+  });
 }

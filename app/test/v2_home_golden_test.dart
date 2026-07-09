@@ -83,9 +83,11 @@ Future<void> _pumpShell(WidgetTester tester, Size size, int initialTab) async {
   SharedPreferences.setMockInitialValues({});
   // initialize()를 부르지 않아 store 필드는 seed 파생 fallback(결정적 데이터)로 유지된다.
   final store = AppStore();
-  // 장바구니 탭은 기능 레이아웃(선택/수량/합계)이 보이도록 샘플 상품을 시드한다.
+  // 장바구니/찜 탭은 기능 레이아웃이 보이도록 샘플 상품을 시드한다.
   if (initialTab == 4) {
     store.cartQuantities = {'p01': 2, 'p03': 1};
+  } else if (initialTab == 3) {
+    store.wishlistIds = {'p01', 'p03'};
   }
   await tester.pumpWidget(
     AppStateScope(
