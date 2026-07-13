@@ -12,7 +12,7 @@ class DoguApp extends StatefulWidget {
   final AppStore? store;
   final bool initializeStore;
   final int initialTabIndex;
-  // 기본은 v1. v2(유희왕 마법 카드 테마)는 `/v2` 라우트 또는 useV2:true로 접근한다.
+  // 기본은 v1. v2(aggressive-clean 테마)는 `/v2` 라우트 또는 useV2:true로 접근한다.
   final bool useV2;
 
   @override
@@ -101,7 +101,7 @@ class _DoguAppState extends State<DoguApp> {
             return ProductDetailPage(product: product);
           },
         ),
-        // v2 디자인(유희왕 마법 카드 테마) 5탭 앱. v1과 병존.
+        // v2 디자인(aggressive-clean 테마) 5탭 앱. v1과 병존.
         GoRoute(path: '/v2', builder: (context, state) => const V2Shell()),
       ],
     );
