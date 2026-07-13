@@ -50,7 +50,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
     final product = widget.product;
     final wished = AppStateScope.watch(context).wishlistIds.contains(product.id);
     return Scaffold(
-      backgroundColor: V2Colors.parchment,
+      backgroundColor: V2Colors.bg,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -66,7 +66,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(product.brand, style: V2Text.title.copyWith(color: V2Colors.tealInk, fontSize: 14)),
+                          Text(product.brand, style: V2Text.title.copyWith(fontSize: 14)),
                           const SizedBox(height: 8),
                           Stack(
                             children: [
@@ -77,8 +77,8 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                                   top: 6,
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                                    color: V2Colors.maroon,
-                                    child: Text(product.discount, style: V2Text.mono.copyWith(color: Colors.white, fontSize: 12)),
+                                    color: V2Colors.accent,
+                                    child: Text(product.discount, style: V2Text.mono.copyWith(color: V2Colors.accentInk, fontSize: 12)),
                                   ),
                                 ),
                               Positioned(right: 6, bottom: 6, child: V2SetCode(product.id, color: Colors.white70)),
@@ -104,7 +104,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.baseline,
                           textBaseline: TextBaseline.alphabetic,
                           children: [
-                            Text(product.price, style: V2Text.display.copyWith(color: V2Colors.maroon, fontSize: 26)),
+                            Text(product.price, style: V2Text.display.copyWith(fontSize: 28)),
                             if (product.hasDiscount) ...[
                               const SizedBox(width: 8),
                               Text(
@@ -172,17 +172,14 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
     return Container(
       height: V2Space.headerHeight,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: const BoxDecoration(
-        color: V2Colors.teal,
-        border: Border(bottom: BorderSide(color: V2Colors.goldDark, width: V2Space.goldBorder)),
-      ),
+      color: V2Colors.jet,
       child: Row(
         children: [
           IconButton(
             onPressed: () => Navigator.of(context).maybePop(),
-            icon: const Icon(Icons.chevron_left_rounded, color: V2Colors.tealInk),
+            icon: const Icon(Icons.chevron_left_rounded, color: V2Colors.jetInk),
           ),
-          Text('카드 상세', style: V2Text.title.copyWith(color: V2Colors.tealInk, fontSize: 17)),
+          Text('카드 상세', style: V2Text.title.copyWith(color: V2Colors.jetInk, fontSize: 17)),
         ],
       ),
     );
@@ -193,8 +190,8 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
     return Container(
       padding: EdgeInsets.fromLTRB(V2Space.pad, 10, V2Space.pad, 10 + bottomInset),
       decoration: const BoxDecoration(
-        color: V2Colors.cream,
-        border: Border(top: BorderSide(color: V2Colors.creamBorder)),
+        color: V2Colors.bg,
+        border: Border(top: BorderSide(color: V2Colors.line)),
       ),
       child: Row(
         children: [
@@ -205,11 +202,11 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
               height: 52,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: V2Colors.parchment,
-                borderRadius: BorderRadius.circular(V2Space.artRadius),
-                border: Border.all(color: V2Colors.goldDark),
+                color: V2Colors.bg,
+                borderRadius: BorderRadius.circular(V2Space.radius),
+                border: Border.all(color: V2Colors.line),
               ),
-              child: Icon(wished ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: V2Colors.maroon),
+              child: Icon(wished ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: V2Colors.accent),
             ),
           ),
           const SizedBox(width: 12),
@@ -220,13 +217,12 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                 height: 52,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: V2Colors.teal,
-                  borderRadius: BorderRadius.circular(V2Space.artRadius),
-                  border: Border.all(color: V2Colors.goldDark, width: V2Space.goldBorder),
+                  color: V2Colors.jet,
+                  borderRadius: BorderRadius.circular(V2Space.radius),
                 ),
                 child: Text(
                   (_added && widget.onGoToCart != null) ? '장바구니 보기' : '장바구니에 담기',
-                  style: V2Text.title.copyWith(color: V2Colors.goldLight, fontSize: 16),
+                  style: V2Text.title.copyWith(color: V2Colors.jetInk, fontSize: 16),
                 ),
               ),
             ),
@@ -251,9 +247,9 @@ class _QtyButton extends StatelessWidget {
         height: 34,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: V2Colors.cream,
-          borderRadius: BorderRadius.circular(V2Space.artRadius),
-          border: Border.all(color: V2Colors.creamBorder),
+          color: V2Colors.bg,
+          borderRadius: BorderRadius.circular(V2Space.radius),
+          border: Border.all(color: V2Colors.line),
         ),
         child: Icon(icon, size: 18, color: V2Colors.ink),
       ),

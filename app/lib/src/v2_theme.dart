@@ -1,47 +1,41 @@
 part of '../main.dart';
 
 // ─────────────────────────────────────────────────────────────────────────
-// v2 "욕망의 항아리" 디자인 시스템 — 유희왕 마법(Spell) 카드 프레임에서 DNA를 잡는다.
-//   · 주색 = 마법 카드 청록(teal) 프레임
-//   · 테두리 = 금색/브론즈 트림(아트워크 프레임)
-//   · 패널 = 크림/베이지 효과 텍스트 박스
-//   · 잉크 = 짙은 갈색-블랙 + 마룬 포인트(아트 배경 적색)
-//   · 요소 = 카드 프레임형 타일, 속성 원형 배지, [브래킷] 타입라인, 모서리 세트코드
+// v2 "Aggressive & Clean" 디자인 시스템 — 고대비 커머스 문법(무신사·29CM 계열).
+//   · 배경 = 순백, 구분은 여백과 헤어라인만 (장식 제로)
+//   · 블록 = 제트 블랙(헤더·히어로·주 CTA)으로 시선을 때린다
+//   · 액센트 = #ff3d00 하나 — 가격·할인·활성 상태 전용, 두 번째 유채색 금지
+//   · 타이포 = Pretendard ExtraBold 대형 디스플레이(자간 −1), 대문자 eyebrow
+//   · 상품 = 아트워크 풀블리드, 할인율 액센트 대형 표기 — 상품이 주인공
 // v2 위젯은 전용 const 토큰만 쓰므로 v1(AppColors) 트리와 완전히 분리된다.
+// (방향 문서: docs/DESIGN_REVIEW_V2.md)
 // ─────────────────────────────────────────────────────────────────────────
 
 class V2Colors {
-  static const parchment = Color(0xfff5f1e8); // 페이지 배경(깨끗한 웜 오프화이트)
-  static const parchmentSoft = Color(0xffece4d3);
+  static const bg = Color(0xffffffff); // 페이지 배경(순백)
+  static const surface = Color(0xfff4f4f2); // 서브 서피스(칩·입력창)
 
-  static const teal = Color(0xff0e6e5b); // 카드 프레임(깊은 에메랄드-그린)
-  static const tealDark = Color(0xff083f35);
-  static const tealLight = Color(0xff2f9f88);
-  static const tealInk = Color(0xfff2f9f4); // 그린 위 밝은 글씨
+  static const ink = Color(0xff0f0f0f); // 본문·디스플레이(거의 검정)
+  static const inkSoft = Color(0xff5c5c5c);
+  static const inkFaint = Color(0xff9c9c9c);
+  static const line = Color(0xffe7e7e5); // 헤어라인
 
-  static const gold = Color(0xffcaa348); // 아트워크 금색 트림
-  static const goldDark = Color(0xff8a6a1e);
-  static const goldLight = Color(0xffeccf7f);
+  static const jet = Color(0xff111111); // 블랙 블록(헤더·히어로·CTA)
+  static const jetInk = Color(0xfff5f5f3); // 블랙 블록 위 글씨
+  static const jetSoft = Color(0xff9a9a9a); // 블랙 블록 위 보조 글씨
+  static const jetLine = Color(0xff2e2e2e); // 블랙 블록 안 구분선
 
-  static const cream = Color(0xfff9f4e8); // 효과 텍스트 박스
-  static const creamBorder = Color(0xffd6c69a);
-
-  static const ink = Color(0xff1b140c);
-  static const inkSoft = Color(0xff5a4e3c);
-  static const inkFaint = Color(0xff90816a);
-
-  static const maroon = Color(0xff8f2b28); // 가격/할인 포인트(적색)
+  static const accent = Color(0xffff3d00); // 가격·할인·활성 — 유일한 유채색
+  static const accentInk = Color(0xffffffff); // 액센트 블록 위 글씨
 }
 
 class V2Space {
   static const pad = 20.0;
-  static const gap = 12.0;
-  static const radius = 10.0; // 카드 모서리
-  static const artRadius = 4.0; // 아트워크 프레임 모서리
-  static const frameBorder = 2.0; // 청록 프레임 두께
-  static const goldBorder = 2.5; // 금색 트림 두께
+  static const gap = 14.0;
+  static const radius = 4.0; // 카드·버튼 모서리(거의 각지게)
+  static const radiusSm = 2.0; // 배지·이미지 모서리
   static const headerHeight = 56.0;
-  static const tabHeight = 72.0;
+  static const tabHeight = 64.0;
 
   // 반응형: 모바일 좁은 캔버스 → 태블릿은 넓은 캔버스 + 더 많은 열.
   static const phoneMax = 440.0;
@@ -58,19 +52,19 @@ class V2Space {
 }
 
 class V2Text {
-  // 카드 이름판 느낌의 굵은 디스플레이(둥근 고딕)
+  // 대형 디스플레이 — ExtraBold + 타이트 자간이 v2의 목소리.
   static const TextStyle display = TextStyle(
-    fontFamily: doguHeroFontFamily,
+    fontFamily: doguFontFamily,
     fontWeight: FontWeight.w800,
     color: V2Colors.ink,
-    letterSpacing: -0.4,
-    height: 1.1,
+    letterSpacing: -1.0,
+    height: 1.05,
   );
   static const TextStyle title = TextStyle(
-    fontFamily: doguHeroFontFamily,
+    fontFamily: doguFontFamily,
     fontWeight: FontWeight.w800,
     color: V2Colors.ink,
-    letterSpacing: -0.2,
+    letterSpacing: -0.5,
     height: 1.15,
   );
   static const TextStyle body = TextStyle(
@@ -78,37 +72,31 @@ class V2Text {
     color: V2Colors.inkSoft,
     height: 1.5,
   );
-  // 세트코드/일련번호 — 모서리 코드 느낌(넓은 자간). 웹/골든 모두 확실히 렌더되도록
-  // 시스템 monospace 대신 번들 Pretendard를 쓴다(한글·기호 글리프 보장).
+  // 대문자 eyebrow/카운트 등 소형 레이블 — 넓은 자간으로 긴장감을 준다.
   static const TextStyle mono = TextStyle(
     fontFamily: doguFontFamily,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0.8,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 1.1,
     color: V2Colors.inkFaint,
   );
 }
 
-/// `[ … ]`식 브래킷 타입라인 — 섹션 라벨에 사용.
+/// 대문자 eyebrow 레이블 — 섹션 우측 액션/보조 표기에 사용.
 class V2TypeLine extends StatelessWidget {
-  const V2TypeLine(this.label, {this.color = V2Colors.inkSoft, super.key});
+  const V2TypeLine(this.label, {this.color = V2Colors.inkFaint, super.key});
   final String label;
   final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      '[ $label ]',
-      style: V2Text.body.copyWith(
-        color: color,
-        fontWeight: FontWeight.w700,
-        fontSize: 11.5,
-        letterSpacing: 0.6,
-      ),
+      label.toUpperCase(),
+      style: V2Text.mono.copyWith(color: color, fontSize: 11),
     );
   }
 }
 
-/// 모서리 세트코드/일련번호.
+/// 일련번호/카운트 등 초소형 캡션.
 class V2SetCode extends StatelessWidget {
   const V2SetCode(this.code, {this.color = V2Colors.inkFaint, super.key});
   final String code;
@@ -120,7 +108,7 @@ class V2SetCode extends StatelessWidget {
   }
 }
 
-/// 마법 카드 프레임 — 청록 테두리 + 안쪽 금색 트림, 자식을 감싼다.
+/// 플랫 카드 — 순백 + 헤어라인 1px. 그림자·이중 테두리 없음.
 class V2CardFrame extends StatelessWidget {
   const V2CardFrame({required this.child, this.padding, this.onTap, super.key});
   final Widget child;
@@ -131,30 +119,19 @@ class V2CardFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final frame = Container(
       decoration: BoxDecoration(
-        color: V2Colors.teal,
+        color: V2Colors.bg,
         borderRadius: BorderRadius.circular(V2Space.radius),
-        border: Border.all(color: V2Colors.tealDark, width: V2Space.frameBorder),
-        boxShadow: const [
-          BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 4)),
-        ],
+        border: Border.all(color: V2Colors.line),
       ),
-      padding: EdgeInsets.all(padding == null ? 7 : 0),
-      child: padding == null
-          ? Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(V2Space.artRadius),
-                border: Border.all(color: V2Colors.goldDark, width: 1),
-              ),
-              child: child,
-            )
-          : Padding(padding: padding!, child: child),
+      padding: padding ?? EdgeInsets.zero,
+      child: child,
     );
     if (onTap == null) return frame;
     return GestureDetector(behavior: HitTestBehavior.opaque, onTap: onTap, child: frame);
   }
 }
 
-/// 크림색 효과 텍스트 박스.
+/// 서브 서피스 박스 — 옅은 그레이 플랫 패널(입력창·요약 등).
 class V2Panel extends StatelessWidget {
   const V2Panel({required this.child, this.padding = const EdgeInsets.all(12), super.key});
   final Widget child;
@@ -166,16 +143,16 @@ class V2Panel extends StatelessWidget {
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: V2Colors.cream,
-        borderRadius: BorderRadius.circular(V2Space.artRadius),
-        border: Border.all(color: V2Colors.creamBorder),
+        color: V2Colors.surface,
+        borderRadius: BorderRadius.circular(V2Space.radius),
       ),
       child: child,
     );
   }
 }
 
-/// 상품 아트워크 박스 — 네트워크 이미지 없이 artwork(HSL+글리프)로 결정적 렌더.
+/// 상품 아트워크 — 네트워크 이미지 없이 artwork(HSL+글리프)로 결정적 렌더.
+/// 테두리 없이 풀블리드로 깔고, 브랜드 이니셜을 크게 얹는다.
 class V2Artwork extends StatelessWidget {
   const V2Artwork({required this.product, super.key});
   final ProductItem product;
@@ -184,7 +161,7 @@ class V2Artwork extends StatelessWidget {
   Widget build(BuildContext context) {
     final art = product.artwork;
     final base = art == null
-        ? V2Colors.tealLight
+        ? V2Colors.surface
         : HSLColor.fromAHSL(
             1,
             (art.hue % 360).toDouble(),
@@ -198,20 +175,20 @@ class V2Artwork extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [base, Color.lerp(base, V2Colors.maroon, 0.35) ?? base],
+            colors: [base, Color.lerp(base, V2Colors.ink, 0.25) ?? base],
           ),
-          border: const Border.fromBorderSide(BorderSide(color: V2Colors.goldDark, width: 1.5)),
+          borderRadius: BorderRadius.circular(V2Space.radiusSm),
         ),
         alignment: Alignment.center,
         // seed의 artwork.mono는 이색 특수문자(두부 위험)라, 확실히 렌더되는 브랜드
-        // 이니셜을 카드 아트 상징으로 크게 얹는다.
+        // 이니셜을 아트 상징으로 크게 얹는다.
         child: Text(
           product.brand.isEmpty ? '욕' : product.brand.substring(0, 1).toUpperCase(),
           style: TextStyle(
-            fontFamily: doguHeroFontFamily,
+            fontFamily: doguFontFamily,
             fontWeight: FontWeight.w800,
             fontSize: 52,
-            color: Colors.white.withValues(alpha: 0.92),
+            color: Colors.white.withValues(alpha: 0.9),
             height: 1.0,
           ),
         ),
@@ -251,7 +228,7 @@ class V2ScrollBody extends StatelessWidget {
   }
 }
 
-/// 빈 상태 — 크림 패널 안에 안내 문구(찜/장바구니/검색 결과 없음).
+/// 빈 상태 — 액센트 바 + 대형 타이틀. 장식 없이 타이포로만 말한다.
 class V2EmptyState extends StatelessWidget {
   const V2EmptyState({required this.title, required this.message, super.key});
   final String title;
@@ -260,28 +237,22 @@ class V2EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(V2Space.pad, 28, V2Space.pad, 0),
-      child: V2Panel(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
-        child: Column(
-          children: [
-            Container(
-              width: 44,
-              height: 3,
-              decoration: BoxDecoration(color: V2Colors.gold, borderRadius: BorderRadius.circular(2)),
-            ),
-            const SizedBox(height: 16),
-            Text(title, style: V2Text.title.copyWith(fontSize: 16), textAlign: TextAlign.center),
-            const SizedBox(height: 6),
-            Text(message, style: V2Text.body.copyWith(fontSize: 12.5), textAlign: TextAlign.center),
-          ],
-        ),
+      padding: const EdgeInsets.fromLTRB(V2Space.pad, 36, V2Space.pad, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(width: 28, height: 4, color: V2Colors.accent),
+          const SizedBox(height: 16),
+          Text(title, style: V2Text.title.copyWith(fontSize: 20)),
+          const SizedBox(height: 6),
+          Text(message, style: V2Text.body.copyWith(fontSize: 13, color: V2Colors.inkFaint)),
+        ],
       ),
     );
   }
 }
 
-/// 태그 칩 — 최근 검색/추천 브랜드 등.
+/// 태그 칩 — 최근 검색/추천 브랜드 등. 서피스 위 잉크, 각진 모서리.
 class V2TagChip extends StatelessWidget {
   const V2TagChip(this.label, {this.onTap, super.key});
   final String label;
@@ -293,19 +264,21 @@ class V2TagChip extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
-          color: V2Colors.cream,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: V2Colors.creamBorder),
+          color: V2Colors.surface,
+          borderRadius: BorderRadius.circular(V2Space.radiusSm),
         ),
-        child: Text(label, style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 12, fontWeight: FontWeight.w600)),
+        child: Text(
+          label,
+          style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 12.5, fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }
 }
 
-/// 섹션 헤더 — 인덱스 + 제목 + 브래킷 타입라인(TCG 카드 상단 느낌).
+/// 섹션 헤더 — 액센트 인덱스 eyebrow + 대형 타이틀 + 우측 액션.
 class V2SectionHeader extends StatelessWidget {
   const V2SectionHeader({required this.index, required this.title, required this.typeLine, this.onTypeLineTap, super.key});
   final String index;
@@ -316,28 +289,27 @@ class V2SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(V2Space.pad, 22, V2Space.pad, 12),
+      padding: const EdgeInsets.fromLTRB(V2Space.pad, 30, V2Space.pad, 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: V2Colors.teal,
-              borderRadius: BorderRadius.circular(3),
-              border: Border.all(color: V2Colors.goldDark, width: 1),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(index, style: V2Text.mono.copyWith(color: V2Colors.accent, fontSize: 10)),
+                const SizedBox(height: 4),
+                Text(title, style: V2Text.title.copyWith(fontSize: 23)),
+              ],
             ),
-            child: Text(index, style: V2Text.mono.copyWith(color: V2Colors.goldLight, fontSize: 10)),
           ),
-          const SizedBox(width: 10),
-          Expanded(child: Text(title, style: V2Text.title.copyWith(fontSize: 21))),
           if (onTypeLineTap == null)
             V2TypeLine(typeLine)
           else
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: onTypeLineTap,
-              child: V2TypeLine(typeLine, color: V2Colors.maroon),
+              child: V2TypeLine(typeLine, color: V2Colors.accent),
             ),
         ],
       ),
@@ -345,7 +317,7 @@ class V2SectionHeader extends StatelessWidget {
   }
 }
 
-/// 상품 미니 카드 — 마법 카드 프레임: 이름판 · 금테 아트 · 크림 효과 박스.
+/// 상품 카드 — 풀블리드 아트 + 브랜드/이름 + 할인율·가격. 프레임·그림자 없음.
 class V2ProductCard extends StatelessWidget {
   const V2ProductCard({required this.product, super.key});
   final ProductItem product;
@@ -353,7 +325,9 @@ class V2ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final wished = AppStateScope.watch(context).wishlistIds.contains(product.id);
-    return V2CardFrame(
+    final hasDiscount = product.discount.isNotEmpty && product.discount != '-0%';
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () => openV2ProductDetail(
         context,
         product,
@@ -362,96 +336,81 @@ class V2ProductCard extends StatelessWidget {
           V2NavScope.go(context, 4);
         },
       ),
-      padding: const EdgeInsets.all(7),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 이름판: 브랜드
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6, left: 2, right: 2),
-            child: Text(
-              product.brand,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: V2Text.title.copyWith(color: V2Colors.tealInk, fontSize: 12.5),
-            ),
-          ),
-          // 금테 아트워크 + 코너 배지들
+          // 풀블리드 아트워크 + 하트
           Stack(
             children: [
               V2Artwork(product: product),
-              if (product.discount.isNotEmpty && product.discount != '-0%')
-                Positioned(
-                  left: 4,
-                  top: 4,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                    color: V2Colors.maroon,
-                    child: Text(product.discount, style: V2Text.mono.copyWith(color: Colors.white, fontSize: 10)),
-                  ),
-                ),
-              Positioned(right: 4, bottom: 4, child: V2SetCode(product.id, color: Colors.white70)),
               Positioned(
-                right: 4,
-                top: 4,
+                right: 6,
+                top: 6,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () => AppStateScope.read(context).toggleWishlist(product),
                   child: Container(
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      color: V2Colors.tealDark.withValues(alpha: 0.55),
+                      color: V2Colors.ink.withValues(alpha: 0.35),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Icon(
                       wished ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                       size: 16,
-                      color: wished ? V2Colors.goldLight : Colors.white,
+                      color: wished ? V2Colors.accent : Colors.white,
                     ),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          // 크림 효과 박스: 상품명 + 가격
-          V2Panel(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          const SizedBox(height: 9),
+          // 브랜드 — 대문자 eyebrow
+          Text(
+            product.brand.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: V2Text.mono.copyWith(fontSize: 10, color: V2Colors.inkSoft),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            product.name,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 13, height: 1.3, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 7),
+          // 할인율(액센트) + 가격(볼드) + 정가(취소선)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              if (hasDiscount) ...[
                 Text(
-                  product.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 12.5, height: 1.3, fontWeight: FontWeight.w600),
+                  product.discount.replaceAll('-', '').replaceAll('−', ''),
+                  style: V2Text.title.copyWith(color: V2Colors.accent, fontSize: 16),
                 ),
-                const SizedBox(height: 6),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(product.price, style: V2Text.title.copyWith(color: V2Colors.maroon, fontSize: 15)),
-                    if (product.hasDiscount) ...[
-                      const SizedBox(width: 5),
-                      Flexible(
-                        child: Text(
-                          product.oldPrice,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: V2Text.body.copyWith(
-                            fontSize: 11,
-                            color: V2Colors.inkFaint,
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
+                const SizedBox(width: 5),
+              ],
+              Text(product.price, style: V2Text.title.copyWith(fontSize: 16)),
+              if (product.hasDiscount) ...[
+                const SizedBox(width: 5),
+                Flexible(
+                  child: Text(
+                    product.oldPrice,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: V2Text.body.copyWith(
+                      fontSize: 11,
+                      color: V2Colors.inkFaint,
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
                 ),
               ],
-            ),
+            ],
           ),
         ],
       ),

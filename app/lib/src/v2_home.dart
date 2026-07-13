@@ -31,7 +31,7 @@ class V2HomeBody extends StatelessWidget {
   }
 }
 
-/// 상단 청록 바 — 카드 이름 영역처럼 앱 타이틀 + 속성 배지.
+/// 상단 제트 블랙 바 — 앱 타이틀 + 액센트 도트.
 class V2Header extends StatelessWidget {
   const V2Header({super.key});
 
@@ -40,22 +40,19 @@ class V2Header extends StatelessWidget {
     return Container(
       height: V2Space.headerHeight,
       padding: const EdgeInsets.symmetric(horizontal: V2Space.pad),
-      decoration: const BoxDecoration(
-        color: V2Colors.teal,
-        border: Border(bottom: BorderSide(color: V2Colors.goldDark, width: V2Space.goldBorder)),
-      ),
+      color: V2Colors.jet,
       child: Row(
         children: [
           Text(
             '욕망의장바구니',
-            style: V2Text.display.copyWith(color: V2Colors.tealInk, fontSize: 20),
+            style: V2Text.display.copyWith(color: V2Colors.jetInk, fontSize: 20),
           ),
           const SizedBox(width: 8),
           Container(
             margin: const EdgeInsets.only(top: 2),
             width: 6,
             height: 6,
-            decoration: const BoxDecoration(color: V2Colors.goldLight, shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: V2Colors.accent, shape: BoxShape.circle),
           ),
         ],
       ),
@@ -77,13 +74,12 @@ class V2HomeSearchEntry extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: V2Colors.cream,
-            borderRadius: BorderRadius.circular(V2Space.artRadius),
-            border: Border.all(color: V2Colors.creamBorder),
+            color: V2Colors.surface,
+            borderRadius: BorderRadius.circular(V2Space.radius),
           ),
           child: Row(
             children: [
-              const Icon(Icons.search_rounded, size: 20, color: V2Colors.teal),
+              const Icon(Icons.search_rounded, size: 20, color: V2Colors.ink),
               const SizedBox(width: 10),
               Text('어떤 카드를 찾으시나요?', style: V2Text.body.copyWith(fontSize: 13.5, color: V2Colors.inkFaint)),
             ],
@@ -139,7 +135,7 @@ class _V2NewsletterBlockState extends State<V2NewsletterBlock> {
               child: TextField(
                 controller: _controller,
                 style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 13),
-                cursorColor: V2Colors.teal,
+                cursorColor: V2Colors.accent,
                 decoration: InputDecoration(
                   isDense: true,
                   border: InputBorder.none,
@@ -155,11 +151,10 @@ class _V2NewsletterBlockState extends State<V2NewsletterBlock> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: V2Colors.teal,
-                  borderRadius: BorderRadius.circular(V2Space.artRadius),
-                  border: Border.all(color: V2Colors.goldDark),
+                  color: V2Colors.jet,
+                  borderRadius: BorderRadius.circular(V2Space.radius),
                 ),
-                child: Text('구독', style: V2Text.title.copyWith(color: V2Colors.goldLight, fontSize: 13)),
+                child: Text('구독', style: V2Text.title.copyWith(color: V2Colors.jetInk, fontSize: 13)),
               ),
             ),
           ],
@@ -185,12 +180,12 @@ class V2HeroCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Expanded(child: V2TypeLine(store.heroEyebrow, color: V2Colors.goldLight)),
-                V2SetCode('SY-KR040', color: V2Colors.tealInk),
+                Expanded(child: V2TypeLine(store.heroEyebrow, color: V2Colors.accent)),
+                V2SetCode('SY-KR040', color: V2Colors.inkFaint),
               ],
             ),
             const SizedBox(height: 10),
-            Text(store.heroTitle, style: V2Text.display.copyWith(color: V2Colors.tealInk, fontSize: 26)),
+            Text(store.heroTitle, style: V2Text.display.copyWith(fontSize: 26)),
             const SizedBox(height: 12),
             V2Panel(
               child: Text(
@@ -209,9 +204,9 @@ class V2HeroCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // U+2212(−) 등 번들 폰트에 없는 기호는 ASCII로 정규화해 두부를 막는다.
-                      Text(stat.$1.replaceAll('−', '-'), style: V2Text.title.copyWith(color: V2Colors.goldLight, fontSize: 18)),
+                      Text(stat.$1.replaceAll('−', '-'), style: V2Text.title.copyWith(color: V2Colors.accent, fontSize: 18)),
                       const SizedBox(width: 4),
-                      Text(stat.$2, style: V2Text.body.copyWith(color: V2Colors.tealInk, fontSize: 11)),
+                      Text(stat.$2, style: V2Text.body.copyWith(color: V2Colors.inkSoft, fontSize: 11)),
                     ],
                   ),
               ],
@@ -246,9 +241,8 @@ class V2CategoryStrip extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: V2Colors.cream,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: V2Colors.creamBorder),
+                  color: V2Colors.surface,
+                  borderRadius: BorderRadius.circular(V2Space.radiusSm),
                 ),
                 child: Text(c.name, style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 12.5, fontWeight: FontWeight.w700)),
               ),
@@ -306,8 +300,8 @@ class V2BrandPanel extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  border: Border.all(color: V2Colors.goldDark),
-                  borderRadius: BorderRadius.circular(3),
+                  border: Border.all(color: V2Colors.line),
+                  borderRadius: BorderRadius.circular(V2Space.radiusSm),
                 ),
                 child: Text(b, style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 12, fontWeight: FontWeight.w600)),
               ),
