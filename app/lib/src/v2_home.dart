@@ -164,7 +164,7 @@ class _V2NewsletterBlockState extends State<V2NewsletterBlock> {
   }
 }
 
-/// 히어로 — 시즌 캠페인 카드(리디자인은 Task 36에서 블랙 블록으로).
+/// 히어로 — 제트 블랙 블록: 액센트 eyebrow + 대형 디스플레이 + 스탯 스트립.
 class V2HeroCard extends StatelessWidget {
   const V2HeroCard({required this.store, super.key});
   final AppStore store;
@@ -173,35 +173,38 @@ class V2HeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(V2Space.pad, V2Space.pad, V2Space.pad, 4),
-      child: V2CardFrame(
-        padding: const EdgeInsets.all(14),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
+        decoration: BoxDecoration(
+          color: V2Colors.jet,
+          borderRadius: BorderRadius.circular(V2Space.radius),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             V2TypeLine(store.heroEyebrow, color: V2Colors.accent),
+            const SizedBox(height: 12),
+            Text(store.heroTitle, style: V2Text.display.copyWith(color: V2Colors.jetInk, fontSize: 30)),
             const SizedBox(height: 10),
-            Text(store.heroTitle, style: V2Text.display.copyWith(fontSize: 26)),
-            const SizedBox(height: 12),
-            V2Panel(
-              child: Text(
-                store.heroSubtitle,
-                style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 13),
-              ),
-            ),
-            const SizedBox(height: 12),
+            Text(store.heroSubtitle, style: V2Text.body.copyWith(color: V2Colors.jetSoft, fontSize: 13)),
+            const SizedBox(height: 18),
+            Container(height: 1, color: V2Colors.jetLine),
+            const SizedBox(height: 14),
             Wrap(
-              spacing: 16,
-              runSpacing: 6,
+              spacing: 22,
+              runSpacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 for (final stat in store.heroStats)
                   Row(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     children: [
                       // U+2212(−) 등 번들 폰트에 없는 기호는 ASCII로 정규화해 두부를 막는다.
-                      Text(stat.$1.replaceAll('−', '-'), style: V2Text.title.copyWith(color: V2Colors.accent, fontSize: 18)),
-                      const SizedBox(width: 4),
-                      Text(stat.$2, style: V2Text.body.copyWith(color: V2Colors.inkSoft, fontSize: 11)),
+                      Text(stat.$1.replaceAll('−', '-'), style: V2Text.title.copyWith(color: V2Colors.accent, fontSize: 20)),
+                      const SizedBox(width: 5),
+                      Text(stat.$2, style: V2Text.body.copyWith(color: V2Colors.jetSoft, fontSize: 11)),
                     ],
                   ),
               ],
