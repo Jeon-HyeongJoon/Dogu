@@ -191,16 +191,14 @@ class Header extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // 로고는 2px 위로 올린다(높이 유지).
+                // 로고는 2px 위로 올린다(높이 유지). 36px 원형 이미지와 같은 박스를
+                // 유지하도록 마크(30)를 36 박스 중앙에 앉힌다 — 락업 튜닝 보존.
                 Transform.translate(
                   offset: const Offset(0, -2),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/logo-square.png',
-                      width: 36,
-                      height: 36,
-                      fit: BoxFit.cover,
-                    ),
+                  child: const SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: Center(child: DoguBrandMark(size: 30)),
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -1074,15 +1072,11 @@ class NeutralImageSurface extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Center(
+          const Center(
             child: Opacity(
               opacity: 0.14,
-              child: Image.asset(
-                'assets/logo-square.png',
-                width: 52,
-                height: 52,
-                fit: BoxFit.cover,
-              ),
+              // 워터마크는 단색 — 액센트 도트도 잉크로 눌러 은은하게.
+              child: DoguBrandMark(size: 52, bag: AppColors.ink3, dot: AppColors.ink3),
             ),
           ),
           if (child != null) child!,

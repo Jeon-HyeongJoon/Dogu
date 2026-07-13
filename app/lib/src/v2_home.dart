@@ -43,16 +43,11 @@ class V2Header extends StatelessWidget {
       color: V2Colors.jet,
       child: Row(
         children: [
+          const DoguBrandMark(size: 22, bag: V2Colors.jetInk, dot: V2Colors.accent),
+          const SizedBox(width: 9),
           Text(
             '욕망의장바구니',
             style: V2Text.display.copyWith(color: V2Colors.jetInk, fontSize: 20),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            margin: const EdgeInsets.only(top: 2),
-            width: 6,
-            height: 6,
-            decoration: const BoxDecoration(color: V2Colors.accent, shape: BoxShape.circle),
           ),
           const Spacer(),
           // v2 → v1 복귀 — GoRouter 밖(단독 위젯 테스트 등)에서는 탭이 조용히 무시된다.

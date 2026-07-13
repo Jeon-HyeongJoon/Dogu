@@ -408,7 +408,7 @@ class FooterSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              ClipOval(child: Image.asset('assets/logo-square.png', width: 30, height: 30)),
+              const DoguBrandMark(size: 26),
               const SizedBox(width: 9),
               const Text('욕망의장바구니', style: TextStyle(color: AppColors.accent, fontSize: 21, fontWeight: FontWeight.w900)),
             ],

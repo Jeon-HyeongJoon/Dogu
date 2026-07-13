@@ -45,10 +45,7 @@ void main() {
         ),
       ),
     );
-    // 에셋 로고(PNG) 디코딩을 강제해 골든에 실제로 렌더되게 한다.
-    await tester.runAsync(() async {
-      await precacheImage(const AssetImage('assets/logo-square.png'), tester.element(find.byType(Header)));
-    });
+    // 로고는 벡터 마크(DoguBrandMark)라 이미지 디코딩 없이 바로 렌더된다.
     await tester.pumpAndSettle();
 
     await expectLater(find.byType(Header), matchesGoldenFile('goldens/v1_header.png'));
