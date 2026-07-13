@@ -40,14 +40,14 @@ class V2Header extends StatelessWidget {
     return Container(
       height: V2Space.headerHeight,
       padding: const EdgeInsets.symmetric(horizontal: V2Space.pad),
-      color: V2Colors.jet,
+      color: V2Colors.pot,
       child: Row(
         children: [
-          const DoguBrandMark(size: 22, bag: V2Colors.jetInk, dot: V2Colors.accent),
+          const DoguBrandMark(size: 22, bag: V2Colors.potInk, dot: V2Colors.crave),
           const SizedBox(width: 9),
           Text(
             '욕망의장바구니',
-            style: V2Text.display.copyWith(color: V2Colors.jetInk, fontSize: 20),
+            style: V2Text.display.copyWith(color: V2Colors.potInk, fontSize: 20),
           ),
           const Spacer(),
           // v2 → v1 복귀 — GoRouter 밖(단독 위젯 테스트 등)에서는 탭이 조용히 무시된다.
@@ -57,10 +57,10 @@ class V2Header extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
               decoration: BoxDecoration(
-                border: Border.all(color: V2Colors.jetLine),
+                border: Border.all(color: V2Colors.potLine),
                 borderRadius: BorderRadius.circular(V2Space.radius),
               ),
-              child: Text('V1', style: V2Text.mono.copyWith(color: V2Colors.jetSoft, fontSize: 11)),
+              child: Text('V1', style: V2Text.mono.copyWith(color: V2Colors.potSoft, fontSize: 11)),
             ),
           ),
         ],
@@ -144,7 +144,7 @@ class _V2NewsletterBlockState extends State<V2NewsletterBlock> {
               child: TextField(
                 controller: _controller,
                 style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 13),
-                cursorColor: V2Colors.accent,
+                cursorColor: V2Colors.crave,
                 decoration: InputDecoration(
                   isDense: true,
                   border: InputBorder.none,
@@ -160,10 +160,10 @@ class _V2NewsletterBlockState extends State<V2NewsletterBlock> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: V2Colors.jet,
+                  color: V2Colors.pot,
                   borderRadius: BorderRadius.circular(V2Space.radius),
                 ),
-                child: Text('구독', style: V2Text.title.copyWith(color: V2Colors.jetInk, fontSize: 13)),
+                child: Text('구독', style: V2Text.title.copyWith(color: V2Colors.potInk, fontSize: 13)),
               ),
             ),
           ],
@@ -185,19 +185,19 @@ class V2HeroCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
         decoration: BoxDecoration(
-          color: V2Colors.jet,
+          color: V2Colors.pot,
           borderRadius: BorderRadius.circular(V2Space.radius),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            V2TypeLine(store.heroEyebrow, color: V2Colors.accent),
+            V2TypeLine(store.heroEyebrow, color: V2Colors.gold),
             const SizedBox(height: 12),
-            Text(store.heroTitle, style: V2Text.display.copyWith(color: V2Colors.jetInk, fontSize: 30)),
+            Text(store.heroTitle, style: V2Text.display.copyWith(color: V2Colors.potInk, fontSize: 30)),
             const SizedBox(height: 10),
-            Text(store.heroSubtitle, style: V2Text.body.copyWith(color: V2Colors.jetSoft, fontSize: 13)),
+            Text(store.heroSubtitle, style: V2Text.body.copyWith(color: V2Colors.potSoft, fontSize: 13)),
             const SizedBox(height: 18),
-            Container(height: 1, color: V2Colors.jetLine),
+            Container(height: 1, color: V2Colors.potLine),
             const SizedBox(height: 14),
             Wrap(
               spacing: 22,
@@ -211,9 +211,9 @@ class V2HeroCard extends StatelessWidget {
                     textBaseline: TextBaseline.alphabetic,
                     children: [
                       // U+2212(−) 등 번들 폰트에 없는 기호는 ASCII로 정규화해 두부를 막는다.
-                      Text(stat.$1.replaceAll('−', '-'), style: V2Text.title.copyWith(color: V2Colors.accent, fontSize: 20)),
+                      Text(stat.$1.replaceAll('−', '-'), style: V2Text.title.copyWith(color: V2Colors.gold, fontSize: 20)),
                       const SizedBox(width: 5),
-                      Text(stat.$2, style: V2Text.body.copyWith(color: V2Colors.jetSoft, fontSize: 11)),
+                      Text(stat.$2, style: V2Text.body.copyWith(color: V2Colors.potSoft, fontSize: 11)),
                     ],
                   ),
               ],

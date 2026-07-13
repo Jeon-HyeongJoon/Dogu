@@ -1,32 +1,37 @@
 part of '../main.dart';
 
 // ─────────────────────────────────────────────────────────────────────────
-// v2 "Aggressive & Clean" 디자인 시스템 — 고대비 커머스 문법(무신사·29CM 계열).
-//   · 배경 = 순백, 구분은 여백과 헤어라인만 (장식 제로)
-//   · 블록 = 제트 블랙(헤더·히어로·주 CTA)으로 시선을 때린다
-//   · 액센트 = #ff3d00 하나 — 가격·할인·활성 상태 전용, 두 번째 유채색 금지
-//   · 타이포 = Pretendard ExtraBold 대형 디스플레이(자간 −1), 대문자 eyebrow
-//   · 상품 = 아트워크 풀블리드, 할인율 액센트 대형 표기 — 상품이 주인공
+// v2 "Desire Emporium" 디자인 시스템 — Pot of Desire Co. 로고(assets/logo-pot.jpg)
+// 의 철학(탐욕스러운 미소, SATISFYING EVERY CRAVING)에서 DNA를 잡는다.
+//   · 배경 = 아이보리 종이 — 빈티지 엠포리엄의 지면
+//   · 블록 = 딥 그린(헤더·히어로·주 CTA) — 로고의 바구니/잉크 그린
+//   · 골드 = 브라스 레이블·트림 — eyebrow/인덱스/타이프라인 전용
+//   · 레드 = 크레이빙(갈망) — 가격·할인·찜, 욕망이 닿는 곳에만
+//   · 타이포 = 디스플레이는 둥근 고딕(NanumSquareRound EB) — 능글맞은 무게감
+//   · 상품 = 아트워크 풀블리드 — 구조는 aggressive-clean을 유지
 // v2 위젯은 전용 const 토큰만 쓰므로 v1(AppColors) 트리와 완전히 분리된다.
 // (방향 문서: docs/DESIGN_REVIEW_V2.md)
 // ─────────────────────────────────────────────────────────────────────────
 
 class V2Colors {
-  static const bg = Color(0xffffffff); // 페이지 배경(순백)
-  static const surface = Color(0xfff4f4f2); // 서브 서피스(칩·입력창)
+  static const paper = Color(0xfffaf5ea); // 페이지 배경(아이보리 종이)
+  static const surface = Color(0xfff1e9d6); // 서브 서피스(칩·입력창)
 
-  static const ink = Color(0xff0f0f0f); // 본문·디스플레이(거의 검정)
-  static const inkSoft = Color(0xff5c5c5c);
-  static const inkFaint = Color(0xff9c9c9c);
-  static const line = Color(0xffe7e7e5); // 헤어라인
+  static const ink = Color(0xff1a2b20); // 본문·디스플레이(그린 블랙)
+  static const inkSoft = Color(0xff53645a);
+  static const inkFaint = Color(0xff92a097);
+  static const line = Color(0xffe2d8c2); // 헤어라인
 
-  static const jet = Color(0xff111111); // 블랙 블록(헤더·히어로·CTA)
-  static const jetInk = Color(0xfff5f5f3); // 블랙 블록 위 글씨
-  static const jetSoft = Color(0xff9a9a9a); // 블랙 블록 위 보조 글씨
-  static const jetLine = Color(0xff2e2e2e); // 블랙 블록 안 구분선
+  static const pot = Color(0xff1d4a33); // 브랜드 그린 블록(헤더·히어로·CTA)
+  static const potInk = Color(0xfff5eeda); // 그린 블록 위 글씨(크림)
+  static const potSoft = Color(0xffa8bcae); // 그린 블록 위 보조 글씨
+  static const potLine = Color(0xff2e5c42); // 그린 블록 안 구분선
 
-  static const accent = Color(0xffff3d00); // 가격·할인·활성 — 유일한 유채색
-  static const accentInk = Color(0xffffffff); // 액센트 블록 위 글씨
+  static const gold = Color(0xffc9a24e); // 브라스 골드 — 레이블·트림 전용
+  static const goldDeep = Color(0xff8f7130); // 종이 위 골드 텍스트(가독 확보)
+
+  static const crave = Color(0xffb3282d); // 크레이빙 레드 — 가격·할인·찜
+  static const craveInk = Color(0xfffdf7ee); // 레드 블록 위 글씨
 }
 
 class V2Space {
@@ -52,19 +57,19 @@ class V2Space {
 }
 
 class V2Text {
-  // 대형 디스플레이 — ExtraBold + 타이트 자간이 v2의 목소리.
+  // 대형 디스플레이 — 둥근 고딕 ExtraBold: 항아리의 능글맞은 무게감.
   static const TextStyle display = TextStyle(
-    fontFamily: doguFontFamily,
+    fontFamily: doguHeroFontFamily,
     fontWeight: FontWeight.w800,
     color: V2Colors.ink,
-    letterSpacing: -1.0,
-    height: 1.05,
+    letterSpacing: -0.6,
+    height: 1.08,
   );
   static const TextStyle title = TextStyle(
-    fontFamily: doguFontFamily,
+    fontFamily: doguHeroFontFamily,
     fontWeight: FontWeight.w800,
     color: V2Colors.ink,
-    letterSpacing: -0.5,
+    letterSpacing: -0.3,
     height: 1.15,
   );
   static const TextStyle body = TextStyle(
@@ -83,7 +88,7 @@ class V2Text {
 
 /// 대문자 eyebrow 레이블 — 섹션 우측 액션/보조 표기에 사용.
 class V2TypeLine extends StatelessWidget {
-  const V2TypeLine(this.label, {this.color = V2Colors.inkFaint, super.key});
+  const V2TypeLine(this.label, {this.color = V2Colors.goldDeep, super.key});
   final String label;
   final Color color;
 
@@ -119,7 +124,7 @@ class V2CardFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final frame = Container(
       decoration: BoxDecoration(
-        color: V2Colors.bg,
+        color: V2Colors.paper,
         borderRadius: BorderRadius.circular(V2Space.radius),
         border: Border.all(color: V2Colors.line),
       ),
@@ -241,7 +246,7 @@ class V2EmptyState extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(width: 28, height: 4, color: V2Colors.accent),
+          Container(width: 28, height: 4, color: V2Colors.gold),
           const SizedBox(height: 16),
           Text(title, style: V2Text.title.copyWith(fontSize: 20)),
           const SizedBox(height: 6),
@@ -297,7 +302,7 @@ class V2SectionHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(index, style: V2Text.mono.copyWith(color: V2Colors.accent, fontSize: 10)),
+                Text(index, style: V2Text.mono.copyWith(color: V2Colors.goldDeep, fontSize: 10)),
                 const SizedBox(height: 4),
                 Text(title, style: V2Text.title.copyWith(fontSize: 23)),
               ],
@@ -309,7 +314,7 @@ class V2SectionHeader extends StatelessWidget {
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: onTypeLineTap,
-              child: V2TypeLine(typeLine, color: V2Colors.accent),
+              child: V2TypeLine(typeLine, color: V2Colors.crave),
             ),
         ],
       ),
@@ -359,7 +364,7 @@ class V2ProductCard extends StatelessWidget {
                     child: Icon(
                       wished ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                       size: 16,
-                      color: wished ? V2Colors.accent : Colors.white,
+                      color: wished ? V2Colors.crave : Colors.white,
                     ),
                   ),
                 ),
@@ -390,7 +395,7 @@ class V2ProductCard extends StatelessWidget {
               if (hasDiscount) ...[
                 Text(
                   product.discount.replaceAll('-', '').replaceAll('−', ''),
-                  style: V2Text.title.copyWith(color: V2Colors.accent, fontSize: 16),
+                  style: V2Text.title.copyWith(color: V2Colors.crave, fontSize: 16),
                 ),
                 const SizedBox(width: 5),
               ],
