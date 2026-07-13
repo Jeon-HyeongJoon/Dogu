@@ -135,6 +135,26 @@ class Header extends StatelessWidget {
                                 ),
                               ),
                             ),
+                          // v1 → v2 전환 — 새 디자인(/v2)으로 이동. GoRouter 밖(단독 위젯
+                          // 테스트 등)에서는 탭이 조용히 무시된다.
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              Navigator.of(dialogContext).pop();
+                              GoRouter.maybeOf(context)?.go('/v2');
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad, vertical: 16),
+                              decoration: const BoxDecoration(border: Border(top: BorderSide(color: AppColors.line))),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.bolt_outlined, size: 23, color: AppColors.ink3),
+                                  SizedBox(width: 14),
+                                  Text('V2 새 디자인', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300, color: AppColors.ink)),
+                                ],
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
