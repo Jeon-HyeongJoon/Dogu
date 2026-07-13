@@ -43,7 +43,10 @@ class V2Header extends StatelessWidget {
       color: V2Colors.pot,
       child: Row(
         children: [
-          const DoguBrandMark(size: 22, bag: V2Colors.potInk, dot: V2Colors.crave),
+          // 항아리 엠블럼 — 그린 바 위의 크림 코인처럼 얹힌다.
+          ClipOval(
+            child: Image.asset('assets/logo-square.png', width: 30, height: 30, fit: BoxFit.cover),
+          ),
           const SizedBox(width: 9),
           Text(
             '욕망의장바구니',
@@ -191,8 +194,17 @@ class V2HeroCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            V2TypeLine(store.heroEyebrow, color: V2Colors.gold),
-            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(child: V2TypeLine(store.heroEyebrow, color: V2Colors.gold)),
+                // 항아리 엠블럼 — 히어로 우상단의 브랜드 인장.
+                ClipOval(
+                  child: Image.asset('assets/logo-square.png', width: 44, height: 44, fit: BoxFit.cover),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
             Text(store.heroTitle, style: V2Text.display.copyWith(color: V2Colors.potInk, fontSize: 30)),
             const SizedBox(height: 10),
             Text(store.heroSubtitle, style: V2Text.body.copyWith(color: V2Colors.potSoft, fontSize: 13)),
@@ -319,7 +331,7 @@ class V2BrandPanel extends StatelessWidget {
   }
 }
 
-/// 푸터 — 저작권 라인.
+/// 푸터 — 브랜드 서명 + 태그라인 + 저작권 라인.
 class V2Footer extends StatelessWidget {
   const V2Footer({super.key});
 
@@ -327,11 +339,17 @@ class V2Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.fromLTRB(V2Space.pad, 24, V2Space.pad, 0),
-      child: Row(
+      child: Column(
         children: [
-          V2SetCode('DOGU'),
-          Spacer(),
-          V2SetCode('© 2026 욕망의장바구니'),
+          Center(child: V2SetCode('SATISFYING EVERY CRAVING', color: V2Colors.goldDeep)),
+          SizedBox(height: 8),
+          Row(
+            children: [
+              V2SetCode('POT OF DESIRE CO.'),
+              Spacer(),
+              V2SetCode('© 2026 욕망의장바구니'),
+            ],
+          ),
         ],
       ),
     );
