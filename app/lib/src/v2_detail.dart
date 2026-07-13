@@ -50,7 +50,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
     final product = widget.product;
     final wished = AppStateScope.watch(context).wishlistIds.contains(product.id);
     return Scaffold(
-      backgroundColor: V2Colors.bg,
+      backgroundColor: V2Colors.paper,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -71,8 +71,8 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                             top: 0,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                              color: V2Colors.accent,
-                              child: Text(product.discount, style: V2Text.mono.copyWith(color: V2Colors.accentInk, fontSize: 13)),
+                              color: V2Colors.crave,
+                              child: Text(product.discount, style: V2Text.mono.copyWith(color: V2Colors.craveInk, fontSize: 13)),
                             ),
                           ),
                         Positioned(right: 8, bottom: 8, child: V2SetCode(product.id, color: Colors.white70)),
@@ -101,7 +101,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                             if (product.hasDiscount) ...[
                               Text(
                                 product.discount.replaceAll('-', '').replaceAll('−', ''),
-                                style: V2Text.display.copyWith(color: V2Colors.accent, fontSize: 28),
+                                style: V2Text.display.copyWith(color: V2Colors.crave, fontSize: 28),
                               ),
                               const SizedBox(width: 8),
                             ],
@@ -173,14 +173,14 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
     return Container(
       height: V2Space.headerHeight,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      color: V2Colors.jet,
+      color: V2Colors.pot,
       child: Row(
         children: [
           IconButton(
             onPressed: () => Navigator.of(context).maybePop(),
-            icon: const Icon(Icons.chevron_left_rounded, color: V2Colors.jetInk),
+            icon: const Icon(Icons.chevron_left_rounded, color: V2Colors.potInk),
           ),
-          Text('상품 상세', style: V2Text.title.copyWith(color: V2Colors.jetInk, fontSize: 17)),
+          Text('상품 상세', style: V2Text.title.copyWith(color: V2Colors.potInk, fontSize: 17)),
         ],
       ),
     );
@@ -191,7 +191,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
     return Container(
       padding: EdgeInsets.fromLTRB(V2Space.pad, 10, V2Space.pad, 10 + bottomInset),
       decoration: const BoxDecoration(
-        color: V2Colors.bg,
+        color: V2Colors.paper,
         border: Border(top: BorderSide(color: V2Colors.line)),
       ),
       child: Row(
@@ -203,11 +203,11 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
               height: 52,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: V2Colors.bg,
+                color: V2Colors.paper,
                 borderRadius: BorderRadius.circular(V2Space.radius),
                 border: Border.all(color: V2Colors.line),
               ),
-              child: Icon(wished ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: V2Colors.accent),
+              child: Icon(wished ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: V2Colors.crave),
             ),
           ),
           const SizedBox(width: 12),
@@ -218,12 +218,12 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                 height: 52,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: V2Colors.jet,
+                  color: V2Colors.pot,
                   borderRadius: BorderRadius.circular(V2Space.radius),
                 ),
                 child: Text(
                   (_added && widget.onGoToCart != null) ? '장바구니 보기' : '장바구니에 담기',
-                  style: V2Text.title.copyWith(color: V2Colors.jetInk, fontSize: 16),
+                  style: V2Text.title.copyWith(color: V2Colors.potInk, fontSize: 16),
                 ),
               ),
             ),
@@ -248,7 +248,7 @@ class _QtyButton extends StatelessWidget {
         height: 34,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: V2Colors.bg,
+          color: V2Colors.paper,
           borderRadius: BorderRadius.circular(V2Space.radius),
           border: Border.all(color: V2Colors.line),
         ),

@@ -26,7 +26,7 @@ class _V2ShellState extends State<V2Shell> {
     return V2NavScope(
       goToTab: (index) => setState(() => _tab = index),
       child: Scaffold(
-        backgroundColor: V2Colors.bg,
+        backgroundColor: V2Colors.paper,
         body: Stack(
           children: [
             SafeArea(
@@ -79,12 +79,12 @@ class V2CartToast extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: V2Colors.jet,
+                  color: V2Colors.pot,
                   borderRadius: BorderRadius.circular(V2Space.radius),
                 ),
                 child: Text(
                   message,
-                  style: V2Text.body.copyWith(color: V2Colors.jetInk, fontSize: 13, fontWeight: FontWeight.w600),
+                  style: V2Text.body.copyWith(color: V2Colors.potInk, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -112,7 +112,7 @@ class V2BottomBar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
-        color: V2Colors.bg,
+        color: V2Colors.paper,
         border: Border(top: BorderSide(color: V2Colors.line)),
       ),
       child: SizedBox(
@@ -245,7 +245,7 @@ class _V2FilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: active ? V2Colors.jet : V2Colors.surface,
+          color: active ? V2Colors.pot : V2Colors.surface,
           borderRadius: BorderRadius.circular(V2Space.radiusSm),
         ),
         child: Text(
@@ -253,7 +253,7 @@ class _V2FilterChip extends StatelessWidget {
           style: V2Text.body.copyWith(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: active ? V2Colors.jetInk : V2Colors.inkSoft,
+            color: active ? V2Colors.potInk : V2Colors.inkSoft,
           ),
         ),
       ),
@@ -277,7 +277,7 @@ class V2CategoryRow extends StatelessWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: V2Colors.bg,
+            color: V2Colors.paper,
             borderRadius: BorderRadius.circular(V2Space.radius),
             border: Border.all(color: selected ? V2Colors.ink : V2Colors.line, width: selected ? 1.5 : 1),
           ),
@@ -351,7 +351,7 @@ class _V2SearchBodyState extends State<V2SearchBody> {
                   child: TextField(
                     controller: _controller,
                     style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 14),
-                    cursorColor: V2Colors.accent,
+                    cursorColor: V2Colors.crave,
                     decoration: InputDecoration(
                       isDense: true,
                       border: InputBorder.none,
@@ -366,10 +366,10 @@ class _V2SearchBodyState extends State<V2SearchBody> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: V2Colors.jet,
+                      color: V2Colors.pot,
                       borderRadius: BorderRadius.circular(V2Space.radius),
                     ),
-                    child: const Icon(Icons.search_rounded, size: 20, color: V2Colors.jetInk),
+                    child: const Icon(Icons.search_rounded, size: 20, color: V2Colors.potInk),
                   ),
                 ),
               ],
@@ -517,7 +517,7 @@ class V2CartBody extends StatelessWidget {
                 children: [
                   _summaryRow('상품 금액', formatWon(store.selectedCartOldTotal)),
                   const SizedBox(height: 6),
-                  _summaryRow('할인', '-${formatWon(store.selectedCartDiscount)}', color: V2Colors.accent),
+                  _summaryRow('할인', '-${formatWon(store.selectedCartDiscount)}', color: V2Colors.crave),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 10),
                     child: Divider(height: 1, color: V2Colors.line),
@@ -526,7 +526,7 @@ class V2CartBody extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('결제 금액 (${store.selectedCartCount})', style: V2Text.title.copyWith(fontSize: 15)),
-                      Text(formatWon(store.selectedCartTotal), style: V2Text.title.copyWith(fontSize: 20, color: V2Colors.accent)),
+                      Text(formatWon(store.selectedCartTotal), style: V2Text.title.copyWith(fontSize: 20, color: V2Colors.crave)),
                     ],
                   ),
                 ],
@@ -541,10 +541,10 @@ class V2CartBody extends StatelessWidget {
                 height: 54,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: V2Colors.jet,
+                  color: V2Colors.pot,
                   borderRadius: BorderRadius.circular(V2Space.radius),
                 ),
-                child: Text('결제하기', style: V2Text.title.copyWith(color: V2Colors.jetInk, fontSize: 16)),
+                child: Text('결제하기', style: V2Text.title.copyWith(color: V2Colors.potInk, fontSize: 16)),
               ),
             ),
           ),
@@ -625,11 +625,11 @@ class _V2Check extends StatelessWidget {
       height: 22,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: checked ? V2Colors.jet : V2Colors.bg,
+        color: checked ? V2Colors.pot : V2Colors.paper,
         borderRadius: BorderRadius.circular(V2Space.radiusSm),
-        border: Border.all(color: checked ? V2Colors.jet : V2Colors.line, width: 1.4),
+        border: Border.all(color: checked ? V2Colors.pot : V2Colors.line, width: 1.4),
       ),
-      child: checked ? const Icon(Icons.check_rounded, size: 15, color: V2Colors.jetInk) : null,
+      child: checked ? const Icon(Icons.check_rounded, size: 15, color: V2Colors.potInk) : null,
     );
   }
 }
