@@ -59,51 +59,52 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
             Expanded(
               child: V2ScrollBody(
                 builder: (context, cols) => [
+                  // 풀블리드 아트워크 — 프레임 없이 상품이 화면을 가득 채운다.
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(V2Space.pad, V2Space.pad, V2Space.pad, 4),
-                    child: V2CardFrame(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(product.brand, style: V2Text.title.copyWith(fontSize: 14)),
-                          const SizedBox(height: 8),
-                          Stack(
-                            children: [
-                              V2Artwork(product: product),
-                              if (product.discount.isNotEmpty && product.discount != '-0%')
-                                Positioned(
-                                  left: 6,
-                                  top: 6,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                                    color: V2Colors.accent,
-                                    child: Text(product.discount, style: V2Text.mono.copyWith(color: V2Colors.accentInk, fontSize: 12)),
-                                  ),
-                                ),
-                              Positioned(right: 6, bottom: 6, child: V2SetCode(product.id, color: Colors.white70)),
-                            ],
+                    padding: const EdgeInsets.fromLTRB(V2Space.pad, V2Space.pad, V2Space.pad, 0),
+                    child: Stack(
+                      children: [
+                        V2Artwork(product: product),
+                        if (product.discount.isNotEmpty && product.discount != '-0%')
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                              color: V2Colors.accent,
+                              child: Text(product.discount, style: V2Text.mono.copyWith(color: V2Colors.accentInk, fontSize: 13)),
+                            ),
                           ),
-                        ],
-                      ),
+                        Positioned(right: 8, bottom: 8, child: V2SetCode(product.id, color: Colors.white70)),
+                      ],
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(V2Space.pad, 14, V2Space.pad, 0),
+                    padding: const EdgeInsets.fromLTRB(V2Space.pad, 18, V2Space.pad, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(product.name, style: V2Text.display.copyWith(fontSize: 24)),
+                        Text(product.brand.toUpperCase(), style: V2Text.mono.copyWith(fontSize: 11, color: V2Colors.inkSoft)),
+                        const SizedBox(height: 6),
+                        Text(product.name, style: V2Text.display.copyWith(fontSize: 25)),
                         if (product.subtitle.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 6),
                             child: Text(product.subtitle, style: V2Text.body.copyWith(fontSize: 13)),
                           ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 14),
+                        // 빅 프라이스 — 할인율(액센트) + 판매가 + 정가 취소선.
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.baseline,
                           textBaseline: TextBaseline.alphabetic,
                           children: [
+                            if (product.hasDiscount) ...[
+                              Text(
+                                product.discount.replaceAll('-', '').replaceAll('−', ''),
+                                style: V2Text.display.copyWith(color: V2Colors.accent, fontSize: 28),
+                              ),
+                              const SizedBox(width: 8),
+                            ],
                             Text(product.price, style: V2Text.display.copyWith(fontSize: 28)),
                             if (product.hasDiscount) ...[
                               const SizedBox(width: 8),
@@ -114,7 +115,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                             ],
                           ],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
                         Text('★ ${product.rating.toStringAsFixed(1)}  ·  리뷰 ${product.reviews}', style: V2Text.body.copyWith(fontSize: 12.5)),
                       ],
                     ),
