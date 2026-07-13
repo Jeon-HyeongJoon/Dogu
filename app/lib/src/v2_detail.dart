@@ -1,13 +1,13 @@
 part of '../main.dart';
 
-/// v2 상품 상세를 셸 위(루트 네비게이터)로 띄운다 — v2 카드 → v2 상세로 일관 유지.
+/// v2 상품 상세를 셸 위(루트 네비게이터)로 띄운다 — v2 카드 탭 → v2 상세로 일관 유지.
 void openV2ProductDetail(BuildContext context, ProductItem product, {VoidCallback? onGoToCart}) {
   Navigator.of(context, rootNavigator: true).push(
     MaterialPageRoute<void>(builder: (_) => V2ProductDetailPage(product: product, onGoToCart: onGoToCart)),
   );
 }
 
-/// v2 상품 상세 — 한 장의 큰 마법 카드로 상품을 보여준다(v1 ProductDetailPage 미러).
+/// v2 상품 상세 — 풀블리드 아트 + 빅 프라이스 + 블랙 CTA(v1 ProductDetailPage 미러).
 class V2ProductDetailPage extends StatefulWidget {
   const V2ProductDetailPage({required this.product, this.onGoToCart, super.key});
   final ProductItem product;
@@ -29,7 +29,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
     await store.changeCartQuantity(widget.product.id, _quantity);
     if (!mounted) return;
     setState(() => _added = true);
-    store.showCartToast('${widget.product.name} $_quantity장을 장바구니에 담았습니다.');
+    store.showCartToast('${widget.product.name} $_quantity개를 장바구니에 담았습니다.');
   }
 
   String _tagLabel(String tag) {
@@ -119,7 +119,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                       ],
                     ),
                   ),
-                  const V2SectionHeader(index: '효과', title: '카드 설명', typeLine: '텍스트'),
+                  const V2SectionHeader(index: '01', title: '상품 정보', typeLine: 'Detail'),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: V2Space.pad),
                     child: V2Panel(
@@ -128,7 +128,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            product.blurb.isEmpty ? '이 카드에 대한 설명이 곧 추가됩니다.' : product.blurb,
+                            product.blurb.isEmpty ? '이 상품에 대한 설명이 곧 추가됩니다.' : product.blurb,
                             style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 13),
                           ),
                           if (product.tags.isNotEmpty) ...[
@@ -179,7 +179,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
             onPressed: () => Navigator.of(context).maybePop(),
             icon: const Icon(Icons.chevron_left_rounded, color: V2Colors.jetInk),
           ),
-          Text('카드 상세', style: V2Text.title.copyWith(color: V2Colors.jetInk, fontSize: 17)),
+          Text('상품 상세', style: V2Text.title.copyWith(color: V2Colors.jetInk, fontSize: 17)),
         ],
       ),
     );

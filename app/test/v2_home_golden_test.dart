@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:dogu_mobile_shop/main.dart';
 
-// v2(유희왕 마법 카드 테마) 5탭을 모바일/태블릿 뷰포트로 이미지 스냅샷한다.
+// v2(aggressive-clean 테마) 5탭을 모바일/태블릿 뷰포트로 이미지 스냅샷한다.
 // 크로스플랫폼 렌더 차이가 있어 CI의 flutter test는 `--exclude-tags golden`으로 제외한다.
 // 이미지 (재)생성:  flutter test --update-goldens --tags golden
 void main() {

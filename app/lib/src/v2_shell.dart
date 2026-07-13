@@ -171,7 +171,7 @@ class V2CategoryBody extends StatelessWidget {
     final browsing = store.selectedCategoryKey != null || store.categoryQuickFilter != 'all';
     return V2ScrollBody(
       builder: (context, cols) => [
-        const V2SectionHeader(index: '00', title: '카테고리', typeLine: '전체 카드'),
+        const V2SectionHeader(index: '01', title: '카테고리', typeLine: '전체 상품'),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: V2Space.pad),
           child: Wrap(
@@ -219,11 +219,11 @@ class V2CategoryBody extends StatelessWidget {
             ),
           ),
           if (store.categoryBrowseProducts.isEmpty)
-            const V2EmptyState(title: '해당 카드가 없어요', message: '다른 카테고리나 필터를 골라 보세요.')
+            const V2EmptyState(title: '해당 상품이 없어요', message: '다른 카테고리나 필터를 골라 보세요.')
           else
             V2ProductGrid(products: store.categoryBrowseProducts, columns: cols),
         ],
-        const V2SectionHeader(index: '04', title: 'SHOP BY BRAND', typeLine: '덱 리스트'),
+        const V2SectionHeader(index: '02', title: 'SHOP BY BRAND', typeLine: 'A-Z'),
         V2BrandPanel(brands: {for (final p in store.catalogProducts) p.brand}.toList()),
       ],
     );
@@ -355,7 +355,7 @@ class _V2SearchBodyState extends State<V2SearchBody> {
                     decoration: InputDecoration(
                       isDense: true,
                       border: InputBorder.none,
-                      hintText: '어떤 카드를 찾으시나요?',
+                      hintText: '어떤 상품을 찾으시나요?',
                       hintStyle: V2Text.body.copyWith(color: V2Colors.inkFaint, fontSize: 14),
                     ),
                     onSubmitted: (value) => _submit(context, value),
@@ -377,9 +377,9 @@ class _V2SearchBodyState extends State<V2SearchBody> {
           ),
         ),
         if (store.lastSearchTerm.isNotEmpty) ...[
-          V2SectionHeader(index: '검', title: '“${store.lastSearchTerm}”', typeLine: '${store.searchResults.length} 히트'),
+          V2SectionHeader(index: '00', title: '“${store.lastSearchTerm}”', typeLine: '${store.searchResults.length}개 결과'),
           if (store.searchResults.isEmpty)
-            const V2EmptyState(title: '검색 결과가 없어요', message: '다른 키워드로 다시 드로우해 보세요.')
+            const V2EmptyState(title: '검색 결과가 없어요', message: '다른 키워드로 다시 검색해 보세요.')
           else
             V2ProductGrid(products: store.searchResults, columns: cols),
         ],
@@ -410,8 +410,7 @@ class _V2SearchBodyState extends State<V2SearchBody> {
   }
 }
 
-/// 찜 탭 — 위시리스트 상품 그리드(비어 있으면 빈 상태).
-/// 찜 탭 — 위시리스트 그리드 + 전체/세일 필터(v1 WishTabPage 미러). 카드 하트로 담기/빼기.
+/// 찜 탭 — 위시리스트 그리드 + 전체/세일 필터(v1 WishTabPage 미러). 상품 카드 하트로 담기/빼기.
 class V2WishBody extends StatefulWidget {
   const V2WishBody({super.key});
 
@@ -428,7 +427,7 @@ class _V2WishBodyState extends State<V2WishBody> {
     final items = _filter == 'sale' ? all.where((p) => p.hasDiscount).toList() : all;
     return V2ScrollBody(
       builder: (context, cols) => [
-        const V2SectionHeader(index: '찜', title: '찜한 카드', typeLine: '마이 컬렉션'),
+        const V2SectionHeader(index: '01', title: '찜한 상품', typeLine: 'My Picks'),
         if (all.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: V2Space.pad),
@@ -438,16 +437,16 @@ class _V2WishBodyState extends State<V2WishBody> {
                 const SizedBox(width: 8),
                 _V2FilterChip(label: '세일', active: _filter == 'sale', onTap: () => setState(() => _filter = 'sale')),
                 const Spacer(),
-                Text('${all.length} 카드', style: V2Text.mono.copyWith(fontSize: 12)),
+                Text('${all.length}개', style: V2Text.mono.copyWith(fontSize: 12)),
               ],
             ),
           ),
           const SizedBox(height: 12),
         ],
         if (all.isEmpty)
-          const V2EmptyState(title: '찜한 카드가 없어요', message: '마음에 드는 상품의 하트를 눌러 컬렉션에 담아보세요.')
+          const V2EmptyState(title: '찜한 상품이 없어요', message: '마음에 드는 상품의 하트를 눌러 찜 목록에 담아보세요.')
         else if (items.isEmpty)
-          const V2EmptyState(title: '세일 중인 찜이 없어요', message: '전체 보기로 찜한 카드를 모두 확인하세요.')
+          const V2EmptyState(title: '세일 중인 찜이 없어요', message: '전체 보기로 찜한 상품을 모두 확인하세요.')
         else
           V2ProductGrid(products: items, columns: cols),
       ],
@@ -470,7 +469,7 @@ class V2CartBody extends StatelessWidget {
       'item_count': store.selectedCartCount,
       'total_price': store.selectedCartTotal,
     });
-    store.showCartToast('${store.selectedCartCount}장 · ${formatWon(store.selectedCartTotal)} 결제가 완료되었습니다 (데모).');
+    store.showCartToast('${store.selectedCartCount}개 · ${formatWon(store.selectedCartTotal)} 결제가 완료되었습니다 (데모).');
   }
 
   @override
@@ -481,9 +480,9 @@ class V2CartBody extends StatelessWidget {
     final allSelected = lines.isNotEmpty && selected.length == lines.length;
     return V2ScrollBody(
       builder: (context, cols) => [
-        const V2SectionHeader(index: '담', title: '장바구니', typeLine: '드로우 예정'),
+        const V2SectionHeader(index: '01', title: '장바구니', typeLine: 'Checkout'),
         if (lines.isEmpty)
-          const V2EmptyState(title: '장바구니가 비어 있어요', message: '담고 싶은 카드를 골라 장바구니에 추가해 보세요.')
+          const V2EmptyState(title: '장바구니가 비어 있어요', message: '담고 싶은 상품을 골라 장바구니에 추가해 보세요.')
         else ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(V2Space.pad, 0, V2Space.pad, 10),

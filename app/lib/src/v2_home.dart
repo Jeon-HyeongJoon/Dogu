@@ -1,7 +1,7 @@
 part of '../main.dart';
 
 /// v2 홈 바디 — v1과 동일한 섹션 구성(히어로·카테고리·특가·신상·브랜드·푸터)을
-/// 유희왕 마법 카드 디자인으로 미러링한다. 상단 헤더/하단 탭바는 V2Shell이 제공한다.
+/// aggressive-clean 디자인으로 미러링한다. 상단 헤더/하단 탭바는 V2Shell이 제공한다.
 class V2HomeBody extends StatelessWidget {
   const V2HomeBody({super.key});
 
@@ -13,11 +13,11 @@ class V2HomeBody extends StatelessWidget {
         const V2HomeSearchEntry(),
         V2HeroCard(store: store),
         V2CategoryStrip(categories: store.categories),
-        const V2SectionHeader(index: '01', title: '오늘의 특가', typeLine: '속공 마법'),
+        const V2SectionHeader(index: '01', title: '오늘의 특가', typeLine: 'Today Only'),
         V2ProductGrid(products: store.dealProducts, columns: cols),
-        const V2SectionHeader(index: '02', title: '신상 드로우', typeLine: '일반 마법'),
+        const V2SectionHeader(index: '02', title: '신상품', typeLine: 'Just In'),
         V2ProductGrid(products: store.newProducts, columns: cols),
-        const V2SectionHeader(index: '03', title: 'THIS WEEK', typeLine: '금지 · 제한'),
+        const V2SectionHeader(index: '03', title: 'THIS WEEK', typeLine: 'Hot Brands'),
         V2BrandPanel(
           brands: {
             for (final p in [...store.dealProducts, ...store.newProducts]) p.brand,
@@ -81,7 +81,7 @@ class V2HomeSearchEntry extends StatelessWidget {
             children: [
               const Icon(Icons.search_rounded, size: 20, color: V2Colors.ink),
               const SizedBox(width: 10),
-              Text('어떤 카드를 찾으시나요?', style: V2Text.body.copyWith(fontSize: 13.5, color: V2Colors.inkFaint)),
+              Text('어떤 상품을 찾으시나요?', style: V2Text.body.copyWith(fontSize: 13.5, color: V2Colors.inkFaint)),
             ],
           ),
         ),
@@ -139,7 +139,7 @@ class _V2NewsletterBlockState extends State<V2NewsletterBlock> {
                 decoration: InputDecoration(
                   isDense: true,
                   border: InputBorder.none,
-                  hintText: '이메일로 신상 드로우 소식 받기',
+                  hintText: '이메일로 신상품 소식 받기',
                   hintStyle: V2Text.body.copyWith(color: V2Colors.inkFaint, fontSize: 13),
                 ),
                 onSubmitted: (_) => _subscribe(),
@@ -164,7 +164,7 @@ class _V2NewsletterBlockState extends State<V2NewsletterBlock> {
   }
 }
 
-/// 히어로 — 한 장의 큰 마법 카드로 표현.
+/// 히어로 — 시즌 캠페인 카드(리디자인은 Task 36에서 블랙 블록으로).
 class V2HeroCard extends StatelessWidget {
   const V2HeroCard({required this.store, super.key});
   final AppStore store;
@@ -178,12 +178,7 @@ class V2HeroCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(child: V2TypeLine(store.heroEyebrow, color: V2Colors.accent)),
-                V2SetCode('SY-KR040', color: V2Colors.inkFaint),
-              ],
-            ),
+            V2TypeLine(store.heroEyebrow, color: V2Colors.accent),
             const SizedBox(height: 10),
             Text(store.heroTitle, style: V2Text.display.copyWith(fontSize: 26)),
             const SizedBox(height: 12),
@@ -312,7 +307,7 @@ class V2BrandPanel extends StatelessWidget {
   }
 }
 
-/// 푸터 — 카드 하단 저작권 라인 패러디.
+/// 푸터 — 저작권 라인.
 class V2Footer extends StatelessWidget {
   const V2Footer({super.key});
 
@@ -322,7 +317,7 @@ class V2Footer extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(V2Space.pad, 24, V2Space.pad, 0),
       child: Row(
         children: [
-          V2SetCode('55144522'),
+          V2SetCode('DOGU'),
           Spacer(),
           V2SetCode('© 2026 욕망의장바구니'),
         ],
