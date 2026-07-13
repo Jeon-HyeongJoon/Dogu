@@ -1,6 +1,6 @@
 part of '../main.dart';
 
-/// v2 앱 셸 — 청록 헤더 + 5탭 바디(IndexedStack) + 유희왕 카드풍 하단 탭바.
+/// v2 앱 셸 — 제트 블랙 헤더 + 5탭 바디(IndexedStack) + 화이트 하단 탭바.
 /// v1 AppShell과 동일한 5탭 구성(홈·카테고리·검색·찜·장바구니)을 미러링한다.
 class V2Shell extends StatefulWidget {
   const V2Shell({this.initialTab = 0, super.key});
@@ -26,7 +26,7 @@ class _V2ShellState extends State<V2Shell> {
     return V2NavScope(
       goToTab: (index) => setState(() => _tab = index),
       child: Scaffold(
-        backgroundColor: V2Colors.parchment,
+        backgroundColor: V2Colors.bg,
         body: Stack(
           children: [
             SafeArea(
@@ -62,7 +62,7 @@ class V2NavScope extends InheritedWidget {
   bool updateShouldNotify(V2NavScope oldWidget) => false;
 }
 
-/// v2 장바구니 토스트 — store.cartToastMessage를 청록/금색 배너로 표시(3초 후 자동 소멸).
+/// v2 장바구니 토스트 — store.cartToastMessage를 제트 블랙 배너로 표시(3초 후 자동 소멸).
 class V2CartToast extends StatelessWidget {
   const V2CartToast({super.key});
 
@@ -79,14 +79,12 @@ class V2CartToast extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: V2Colors.teal,
-                  borderRadius: BorderRadius.circular(V2Space.artRadius),
-                  border: Border.all(color: V2Colors.goldDark, width: 1.5),
-                  boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 3))],
+                  color: V2Colors.jet,
+                  borderRadius: BorderRadius.circular(V2Space.radius),
                 ),
                 child: Text(
                   message,
-                  style: V2Text.body.copyWith(color: V2Colors.tealInk, fontSize: 13, fontWeight: FontWeight.w600),
+                  style: V2Text.body.copyWith(color: V2Colors.jetInk, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -94,7 +92,7 @@ class V2CartToast extends StatelessWidget {
   }
 }
 
-/// 하단 탭바 — 청록 바 + 금색 상단 트림, 활성 탭은 금색.
+/// 하단 탭바 — 화이트 바 + 헤어라인 트림, 활성 탭은 잉크(블랙).
 class V2BottomBar extends StatelessWidget {
   const V2BottomBar({required this.current, required this.onTap, super.key});
   final int current;
@@ -114,8 +112,8 @@ class V2BottomBar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
-        color: V2Colors.teal,
-        border: Border(top: BorderSide(color: V2Colors.goldDark, width: V2Space.goldBorder)),
+        color: V2Colors.bg,
+        border: Border(top: BorderSide(color: V2Colors.line)),
       ),
       child: SizedBox(
         height: V2Space.tabHeight,
@@ -132,7 +130,7 @@ class V2BottomBar extends StatelessWidget {
                       Icon(
                         _items[i].$1,
                         size: 23,
-                        color: i == current ? V2Colors.goldLight : V2Colors.tealInk.withValues(alpha: 0.55),
+                        color: i == current ? V2Colors.ink : V2Colors.inkFaint,
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -140,7 +138,7 @@ class V2BottomBar extends StatelessWidget {
                         style: V2Text.body.copyWith(
                           fontSize: 10.5,
                           fontWeight: i == current ? FontWeight.w800 : FontWeight.w500,
-                          color: i == current ? V2Colors.goldLight : V2Colors.tealInk.withValues(alpha: 0.7),
+                          color: i == current ? V2Colors.ink : V2Colors.inkFaint,
                         ),
                       ),
                     ],
@@ -214,8 +212,8 @@ class V2CategoryBody extends StatelessWidget {
               },
               child: Row(
                 children: [
-                  const Icon(Icons.chevron_left_rounded, size: 18, color: V2Colors.teal),
-                  Text('전체 카테고리', style: V2Text.body.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: V2Colors.teal)),
+                  const Icon(Icons.chevron_left_rounded, size: 18, color: V2Colors.ink),
+                  Text('전체 카테고리', style: V2Text.body.copyWith(fontSize: 12, fontWeight: FontWeight.w700, color: V2Colors.ink)),
                 ],
               ),
             ),
@@ -247,16 +245,15 @@ class _V2FilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: active ? V2Colors.teal : V2Colors.cream,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: active ? V2Colors.goldDark : V2Colors.creamBorder),
+          color: active ? V2Colors.jet : V2Colors.surface,
+          borderRadius: BorderRadius.circular(V2Space.radiusSm),
         ),
         child: Text(
           label,
           style: V2Text.body.copyWith(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: active ? V2Colors.goldLight : V2Colors.inkSoft,
+            color: active ? V2Colors.jetInk : V2Colors.inkSoft,
           ),
         ),
       ),
@@ -280,9 +277,9 @@ class V2CategoryRow extends StatelessWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: V2Colors.cream,
-            borderRadius: BorderRadius.circular(V2Space.artRadius),
-            border: Border.all(color: selected ? V2Colors.teal : V2Colors.creamBorder, width: selected ? 2 : 1),
+            color: V2Colors.bg,
+            borderRadius: BorderRadius.circular(V2Space.radius),
+            border: Border.all(color: selected ? V2Colors.ink : V2Colors.line, width: selected ? 1.5 : 1),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           child: Row(
@@ -307,7 +304,7 @@ class V2CategoryRow extends StatelessWidget {
             ),
             Text(item.count, style: V2Text.mono.copyWith(fontSize: 11, color: V2Colors.inkFaint)),
             const SizedBox(width: 4),
-            const Icon(Icons.chevron_right_rounded, size: 20, color: V2Colors.teal),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: V2Colors.inkFaint),
           ],
           ),
         ),
@@ -353,13 +350,13 @@ class _V2SearchBodyState extends State<V2SearchBody> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    style: V2Text.body.copyWith(color: V2Colors.tealInk, fontSize: 14),
-                    cursorColor: V2Colors.goldLight,
+                    style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 14),
+                    cursorColor: V2Colors.accent,
                     decoration: InputDecoration(
                       isDense: true,
                       border: InputBorder.none,
                       hintText: '어떤 카드를 찾으시나요?',
-                      hintStyle: V2Text.body.copyWith(color: V2Colors.tealInk.withValues(alpha: 0.6), fontSize: 14),
+                      hintStyle: V2Text.body.copyWith(color: V2Colors.inkFaint, fontSize: 14),
                     ),
                     onSubmitted: (value) => _submit(context, value),
                   ),
@@ -369,11 +366,10 @@ class _V2SearchBodyState extends State<V2SearchBody> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: V2Colors.gold,
-                      borderRadius: BorderRadius.circular(V2Space.artRadius),
-                      border: Border.all(color: V2Colors.goldDark),
+                      color: V2Colors.jet,
+                      borderRadius: BorderRadius.circular(V2Space.radius),
                     ),
-                    child: const Icon(Icons.search_rounded, size: 20, color: V2Colors.ink),
+                    child: const Icon(Icons.search_rounded, size: 20, color: V2Colors.jetInk),
                   ),
                 ),
               ],
@@ -522,16 +518,16 @@ class V2CartBody extends StatelessWidget {
                 children: [
                   _summaryRow('상품 금액', formatWon(store.selectedCartOldTotal)),
                   const SizedBox(height: 6),
-                  _summaryRow('할인', '-${formatWon(store.selectedCartDiscount)}', color: V2Colors.maroon),
+                  _summaryRow('할인', '-${formatWon(store.selectedCartDiscount)}', color: V2Colors.accent),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Divider(height: 1, color: V2Colors.creamBorder),
+                    child: Divider(height: 1, color: V2Colors.line),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('결제 금액 (${store.selectedCartCount})', style: V2Text.title.copyWith(fontSize: 15)),
-                      Text(formatWon(store.selectedCartTotal), style: V2Text.title.copyWith(fontSize: 20, color: V2Colors.maroon)),
+                      Text(formatWon(store.selectedCartTotal), style: V2Text.title.copyWith(fontSize: 20, color: V2Colors.accent)),
                     ],
                   ),
                 ],
@@ -543,14 +539,13 @@ class V2CartBody extends StatelessWidget {
             child: GestureDetector(
               onTap: () => _checkout(context),
               child: Container(
-                height: 52,
+                height: 54,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: V2Colors.teal,
-                  borderRadius: BorderRadius.circular(V2Space.artRadius),
-                  border: Border.all(color: V2Colors.goldDark, width: V2Space.goldBorder),
+                  color: V2Colors.jet,
+                  borderRadius: BorderRadius.circular(V2Space.radius),
                 ),
-                child: Text('결제하기', style: V2Text.title.copyWith(color: V2Colors.goldLight, fontSize: 16)),
+                child: Text('결제하기', style: V2Text.title.copyWith(color: V2Colors.jetInk, fontSize: 16)),
               ),
             ),
           ),
@@ -600,7 +595,7 @@ class V2CartLineRow extends StatelessWidget {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    Text(product.price, style: V2Text.body.copyWith(fontSize: 13, color: V2Colors.maroon, fontWeight: FontWeight.w700)),
+                    Text(product.price, style: V2Text.body.copyWith(fontSize: 13, color: V2Colors.ink, fontWeight: FontWeight.w800)),
                     const Spacer(),
                     _QtyButton(icon: Icons.remove_rounded, onTap: () => store.changeCartQuantity(product.id, -1)),
                     Padding(
@@ -619,7 +614,7 @@ class V2CartLineRow extends StatelessWidget {
   }
 }
 
-/// v2 체크박스 — 선택 표시(금테 사각 + 체크).
+/// v2 체크박스 — 선택 표시(블랙 사각 + 화이트 체크).
 class _V2Check extends StatelessWidget {
   const _V2Check({required this.checked});
   final bool checked;
@@ -631,11 +626,11 @@ class _V2Check extends StatelessWidget {
       height: 22,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: checked ? V2Colors.teal : V2Colors.cream,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: checked ? V2Colors.goldDark : V2Colors.creamBorder, width: 1.4),
+        color: checked ? V2Colors.jet : V2Colors.bg,
+        borderRadius: BorderRadius.circular(V2Space.radiusSm),
+        border: Border.all(color: checked ? V2Colors.jet : V2Colors.line, width: 1.4),
       ),
-      child: checked ? const Icon(Icons.check_rounded, size: 15, color: V2Colors.goldLight) : null,
+      child: checked ? const Icon(Icons.check_rounded, size: 15, color: V2Colors.jetInk) : null,
     );
   }
 }
