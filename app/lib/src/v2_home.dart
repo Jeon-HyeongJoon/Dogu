@@ -31,7 +31,7 @@ class V2HomeBody extends StatelessWidget {
   }
 }
 
-/// 상단 제트 블랙 바 — 앱 타이틀 + 액센트 도트.
+/// 상단 제트 블랙 바 — 앱 타이틀 + 액센트 도트 + v1 복귀 칩.
 class V2Header extends StatelessWidget {
   const V2Header({super.key});
 
@@ -53,6 +53,20 @@ class V2Header extends StatelessWidget {
             width: 6,
             height: 6,
             decoration: const BoxDecoration(color: V2Colors.accent, shape: BoxShape.circle),
+          ),
+          const Spacer(),
+          // v2 → v1 복귀 — GoRouter 밖(단독 위젯 테스트 등)에서는 탭이 조용히 무시된다.
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => GoRouter.maybeOf(context)?.go('/'),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+              decoration: BoxDecoration(
+                border: Border.all(color: V2Colors.jetLine),
+                borderRadius: BorderRadius.circular(V2Space.radius),
+              ),
+              child: Text('V1', style: V2Text.mono.copyWith(color: V2Colors.jetSoft, fontSize: 11)),
+            ),
           ),
         ],
       ),
