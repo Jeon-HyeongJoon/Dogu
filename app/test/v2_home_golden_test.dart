@@ -98,6 +98,10 @@ Future<void> _pumpShell(WidgetTester tester, Size size, int initialTab) async {
       ),
     ),
   );
+  // 항아리 엠블럼(PNG) 디코딩을 강제해 골든에 실제로 렌더되게 한다.
+  await tester.runAsync(() async {
+    await precacheImage(const AssetImage('assets/logo-square.png'), tester.element(find.byType(V2Shell)));
+  });
   await tester.pumpAndSettle();
 }
 

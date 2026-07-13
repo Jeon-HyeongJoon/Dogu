@@ -55,6 +55,9 @@ void main() {
   testWidgets('v2 product card heart toggles the wishlist', (tester) async {
     final store = await _pumpShell(tester, 0);
     expect(store.wishlistIds, isEmpty);
+    // 히어로 높이에 따라 첫 상품 카드가 폴드 밖일 수 있어 하트를 뷰포트로 끌어온다.
+    await tester.ensureVisible(find.byIcon(Icons.favorite_border_rounded).first);
+    await tester.pump();
     await tester.tap(find.byIcon(Icons.favorite_border_rounded).first);
     await tester.pump();
     expect(store.wishlistIds, isNotEmpty);

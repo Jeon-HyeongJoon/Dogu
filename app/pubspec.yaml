@@ -24,6 +24,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/seed.json
+    # 항아리 엠블럼(Pot of Desire Co.) — v2 헤더·히어로 브랜드 마크
+    - assets/logo-square.png
     # 폰트를 fonts:가 아닌 assets:로 등록 — 엔진 FontManifest 프리로드(웹 첫 페인트 차단/이중 로드)를 피하고
     # 런타임 FontLoader로만 'Pretendard'를 등록한다. (bootstrap이 첫 프레임 이후 비차단 로드)
     - assets/fonts/pretendard/Pretendard-Regular.otf
