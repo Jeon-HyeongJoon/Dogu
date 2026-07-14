@@ -59,24 +59,32 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
             Expanded(
               child: V2ScrollBody(
                 builder: (context, cols) => [
-                  // 풀블리드 아트워크 — 프레임 없이 상품이 화면을 가득 채운다.
+                  // 아트워크 — 골드 헤어라인 라벨 프레임 안에 담는다(로고의 라벨 문법).
                   Padding(
                     padding: const EdgeInsets.fromLTRB(V2Space.pad, V2Space.pad, V2Space.pad, 0),
-                    child: Stack(
-                      children: [
-                        V2Artwork(product: product),
-                        if (product.discount.isNotEmpty && product.discount != '-0%')
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                              color: V2Colors.crave,
-                              child: Text(product.discount, style: V2Text.mono.copyWith(color: V2Colors.craveInk, fontSize: 13)),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: V2Colors.paper,
+                        borderRadius: BorderRadius.circular(V2Space.radius),
+                        border: Border.all(color: V2Colors.goldSoft),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: Stack(
+                        children: [
+                          V2Artwork(product: product),
+                          if (product.discount.isNotEmpty && product.discount != '-0%')
+                            Positioned(
+                              left: 0,
+                              top: 0,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                                color: V2Colors.crave,
+                                child: Text(product.discount, style: V2Text.mono.copyWith(color: V2Colors.craveInk, fontSize: 13)),
+                              ),
                             ),
-                          ),
-                        Positioned(right: 8, bottom: 8, child: V2SetCode(product.id, color: Colors.white70)),
-                      ],
+                          Positioned(right: 8, bottom: 8, child: V2SetCode(product.id, color: Colors.white70)),
+                        ],
+                      ),
                     ),
                   ),
                   Padding(
