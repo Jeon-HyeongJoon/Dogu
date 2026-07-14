@@ -10,8 +10,22 @@ class V2HomeBody extends StatelessWidget {
     final store = AppStateScope.watch(context);
     return V2ScrollBody(
       builder: (context, cols) => [
-        const V2HomeSearchEntry(),
-        V2HeroCard(store: store),
+        // 스토어프런트 밴드 — 헤더의 딥 그린이 검색바·히어로 포스터까지 한 필드로
+        // 흘러내리고, 골드 트림으로 종이 지면과 나뉜다(로고의 라벨이 걸린 매장 전면).
+        Container(
+          decoration: const BoxDecoration(
+            color: V2Colors.pot,
+            border: Border(bottom: BorderSide(color: V2Colors.gold, width: 2)),
+          ),
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const V2HomeSearchEntry(),
+              V2HeroCard(store: store),
+            ],
+          ),
+        ),
         V2CategoryStrip(categories: store.categories),
         const V2SectionHeader(index: '01', title: '오늘의 특가', typeLine: 'Today Only'),
         V2ProductGrid(products: store.dealProducts, columns: cols),
@@ -82,20 +96,20 @@ class V2HomeSearchEntry extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(V2Space.pad, V2Space.pad, V2Space.pad, 0),
+      padding: const EdgeInsets.fromLTRB(V2Space.pad, 14, V2Space.pad, 0),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => V2NavScope.go(context, 2),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: V2Colors.surface,
+            color: V2Colors.paper,
             borderRadius: BorderRadius.circular(V2Space.radius),
-            border: Border.all(color: V2Colors.goldSoft, width: 0.8),
+            border: Border.all(color: V2Colors.gold, width: 0.8),
           ),
           child: Row(
             children: [
-              const Icon(Icons.search_rounded, size: 20, color: V2Colors.ink),
+              const Icon(Icons.search_rounded, size: 20, color: V2Colors.goldDeep),
               const SizedBox(width: 10),
               Text('어떤 상품을 찾으시나요?', style: V2Text.body.copyWith(fontSize: 13.5, color: V2Colors.inkFaint)),
             ],
@@ -258,33 +272,56 @@ class V2HeroCard extends StatelessWidget {
   }
 }
 
-/// 카테고리 스트립 — 속성 배지 + 라벨.
+/// 카테고리 스트립 — 엠블럼을 닮은 원형 코인 배지의 가로 롤.
 class V2CategoryStrip extends StatelessWidget {
   const V2CategoryStrip({required this.categories, super.key});
   final List<CategoryItem> categories;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(V2Space.pad, 16, V2Space.pad, 4),
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 10,
+    return SizedBox(
+      height: 108,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(V2Space.pad, 18, V2Space.pad, 4),
         children: [
           for (final c in categories)
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                V2NavScope.go(context, 1);
-                AppStateScope.read(context).selectCategoryBrowse(_normalizeCategoryKey(c.id.isEmpty ? c.name : c.id));
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: V2Colors.surface,
-                  borderRadius: BorderRadius.circular(V2Space.radiusSm),
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  V2NavScope.go(context, 1);
+                  AppStateScope.read(context).selectCategoryBrowse(_normalizeCategoryKey(c.id.isEmpty ? c.name : c.id));
+                },
+                child: SizedBox(
+                  width: 62,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: V2Colors.surface,
+                          border: Border.all(color: V2Colors.goldSoft),
+                        ),
+                        child: Text(
+                          c.name.substring(0, 1),
+                          style: V2Text.title.copyWith(color: V2Colors.goldDeep, fontSize: 21),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        c.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: V2Text.body.copyWith(color: V2Colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Text(c.name, style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 12.5, fontWeight: FontWeight.w700)),
               ),
             ),
         ],
