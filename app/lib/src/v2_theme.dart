@@ -29,6 +29,7 @@ class V2Colors {
 
   static const gold = Color(0xffc9a24e); // 브라스 골드 — 레이블·트림 전용
   static const goldDeep = Color(0xff8f7130); // 종이 위 골드 텍스트(가독 확보)
+  static const goldSoft = Color(0xffd9c48f); // 종이 위 골드 괘선(은은한 트림)
 
   static const crave = Color(0xffb3282d); // 크레이빙 레드 — 가격·할인·찜
   static const craveInk = Color(0xfffdf7ee); // 레드 블록 위 글씨
@@ -110,6 +111,58 @@ class V2SetCode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(code.toUpperCase(), style: V2Text.mono.copyWith(color: color, fontSize: 9));
+  }
+}
+
+/// 골드 이중 괘선 프레임 — 로고의 빈티지 라벨 테두리를 그대로 옮긴다.
+/// 바깥 1.5px + 안쪽 0.8px 두 겹의 골드 선 사이에 3px 숨을 둔다.
+class V2LabelFrame extends StatelessWidget {
+  const V2LabelFrame({
+    required this.child,
+    this.background = V2Colors.pot,
+    this.lineColor = V2Colors.gold,
+    this.padding = const EdgeInsets.all(16),
+    super.key,
+  });
+
+  final Widget child;
+  final Color background;
+  final Color lineColor;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(V2Space.radius),
+        border: Border.all(color: lineColor, width: 1.5),
+      ),
+      padding: const EdgeInsets.all(3),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(V2Space.radiusSm),
+          border: Border.all(color: lineColor, width: 0.8),
+        ),
+        padding: padding,
+        child: child,
+      ),
+    );
+  }
+}
+
+/// 골드 다이아 오너먼트 — 괘선 사이의 마름모 장식(글리프 대신 도형이라 두부 없음).
+class V2Diamond extends StatelessWidget {
+  const V2Diamond({this.size = 5, this.color = V2Colors.gold, super.key});
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: pi / 4,
+      child: Container(width: size, height: size, color: color),
+    );
   }
 }
 
@@ -283,7 +336,7 @@ class V2TagChip extends StatelessWidget {
   }
 }
 
-/// 섹션 헤더 — 액센트 인덱스 eyebrow + 대형 타이틀 + 우측 액션.
+/// 섹션 헤더 — 빈티지 라벨 괘선: NO.인덱스 ── ◆ ── 타이프라인, 아래 대형 타이틀.
 class V2SectionHeader extends StatelessWidget {
   const V2SectionHeader({required this.index, required this.title, required this.typeLine, this.onTypeLineTap, super.key});
   final String index;
@@ -295,27 +348,32 @@ class V2SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(V2Space.pad, 30, V2Space.pad, 14),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(index, style: V2Text.mono.copyWith(color: V2Colors.goldDeep, fontSize: 10)),
-                const SizedBox(height: 4),
-                Text(title, style: V2Text.title.copyWith(fontSize: 23)),
-              ],
-            ),
+          Row(
+            children: [
+              Text('NO.$index', style: V2Text.mono.copyWith(color: V2Colors.goldDeep, fontSize: 10)),
+              const SizedBox(width: 10),
+              const Expanded(child: Divider(height: 1, thickness: 0.8, color: V2Colors.goldSoft)),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: V2Diamond(size: 5, color: V2Colors.goldDeep),
+              ),
+              const Expanded(child: Divider(height: 1, thickness: 0.8, color: V2Colors.goldSoft)),
+              const SizedBox(width: 10),
+              if (onTypeLineTap == null)
+                V2TypeLine(typeLine)
+              else
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: onTypeLineTap,
+                  child: V2TypeLine(typeLine, color: V2Colors.crave),
+                ),
+            ],
           ),
-          if (onTypeLineTap == null)
-            V2TypeLine(typeLine)
-          else
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: onTypeLineTap,
-              child: V2TypeLine(typeLine, color: V2Colors.crave),
-            ),
+          const SizedBox(height: 8),
+          Text(title, style: V2Text.title.copyWith(fontSize: 23)),
         ],
       ),
     );
