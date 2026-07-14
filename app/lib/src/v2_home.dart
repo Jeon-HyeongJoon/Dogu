@@ -176,7 +176,8 @@ class _V2NewsletterBlockState extends State<V2NewsletterBlock> {
   }
 }
 
-/// 히어로 — 제트 블랙 블록: 액센트 eyebrow + 대형 디스플레이 + 스탯 스트립.
+/// 히어로 — 브랜드 포스터: 골드 이중 괘선 라벨 안에 엠블럼·타이틀·레드 리본·스탯을
+/// 센터 정렬로 쌓아 로고(빈티지 엠블럼)의 인상을 그대로 옮긴다.
 class V2HeroCard extends StatelessWidget {
   const V2HeroCard({required this.store, super.key});
   final AppStore store;
@@ -185,49 +186,64 @@ class V2HeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(V2Space.pad, V2Space.pad, V2Space.pad, 4),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
-        decoration: BoxDecoration(
-          color: V2Colors.pot,
-          borderRadius: BorderRadius.circular(V2Space.radius),
-        ),
+      child: V2LabelFrame(
+        padding: const EdgeInsets.fromLTRB(18, 22, 18, 18),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(child: V2TypeLine(store.heroEyebrow, color: V2Colors.gold)),
-                // 항아리 엠블럼 — 히어로 우상단의 브랜드 인장.
-                ClipOval(
-                  child: Image.asset('assets/logo-square.png', width: 44, height: 44, fit: BoxFit.cover),
-                ),
-              ],
+            // 브랜드 인장 — 엠블럼을 골드 링으로 감싼다.
+            Container(
+              padding: const EdgeInsets.all(2.5),
+              decoration: const BoxDecoration(shape: BoxShape.circle, color: V2Colors.gold),
+              child: ClipOval(
+                child: Image.asset('assets/logo-square.png', width: 68, height: 68, fit: BoxFit.cover),
+              ),
+            ),
+            const SizedBox(height: 12),
+            V2TypeLine(store.heroEyebrow, color: V2Colors.gold),
+            const SizedBox(height: 10),
+            Text(
+              store.heroTitle,
+              textAlign: TextAlign.center,
+              style: V2Text.display.copyWith(color: V2Colors.potInk, fontSize: 28),
             ),
             const SizedBox(height: 10),
-            Text(store.heroTitle, style: V2Text.display.copyWith(color: V2Colors.potInk, fontSize: 30)),
-            const SizedBox(height: 10),
-            Text(store.heroSubtitle, style: V2Text.body.copyWith(color: V2Colors.potSoft, fontSize: 13)),
-            const SizedBox(height: 18),
-            Container(height: 1, color: V2Colors.potLine),
-            const SizedBox(height: 14),
-            Wrap(
-              spacing: 22,
-              runSpacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
+            Text(
+              store.heroSubtitle,
+              textAlign: TextAlign.center,
+              style: V2Text.body.copyWith(color: V2Colors.potSoft, fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            // 레드 리본 — 로고 태그라인을 크레이빙 배너로.
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              color: V2Colors.crave,
+              child: Text(
+                'SATISFYING EVERY CRAVING',
+                style: V2Text.mono.copyWith(color: V2Colors.craveInk, fontSize: 10),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
               children: [
-                for (final stat in store.heroStats)
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      // U+2212(−) 등 번들 폰트에 없는 기호는 ASCII로 정규화해 두부를 막는다.
-                      Text(stat.$1.replaceAll('−', '-'), style: V2Text.title.copyWith(color: V2Colors.gold, fontSize: 20)),
-                      const SizedBox(width: 5),
-                      Text(stat.$2, style: V2Text.body.copyWith(color: V2Colors.potSoft, fontSize: 11)),
-                    ],
+                for (var i = 0; i < store.heroStats.length; i++) ...[
+                  if (i > 0) Container(width: 1, height: 26, color: V2Colors.potLine),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        // U+2212(−) 등 번들 폰트에 없는 기호는 ASCII로 정규화해 두부를 막는다.
+                        Text(
+                          store.heroStats[i].$1.replaceAll('−', '-'),
+                          style: V2Text.title.copyWith(color: V2Colors.gold, fontSize: 20),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          store.heroStats[i].$2,
+                          style: V2Text.body.copyWith(color: V2Colors.potSoft, fontSize: 11),
+                        ),
+                      ],
+                    ),
                   ),
+                ],
               ],
             ),
           ],
