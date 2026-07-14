@@ -399,83 +399,113 @@ class V2ProductCard extends StatelessWidget {
           V2NavScope.go(context, 4);
         },
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 풀블리드 아트워크 + 하트
-          Stack(
-            children: [
-              V2Artwork(product: product),
-              Positioned(
-                right: 6,
-                top: 6,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => AppStateScope.read(context).toggleWishlist(product),
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: V2Colors.ink.withValues(alpha: 0.35),
-                      borderRadius: BorderRadius.circular(20),
+      // 빈티지 라벨 카드 — 골드 헤어라인 프레임 안에 아트·라벨·가격을 쌓는다.
+      child: Container(
+        decoration: BoxDecoration(
+          color: V2Colors.paper,
+          borderRadius: BorderRadius.circular(V2Space.radius),
+          border: Border.all(color: V2Colors.goldSoft),
+        ),
+        padding: const EdgeInsets.all(7),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 아트워크 + 레드 코너 태그 + 하트
+            Stack(
+              children: [
+                V2Artwork(product: product),
+                if (hasDiscount)
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      color: V2Colors.crave,
+                      child: Text(
+                        product.discount.replaceAll('−', '-'),
+                        style: V2Text.mono.copyWith(color: V2Colors.craveInk, fontSize: 10),
+                      ),
                     ),
-                    child: Icon(
-                      wished ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                      size: 16,
-                      color: wished ? V2Colors.crave : Colors.white,
+                  ),
+                Positioned(
+                  right: 6,
+                  top: 6,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => AppStateScope.read(context).toggleWishlist(product),
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: V2Colors.ink.withValues(alpha: 0.35),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Icon(
+                        wished ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                        size: 16,
+                        color: wished ? V2Colors.crave : Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 9),
-          // 브랜드 — 대문자 eyebrow
-          Text(
-            product.brand.toUpperCase(),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: V2Text.mono.copyWith(fontSize: 10, color: V2Colors.inkSoft),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            product.name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 13, height: 1.3, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 7),
-          // 할인율(액센트) + 가격(볼드) + 정가(취소선)
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              if (hasDiscount) ...[
-                Text(
-                  product.discount.replaceAll('-', '').replaceAll('−', ''),
-                  style: V2Text.title.copyWith(color: V2Colors.crave, fontSize: 16),
-                ),
-                const SizedBox(width: 5),
               ],
-              Text(product.price, style: V2Text.title.copyWith(fontSize: 16)),
-              if (product.hasDiscount) ...[
+            ),
+            const SizedBox(height: 8),
+            // 브랜드 — 골드 다이아 오너먼트를 낀 대문자 eyebrow
+            Row(
+              children: [
+                const V2Diamond(size: 3.5, color: V2Colors.goldDeep),
                 const SizedBox(width: 5),
-                Flexible(
+                Expanded(
                   child: Text(
-                    product.oldPrice,
+                    product.brand.toUpperCase(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: V2Text.body.copyWith(
-                      fontSize: 11,
-                      color: V2Colors.inkFaint,
-                      decoration: TextDecoration.lineThrough,
-                    ),
+                    style: V2Text.mono.copyWith(fontSize: 10, color: V2Colors.goldDeep),
                   ),
                 ),
               ],
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 3),
+            Text(
+              product.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: V2Text.body.copyWith(color: V2Colors.ink, fontSize: 13, height: 1.3, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 7),
+            // 할인율(크레이브) + 가격(볼드) + 정가(취소선)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                if (hasDiscount) ...[
+                  Text(
+                    product.discount.replaceAll('-', '').replaceAll('−', ''),
+                    style: V2Text.title.copyWith(color: V2Colors.crave, fontSize: 16),
+                  ),
+                  const SizedBox(width: 5),
+                ],
+                Text(product.price, style: V2Text.title.copyWith(fontSize: 16)),
+                if (product.hasDiscount) ...[
+                  const SizedBox(width: 5),
+                  Flexible(
+                    child: Text(
+                      product.oldPrice,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: V2Text.body.copyWith(
+                        fontSize: 11,
+                        color: V2Colors.inkFaint,
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
