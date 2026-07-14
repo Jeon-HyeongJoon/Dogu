@@ -40,7 +40,10 @@ class V2Header extends StatelessWidget {
     return Container(
       height: V2Space.headerHeight,
       padding: const EdgeInsets.symmetric(horizontal: V2Space.pad),
-      color: V2Colors.pot,
+      decoration: const BoxDecoration(
+        color: V2Colors.pot,
+        border: Border(bottom: BorderSide(color: V2Colors.gold, width: 2)),
+      ),
       child: Row(
         children: [
           // 항아리 엠블럼 — 그린 바 위의 크림 코인처럼 얹힌다.
@@ -88,6 +91,7 @@ class V2HomeSearchEntry extends StatelessWidget {
           decoration: BoxDecoration(
             color: V2Colors.surface,
             borderRadius: BorderRadius.circular(V2Space.radius),
+            border: Border.all(color: V2Colors.goldSoft, width: 0.8),
           ),
           child: Row(
             children: [
@@ -165,6 +169,7 @@ class _V2NewsletterBlockState extends State<V2NewsletterBlock> {
                 decoration: BoxDecoration(
                   color: V2Colors.pot,
                   borderRadius: BorderRadius.circular(V2Space.radius),
+                  border: Border.all(color: V2Colors.gold, width: 1.2),
                 ),
                 child: Text('구독', style: V2Text.title.copyWith(color: V2Colors.potInk, fontSize: 13)),
               ),

@@ -173,7 +173,10 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
     return Container(
       height: V2Space.headerHeight,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      color: V2Colors.pot,
+      decoration: const BoxDecoration(
+        color: V2Colors.pot,
+        border: Border(bottom: BorderSide(color: V2Colors.gold, width: 2)),
+      ),
       child: Row(
         children: [
           IconButton(
@@ -205,7 +208,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
               decoration: BoxDecoration(
                 color: V2Colors.paper,
                 borderRadius: BorderRadius.circular(V2Space.radius),
-                border: Border.all(color: V2Colors.line),
+                border: Border.all(color: V2Colors.goldSoft),
               ),
               child: Icon(wished ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: V2Colors.crave),
             ),
@@ -220,6 +223,7 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
                 decoration: BoxDecoration(
                   color: V2Colors.pot,
                   borderRadius: BorderRadius.circular(V2Space.radius),
+                  border: Border.all(color: V2Colors.gold, width: 1.2),
                 ),
                 child: Text(
                   (_added && widget.onGoToCart != null) ? '장바구니 보기' : '장바구니에 담기',

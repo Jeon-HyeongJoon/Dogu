@@ -81,6 +81,7 @@ class V2CartToast extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: V2Colors.pot,
                   borderRadius: BorderRadius.circular(V2Space.radius),
+                  border: Border.all(color: V2Colors.gold, width: 1.2),
                 ),
                 child: Text(
                   message,
@@ -92,7 +93,7 @@ class V2CartToast extends StatelessWidget {
   }
 }
 
-/// 하단 탭바 — 화이트 바 + 헤어라인 트림, 활성 탭은 잉크(블랙).
+/// 하단 탭바 — 딥 그린 바 + 골드 상단 트림, 활성 탭은 골드.
 class V2BottomBar extends StatelessWidget {
   const V2BottomBar({required this.current, required this.onTap, super.key});
   final int current;
@@ -112,8 +113,8 @@ class V2BottomBar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
-        color: V2Colors.paper,
-        border: Border(top: BorderSide(color: V2Colors.line)),
+        color: V2Colors.pot,
+        border: Border(top: BorderSide(color: V2Colors.gold, width: 2)),
       ),
       child: SizedBox(
         height: V2Space.tabHeight,
@@ -130,7 +131,7 @@ class V2BottomBar extends StatelessWidget {
                       Icon(
                         _items[i].$1,
                         size: 23,
-                        color: i == current ? V2Colors.ink : V2Colors.inkFaint,
+                        color: i == current ? V2Colors.gold : V2Colors.potSoft,
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -138,7 +139,7 @@ class V2BottomBar extends StatelessWidget {
                         style: V2Text.body.copyWith(
                           fontSize: 10.5,
                           fontWeight: i == current ? FontWeight.w800 : FontWeight.w500,
-                          color: i == current ? V2Colors.ink : V2Colors.inkFaint,
+                          color: i == current ? V2Colors.gold : V2Colors.potSoft,
                         ),
                       ),
                     ],
@@ -247,6 +248,7 @@ class _V2FilterChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: active ? V2Colors.pot : V2Colors.surface,
           borderRadius: BorderRadius.circular(V2Space.radiusSm),
+          border: Border.all(color: active ? V2Colors.gold : V2Colors.goldSoft, width: active ? 1.2 : 0.8),
         ),
         child: Text(
           label,
@@ -279,7 +281,7 @@ class V2CategoryRow extends StatelessWidget {
           decoration: BoxDecoration(
             color: V2Colors.paper,
             borderRadius: BorderRadius.circular(V2Space.radius),
-            border: Border.all(color: selected ? V2Colors.ink : V2Colors.line, width: selected ? 1.5 : 1),
+            border: Border.all(color: selected ? V2Colors.goldDeep : V2Colors.line, width: selected ? 1.5 : 1),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           child: Row(
@@ -368,6 +370,7 @@ class _V2SearchBodyState extends State<V2SearchBody> {
                     decoration: BoxDecoration(
                       color: V2Colors.pot,
                       borderRadius: BorderRadius.circular(V2Space.radius),
+                      border: Border.all(color: V2Colors.gold, width: 1.2),
                     ),
                     child: const Icon(Icons.search_rounded, size: 20, color: V2Colors.potInk),
                   ),
@@ -543,6 +546,7 @@ class V2CartBody extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: V2Colors.pot,
                   borderRadius: BorderRadius.circular(V2Space.radius),
+                  border: Border.all(color: V2Colors.gold, width: 1.2),
                 ),
                 child: Text('결제하기', style: V2Text.title.copyWith(color: V2Colors.potInk, fontSize: 16)),
               ),
@@ -627,9 +631,9 @@ class _V2Check extends StatelessWidget {
       decoration: BoxDecoration(
         color: checked ? V2Colors.pot : V2Colors.paper,
         borderRadius: BorderRadius.circular(V2Space.radiusSm),
-        border: Border.all(color: checked ? V2Colors.pot : V2Colors.line, width: 1.4),
+        border: Border.all(color: checked ? V2Colors.gold : V2Colors.line, width: 1.4),
       ),
-      child: checked ? const Icon(Icons.check_rounded, size: 15, color: V2Colors.potInk) : null,
+      child: checked ? const Icon(Icons.check_rounded, size: 15, color: V2Colors.gold) : null,
     );
   }
 }
