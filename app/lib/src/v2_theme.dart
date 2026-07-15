@@ -413,7 +413,8 @@ class V2ProductCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                       color: V2Colors.crave,
                       child: Text(
-                        product.discount.replaceAll('−', '-'),
+                        // 상세 가격 행과 부호 표기 통일 — 부호 없는 '60%'.
+                        product.discount.replaceAll('-', '').replaceAll('−', ''),
                         style: V2Text.mono.copyWith(color: V2Colors.craveInk, fontSize: 10),
                       ),
                     ),
@@ -479,7 +480,7 @@ class V2ProductCard extends StatelessWidget {
                       product.oldPrice,
                       style: V2Text.body.copyWith(
                         fontSize: 11,
-                        color: V2Colors.inkFaint,
+                        color: V2Colors.inkSoft,
                         decoration: TextDecoration.lineThrough,
                       ),
                     ),
