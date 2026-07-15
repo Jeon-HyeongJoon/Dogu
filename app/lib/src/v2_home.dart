@@ -238,13 +238,19 @@ class V2HeroCard extends StatelessWidget {
               style: V2Text.body.copyWith(color: V2Colors.potSoft, fontSize: 13),
             ),
             const SizedBox(height: 16),
-            // 레드 리본 — 로고 태그라인을 크레이빙 배너로.
+            // 태그라인 스탬프 — 레드 배너 대신 골드 헤어라인 스탬프로 절제.
+            // (레드는 가격·할인 등 욕망이 닿는 곳에만 남긴다.)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              color: V2Colors.crave,
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: V2Colors.gold, width: 0.8),
+                  bottom: BorderSide(color: V2Colors.gold, width: 0.8),
+                ),
+              ),
               child: Text(
                 'SATISFYING EVERY CRAVING',
-                style: V2Text.mono.copyWith(color: V2Colors.craveInk, fontSize: 10),
+                style: V2Text.mono.copyWith(color: V2Colors.gold, fontSize: 10),
               ),
             ),
             const SizedBox(height: 16),
@@ -311,11 +317,11 @@ class V2CategoryStrip extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: V2Colors.surface,
-                          border: Border.all(color: V2Colors.goldSoft),
+                          border: Border.all(color: V2Colors.line),
                         ),
                         child: Text(
                           c.name.substring(0, 1),
-                          style: V2Text.title.copyWith(color: V2Colors.goldDeep, fontSize: 21),
+                          style: V2Text.title.copyWith(color: V2Colors.inkSoft, fontSize: 21),
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -353,7 +359,7 @@ class V2ProductGrid extends StatelessWidget {
           final cardWidth = (constraints.maxWidth - gap * (columns - 1)) / columns;
           return Wrap(
             spacing: gap,
-            runSpacing: gap,
+            runSpacing: 26, // 에디토리얼 여백 — 행 사이는 넉넉하게 띄운다.
             children: [
               for (final p in products)
                 SizedBox(width: cardWidth, child: V2ProductCard(product: p)),
@@ -365,7 +371,8 @@ class V2ProductGrid extends StatelessWidget {
   }
 }
 
-/// 크레이브 티커 테이프 — 스토어프런트 아래를 지나가는 매장 방송 띠.
+/// 티커 테이프 — 스토어프런트 아래를 지나가는 매장 안내 띠.
+/// 프리미엄 커머스 문법대로 종이 바탕 + 헤어라인 + 잉크 타이포로 절제하고,
 /// 무한 애니메이션(타이머) 없이 가로 무한 ListView로 만들어 손으로 밀 수 있다.
 class V2TickerTape extends StatelessWidget {
   const V2TickerTape({super.key});
@@ -380,19 +387,22 @@ class V2TickerTape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 32,
-      color: V2Colors.crave,
+      height: 34,
+      decoration: const BoxDecoration(
+        color: V2Colors.paper,
+        border: Border(bottom: BorderSide(color: V2Colors.line, width: 1)),
+      ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, i) => Row(
           children: [
-            const SizedBox(width: 18),
-            const V2Diamond(size: 4, color: V2Colors.craveInk),
-            const SizedBox(width: 18),
+            const SizedBox(width: 22),
+            const V2Diamond(size: 3.5, color: V2Colors.gold),
+            const SizedBox(width: 22),
             Center(
               child: Text(
                 _lines[i % _lines.length],
-                style: V2Text.mono.copyWith(color: V2Colors.craveInk, fontSize: 10),
+                style: V2Text.mono.copyWith(color: V2Colors.inkSoft, fontSize: 10),
               ),
             ),
           ],
@@ -438,11 +448,11 @@ class V2ShelfAisle extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(height: 3, color: V2Colors.goldSoft),
-              const SizedBox(height: 4),
+              Container(height: 2, color: V2Colors.goldSoft),
+              const SizedBox(height: 5),
               Row(
                 children: [
-                  V2SetCode(code, color: V2Colors.goldDeep),
+                  V2SetCode(code, color: V2Colors.inkFaint),
                   const Spacer(),
                   V2SetCode('${products.length} ITEMS'),
                 ],
