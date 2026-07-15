@@ -41,7 +41,7 @@ class V2Space {
   static const radius = 4.0; // 카드·버튼 모서리(거의 각지게)
   static const radiusSm = 2.0; // 배지·이미지 모서리
   static const headerHeight = 56.0;
-  static const tabHeight = 64.0;
+  static const railWidth = 64.0; // 좌측 엘리베이터 층 레일(하단 탭바 대체)
 
   // 반응형: 모바일 좁은 캔버스 → 태블릿은 넓은 캔버스 + 더 많은 열.
   static const phoneMax = 440.0;
@@ -336,7 +336,8 @@ class V2TagChip extends StatelessWidget {
   }
 }
 
-/// 섹션 헤더 — 빈티지 라벨 괘선: NO.인덱스 ── ◆ ── 타이프라인, 아래 대형 타이틀.
+/// 섹션 헤더 — 프리미엄 커머스 공통 문법: 헤어라인 한 줄 위에
+/// 자간 넓은 대문자 eyebrow(인덱스 · 우측 액션)와 대형 타이틀, 장식은 없다.
 class V2SectionHeader extends StatelessWidget {
   const V2SectionHeader({required this.index, required this.title, required this.typeLine, this.onTypeLineTap, super.key});
   final String index;
@@ -347,23 +348,18 @@ class V2SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(V2Space.pad, 30, V2Space.pad, 14),
+      padding: const EdgeInsets.fromLTRB(V2Space.pad, 38, V2Space.pad, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Divider(height: 1, thickness: 1, color: V2Colors.line),
+          const SizedBox(height: 14),
           Row(
             children: [
-              Text('NO.$index', style: V2Text.mono.copyWith(color: V2Colors.goldDeep, fontSize: 10)),
-              const SizedBox(width: 10),
-              const Expanded(child: Divider(height: 1, thickness: 0.8, color: V2Colors.goldSoft)),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: V2Diamond(size: 5, color: V2Colors.goldDeep),
-              ),
-              const Expanded(child: Divider(height: 1, thickness: 0.8, color: V2Colors.goldSoft)),
-              const SizedBox(width: 10),
+              Text('NO.$index', style: V2Text.mono.copyWith(color: V2Colors.inkFaint, fontSize: 10)),
+              const Spacer(),
               if (onTypeLineTap == null)
-                V2TypeLine(typeLine)
+                V2TypeLine(typeLine, color: V2Colors.inkFaint)
               else
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
@@ -372,8 +368,8 @@ class V2SectionHeader extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(title, style: V2Text.title.copyWith(fontSize: 23)),
+          const SizedBox(height: 6),
+          Text(title, style: V2Text.title.copyWith(fontSize: 24)),
         ],
       ),
     );
@@ -399,15 +395,9 @@ class V2ProductCard extends StatelessWidget {
           V2NavScope.go(context, 4);
         },
       ),
-      // 빈티지 라벨 카드 — 골드 헤어라인 프레임 안에 아트·라벨·가격을 쌓는다.
-      child: Container(
-        decoration: BoxDecoration(
-          color: V2Colors.paper,
-          borderRadius: BorderRadius.circular(V2Space.radius),
-          border: Border.all(color: V2Colors.goldSoft),
-        ),
-        padding: const EdgeInsets.all(7),
-        child: Column(
+      // 에디토리얼 카드 — 프리미엄 커머스 공통 문법: 프레임 없이 아트 풀블리드,
+      // 아래로 자간 넓은 브랜드 eyebrow와 상품명·가격을 여백으로만 구분한다.
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -450,23 +440,15 @@ class V2ProductCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            // 브랜드 — 골드 다이아 오너먼트를 낀 대문자 eyebrow
-            Row(
-              children: [
-                const V2Diamond(size: 3.5, color: V2Colors.goldDeep),
-                const SizedBox(width: 5),
-                Expanded(
-                  child: Text(
-                    product.brand.toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: V2Text.mono.copyWith(fontSize: 10, color: V2Colors.goldDeep),
-                  ),
-                ),
-              ],
+            const SizedBox(height: 10),
+            // 브랜드 — 자간 넓은 대문자 eyebrow(장식 없이 타이포만).
+            Text(
+              product.brand.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: V2Text.mono.copyWith(fontSize: 10, color: V2Colors.inkFaint),
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 4),
             Text(
               product.name,
               maxLines: 2,
@@ -475,37 +457,37 @@ class V2ProductCard extends StatelessWidget {
             ),
             const SizedBox(height: 7),
             // 할인율(크레이브) + 가격(볼드) + 정가(취소선)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                if (hasDiscount) ...[
-                  Text(
-                    product.discount.replaceAll('-', '').replaceAll('−', ''),
-                    style: V2Text.title.copyWith(color: V2Colors.crave, fontSize: 16),
-                  ),
-                  const SizedBox(width: 5),
-                ],
-                Text(product.price, style: V2Text.title.copyWith(fontSize: 16)),
-                if (product.hasDiscount) ...[
-                  const SizedBox(width: 5),
-                  Flexible(
-                    child: Text(
+            // 좁은 선반 카드에서도 잘리지 않게 행 전체를 축소(FittedBox)로 맞춘다.
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  if (hasDiscount) ...[
+                    Text(
+                      product.discount.replaceAll('-', '').replaceAll('−', ''),
+                      style: V2Text.title.copyWith(color: V2Colors.crave, fontSize: 16),
+                    ),
+                    const SizedBox(width: 5),
+                  ],
+                  Text(product.price, style: V2Text.title.copyWith(fontSize: 16)),
+                  if (product.hasDiscount) ...[
+                    const SizedBox(width: 5),
+                    Text(
                       product.oldPrice,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                       style: V2Text.body.copyWith(
                         fontSize: 11,
                         color: V2Colors.inkFaint,
                         decoration: TextDecoration.lineThrough,
                       ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ],
-        ),
       ),
     );
   }
