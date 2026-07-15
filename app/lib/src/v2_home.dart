@@ -1,7 +1,8 @@
 part of '../main.dart';
 
-/// v2 홈 바디 — v1과 동일한 섹션 구성(히어로·카테고리·특가·신상·브랜드·푸터)을
-/// aggressive-clean 디자인으로 미러링한다. 상단 헤더/하단 탭바는 V2Shell이 제공한다.
+/// v2 홈 바디 = 5F 쇼윈도 — 세로 그리드 대신 백화점 진열대 은유의 실험 레이아웃:
+/// 스토어프런트(검색+히어로) 아래 크레이브 티커 테이프가 지나가고,
+/// 상품 섹션은 가로 스크롤 진열대(aisle)로 쌓인다. 헤더/층 레일은 V2Shell이 제공.
 class V2HomeBody extends StatelessWidget {
   const V2HomeBody({super.key});
 
@@ -26,18 +27,19 @@ class V2HomeBody extends StatelessWidget {
             ],
           ),
         ),
+        const V2TickerTape(),
         V2CategoryStrip(categories: store.categories),
-        const V2SectionHeader(index: '01', title: '오늘의 특가', typeLine: 'Today Only'),
-        V2ProductGrid(products: store.dealProducts, columns: cols),
-        const V2SectionHeader(index: '02', title: '신상품', typeLine: 'Just In'),
-        V2ProductGrid(products: store.newProducts, columns: cols),
-        const V2SectionHeader(index: '03', title: 'THIS WEEK', typeLine: 'Hot Brands'),
+        const V2SectionHeader(index: 'A-1', title: '오늘의 특가', typeLine: 'Today Only'),
+        V2ShelfAisle(code: 'AISLE A-1', products: store.dealProducts),
+        const V2SectionHeader(index: 'A-2', title: '신상품', typeLine: 'Just In'),
+        V2ShelfAisle(code: 'AISLE A-2', products: store.newProducts),
+        const V2SectionHeader(index: 'A-3', title: 'THIS WEEK', typeLine: 'Hot Brands'),
         V2BrandPanel(
           brands: {
             for (final p in [...store.dealProducts, ...store.newProducts]) p.brand,
           }.toList(),
         ),
-        const V2SectionHeader(index: '04', title: '뉴스레터', typeLine: '구독'),
+        const V2SectionHeader(index: 'A-4', title: '뉴스레터', typeLine: '구독'),
         const V2NewsletterBlock(),
         const V2Footer(),
       ],
@@ -45,7 +47,8 @@ class V2HomeBody extends StatelessWidget {
   }
 }
 
-/// 상단 제트 블랙 바 — 앱 타이틀 + 액센트 도트 + v1 복귀 칩.
+/// 상단 안내데스크 밴드 — 관 표기 eyebrow + 앱 타이틀 + v1 복귀 칩.
+/// (항아리 엠블럼은 좌측 층 레일의 옥상 간판으로 이동했다.)
 class V2Header extends StatelessWidget {
   const V2Header({super.key});
 
@@ -60,14 +63,17 @@ class V2Header extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 항아리 엠블럼 — 그린 바 위의 크림 코인처럼 얹힌다.
-          ClipOval(
-            child: Image.asset('assets/logo-square.png', width: 30, height: 30, fit: BoxFit.cover),
-          ),
-          const SizedBox(width: 9),
-          Text(
-            '욕망의장바구니',
-            style: V2Text.display.copyWith(color: V2Colors.potInk, fontSize: 20),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('THE DESIRE DEPT.', style: V2Text.mono.copyWith(color: V2Colors.gold, fontSize: 8)),
+              const SizedBox(height: 1),
+              Text(
+                '욕망의장바구니',
+                style: V2Text.display.copyWith(color: V2Colors.potInk, fontSize: 18),
+              ),
+            ],
           ),
           const Spacer(),
           // v2 → v1 복귀 — GoRouter 밖(단독 위젯 테스트 등)에서는 탭이 조용히 무시된다.
@@ -355,6 +361,96 @@ class V2ProductGrid extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+/// 크레이브 티커 테이프 — 스토어프런트 아래를 지나가는 매장 방송 띠.
+/// 무한 애니메이션(타이머) 없이 가로 무한 ListView로 만들어 손으로 밀 수 있다.
+class V2TickerTape extends StatelessWidget {
+  const V2TickerTape({super.key});
+
+  static const _lines = <String>[
+    'SATISFYING EVERY CRAVING',
+    '5F SHOWCASE NOW OPEN',
+    'POT OF DESIRE CO.',
+    'TODAY ONLY DEALS',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 32,
+      color: V2Colors.crave,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, i) => Row(
+          children: [
+            const SizedBox(width: 18),
+            const V2Diamond(size: 4, color: V2Colors.craveInk),
+            const SizedBox(width: 18),
+            Center(
+              child: Text(
+                _lines[i % _lines.length],
+                style: V2Text.mono.copyWith(color: V2Colors.craveInk, fontSize: 10),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 가로 진열대(aisle) — 상품을 세로 그리드 대신 선반 위에 일렬로 눕힌다.
+/// 선반 아래 골드 레일과 통로 코드로 백화점 진열대의 인상을 만든다.
+class V2ShelfAisle extends StatelessWidget {
+  const V2ShelfAisle({required this.code, required this.products, super.key});
+  final String code;
+  final List<ProductItem> products;
+
+  @override
+  Widget build(BuildContext context) {
+    if (products.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          height: 280,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: V2Space.pad),
+            itemCount: products.length,
+            separatorBuilder: (_, __) => const SizedBox(width: V2Space.gap),
+            itemBuilder: (context, i) => SizedBox(
+              width: 168,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [V2ProductCard(product: products[i])],
+              ),
+            ),
+          ),
+        ),
+        // 선반 레일 — 카드가 얹힌 골드 바 + 통로 코드.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(V2Space.pad, 6, V2Space.pad, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(height: 3, color: V2Colors.goldSoft),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  V2SetCode(code, color: V2Colors.goldDeep),
+                  const Spacer(),
+                  V2SetCode('${products.length} ITEMS'),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

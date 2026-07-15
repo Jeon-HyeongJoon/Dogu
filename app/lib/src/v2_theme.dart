@@ -41,7 +41,7 @@ class V2Space {
   static const radius = 4.0; // 카드·버튼 모서리(거의 각지게)
   static const radiusSm = 2.0; // 배지·이미지 모서리
   static const headerHeight = 56.0;
-  static const tabHeight = 64.0;
+  static const railWidth = 64.0; // 좌측 엘리베이터 층 레일(하단 탭바 대체)
 
   // 반응형: 모바일 좁은 캔버스 → 태블릿은 넓은 캔버스 + 더 많은 열.
   static const phoneMax = 440.0;
@@ -475,34 +475,35 @@ class V2ProductCard extends StatelessWidget {
             ),
             const SizedBox(height: 7),
             // 할인율(크레이브) + 가격(볼드) + 정가(취소선)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                if (hasDiscount) ...[
-                  Text(
-                    product.discount.replaceAll('-', '').replaceAll('−', ''),
-                    style: V2Text.title.copyWith(color: V2Colors.crave, fontSize: 16),
-                  ),
-                  const SizedBox(width: 5),
-                ],
-                Text(product.price, style: V2Text.title.copyWith(fontSize: 16)),
-                if (product.hasDiscount) ...[
-                  const SizedBox(width: 5),
-                  Flexible(
-                    child: Text(
+            // 좁은 선반 카드에서도 잘리지 않게 행 전체를 축소(FittedBox)로 맞춘다.
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  if (hasDiscount) ...[
+                    Text(
+                      product.discount.replaceAll('-', '').replaceAll('−', ''),
+                      style: V2Text.title.copyWith(color: V2Colors.crave, fontSize: 16),
+                    ),
+                    const SizedBox(width: 5),
+                  ],
+                  Text(product.price, style: V2Text.title.copyWith(fontSize: 16)),
+                  if (product.hasDiscount) ...[
+                    const SizedBox(width: 5),
+                    Text(
                       product.oldPrice,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                       style: V2Text.body.copyWith(
                         fontSize: 11,
                         color: V2Colors.inkFaint,
                         decoration: TextDecoration.lineThrough,
                       ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ],
         ),

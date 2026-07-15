@@ -1,7 +1,9 @@
 part of '../main.dart';
 
-/// v2 앱 셸 — 제트 블랙 헤더 + 5탭 바디(IndexedStack) + 화이트 하단 탭바.
-/// v1 AppShell과 동일한 5탭 구성(홈·카테고리·검색·찜·장바구니)을 미러링한다.
+/// v2 앱 셸 — "THE DESIRE DEPT." 백화점 은유의 실험 레이아웃.
+/// 하단 탭바 대신 좌측 세로 엘리베이터 층 레일(5F→1F)로 이동하고,
+/// 각 탭은 백화점의 층(쇼윈도·카테고리·안내소·보관소·계산대)이 된다.
+/// 탭 인덱스(0 홈 … 4 장바구니)는 v1 5탭과 동일하게 유지된다.
 class V2Shell extends StatefulWidget {
   const V2Shell({this.initialTab = 0, super.key});
   final int initialTab;
@@ -27,23 +29,29 @@ class _V2ShellState extends State<V2Shell> {
       goToTab: (index) => setState(() => _tab = index),
       child: Scaffold(
         backgroundColor: V2Colors.paper,
-        body: Stack(
-          children: [
-            SafeArea(
-              bottom: false,
-              child: Column(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const V2Header(),
-                  Expanded(child: IndexedStack(index: _tab, children: _bodies)),
+                  V2FloorRail(
+                    current: _tab,
+                    onTap: (index) => setState(() => _tab = index),
+                  ),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        const V2Header(),
+                        Expanded(child: IndexedStack(index: _tab, children: _bodies)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-            const Positioned(left: 0, right: 0, bottom: 16, child: V2CartToast()),
-          ],
-        ),
-        bottomNavigationBar: V2BottomBar(
-          current: _tab,
-          onTap: (index) => setState(() => _tab = index),
+              const Positioned(left: 0, right: 0, bottom: 16, child: V2CartToast()),
+            ],
+          ),
         ),
       ),
     );
@@ -93,59 +101,104 @@ class V2CartToast extends StatelessWidget {
   }
 }
 
-/// 하단 탭바 — 딥 그린 바 + 골드 상단 트림, 활성 탭은 골드.
-class V2BottomBar extends StatelessWidget {
-  const V2BottomBar({required this.current, required this.onTap, super.key});
+/// 좌측 엘리베이터 층 레일 — 하단 탭바를 대체하는 v2의 실험 내비게이션.
+/// 딥 그린 기둥 위에 5F(쇼윈도)→1F(계산대) 층 버튼을 세로로 쌓고,
+/// 활성 층은 골드 좌측 게이지 + 골드 글자로 "엘리베이터 위치"처럼 표시한다.
+class V2FloorRail extends StatelessWidget {
+  const V2FloorRail({required this.current, required this.onTap, super.key});
   final int current;
   final ValueChanged<int> onTap;
 
-  static const _items = <(IconData, String)>[
-    (Icons.home_rounded, '홈'),
-    (Icons.grid_view_rounded, '카테고리'),
-    (Icons.search_rounded, '검색'),
-    (Icons.favorite_rounded, '찜'),
-    (Icons.shopping_bag_rounded, '장바구니'),
+  // 탭 인덱스 순서(0→4) = 층 순서(5F→1F). 위층에서 내려오며 계산대로 향한다.
+  static const floors = <(String, IconData, String)>[
+    ('5F', Icons.storefront_rounded, '쇼윈도'),
+    ('4F', Icons.grid_view_rounded, '카테고리'),
+    ('3F', Icons.search_rounded, '안내소'),
+    ('2F', Icons.favorite_rounded, '보관소'),
+    ('1F', Icons.shopping_bag_rounded, '계산대'),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
     return Container(
-      padding: EdgeInsets.only(bottom: bottomInset),
+      width: V2Space.railWidth,
       decoration: const BoxDecoration(
         color: V2Colors.pot,
-        border: Border(top: BorderSide(color: V2Colors.gold, width: 2)),
+        border: Border(right: BorderSide(color: V2Colors.gold, width: 2)),
       ),
-      child: SizedBox(
-        height: V2Space.tabHeight,
-        child: Row(
-          children: [
-            for (var i = 0; i < _items.length; i++)
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => onTap(i),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        _items[i].$1,
-                        size: 23,
-                        color: i == current ? V2Colors.gold : V2Colors.potSoft,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _items[i].$2,
-                        style: V2Text.body.copyWith(
-                          fontSize: 10.5,
-                          fontWeight: i == current ? FontWeight.w800 : FontWeight.w500,
-                          color: i == current ? V2Colors.gold : V2Colors.potSoft,
-                        ),
-                      ),
-                    ],
-                  ),
+      child: Column(
+        children: [
+          // 옥상 간판 — 항아리 엠블럼 코인 + 관(館) 표기.
+          Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 6),
+            child: ClipOval(
+              child: Image.asset('assets/logo-square.png', width: 34, height: 34, fit: BoxFit.cover),
+            ),
+          ),
+          Text('DEPT.', style: V2Text.mono.copyWith(color: V2Colors.gold, fontSize: 8)),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Divider(height: 1, thickness: 0.8, color: V2Colors.potLine),
+          ),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                for (var i = 0; i < floors.length; i++) _floorCell(i),
+              ],
+            ),
+          ),
+          // 1층 로비 — 현재 층 표시등.
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14, top: 8),
+            child: Column(
+              children: [
+                const V2Diamond(size: 4, color: V2Colors.gold),
+                const SizedBox(height: 6),
+                Text(
+                  floors[current].$1,
+                  style: V2Text.mono.copyWith(color: V2Colors.gold, fontSize: 11),
                 ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _floorCell(int i) {
+    final active = i == current;
+    final accent = active ? V2Colors.gold : V2Colors.potSoft;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => onTap(i),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 9),
+        decoration: BoxDecoration(
+          color: active ? V2Colors.potLine.withValues(alpha: 0.45) : null,
+          border: Border(
+            left: BorderSide(
+              color: active ? V2Colors.gold : Colors.transparent,
+              width: 3,
+            ),
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(floors[i].$1, style: V2Text.mono.copyWith(color: accent, fontSize: 10)),
+            const SizedBox(height: 4),
+            Icon(floors[i].$2, size: 20, color: accent),
+            const SizedBox(height: 3),
+            Text(
+              floors[i].$3,
+              style: V2Text.body.copyWith(
+                fontSize: 9,
+                fontWeight: active ? FontWeight.w800 : FontWeight.w500,
+                color: active ? V2Colors.potInk : V2Colors.potSoft,
               ),
+            ),
           ],
         ),
       ),
