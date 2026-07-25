@@ -64,6 +64,15 @@ void main() {
       );
     });
   }
+
+  // 액션바의 수량 스테퍼(− 1 +)만 정밀 스냅샷 — +/- 버튼 크기·정렬 회귀를 좁게 잡는다.
+  testWidgets('v2 detail quantity stepper renders', (tester) async {
+    await _pumpDetail(tester, const Size(390, 844));
+    await expectLater(
+      find.byKey(const Key('v2_qty_stepper')),
+      matchesGoldenFile('goldens/v2_detail_qty_stepper.png'),
+    );
+  });
 }
 
 Future<void> _loadFont(String family, List<String> assets) async {
