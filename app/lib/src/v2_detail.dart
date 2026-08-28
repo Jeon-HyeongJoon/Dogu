@@ -232,24 +232,34 @@ class _V2ProductDetailPageState extends State<V2ProductDetailPage> {
           ),
           const SizedBox(width: 10),
           // 수량 스테퍼 — 담기 CTA 바로 곁에서 수량을 정한다(콘텐츠 바닥에서 이동).
-          Container(
-            height: 52,
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            decoration: BoxDecoration(
-              color: V2Colors.paper,
-              borderRadius: BorderRadius.circular(V2Space.radius),
-              border: Border.all(color: V2Colors.line),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _QtyButton(icon: Icons.remove_rounded, onTap: () => _changeQuantity(-1)),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Text('$_quantity', style: V2Text.title.copyWith(fontSize: 16)),
-                ),
-                _QtyButton(icon: Icons.add_rounded, onTap: () => _changeQuantity(1)),
-              ],
+          // v1 QtyBox 기준: −│값│+ 를 구분선으로 나눈 세그먼트형으로 버튼 경계를 뚜렷하게.
+          // RepaintBoundary로 감싸 +/- 스테퍼만 골든으로 좁게 스냅샷할 수 있게 한다.
+          RepaintBoundary(
+            key: const Key('v2_qty_stepper'),
+            child: Container(
+              height: 52,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                color: V2Colors.paper,
+                borderRadius: BorderRadius.circular(V2Space.radius),
+                border: Border.all(color: V2Colors.line),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _QtySegButton(icon: Icons.remove_rounded, onTap: () => _changeQuantity(-1)),
+                  Container(
+                    width: 44,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      border: Border.symmetric(vertical: BorderSide(color: V2Colors.line)),
+                    ),
+                    child: Text('$_quantity', style: V2Text.title.copyWith(fontSize: 16)),
+                  ),
+                  _QtySegButton(icon: Icons.add_rounded, onTap: () => _changeQuantity(1)),
+                ],
+              ),
             ),
           ),
           const SizedBox(width: 10),
@@ -291,6 +301,26 @@ class _QtyButton extends StatelessWidget {
         width: 34,
         height: 34,
         child: Icon(icon, size: 18, color: V2Colors.ink),
+      ),
+    );
+  }
+}
+
+// 상세 액션바 전용 세그먼트 버튼(v1 QtyBox 기준). 구분선 사이에서 전체 높이를 채워
+// −/+ 버튼 경계를 뚜렷하게 한다. 카트 라인 행이 쓰는 공유 _QtyButton과 분리한다.
+class _QtySegButton extends StatelessWidget {
+  const _QtySegButton({required this.icon, required this.onTap});
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: SizedBox(
+        width: 44,
+        child: Center(child: Icon(icon, size: 22, color: V2Colors.ink)),
       ),
     );
   }

@@ -89,4 +89,41 @@ void main() {
     // showCartToast가 건 3초 타이머를 소진해 teardown의 pending-timer 검사를 통과시킨다.
     await tester.pump(const Duration(seconds: 4));
   });
+
+  testWidgets('v2 checkout opens the delivery notice, empties the cart and banks the amount', (tester) async {
+    final store = await _pumpShell(tester, 4, cart: {'p01': 2, 'p03': 1});
+    final total = store.selectedCartTotal;
+    expect(total, greaterThan(0));
+
+    await tester.tap(find.text('결제하기'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(V2OrderDeliveryPage), findsOneWidget);
+    expect(find.text('배송 준비 중'), findsOneWidget);
+    // 결제한 상품은 장바구니에서 빠지고, 그 금액은 이번 달 '참은 돈'으로 적립된다.
+    expect(store.cartQuantities, isEmpty);
+    expect(store.savedInMonth(DateTime.now()), total);
+  });
+
+  testWidgets('v2 delivery notice confirm reveals the not-shipped result', (tester) async {
+    await _pumpShell(tester, 4, cart: {'p01': 1});
+    await tester.tap(find.text('결제하기'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('v2_order_confirm')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(V2OrderRevealPage), findsOneWidget);
+    expect(find.text('사실은요,\n안 보냈습니다'), findsOneWidget);
+    expect(find.byKey(const Key('v2_order_joke')), findsOneWidget);
+    expect(find.text('미발송'), findsOneWidget);
+    expect(find.text('₩0'), findsOneWidget);
+    // 배송 안내로는 돌아갈 수 없다(pushReplacement) — 마지막 CTA는 셸로 되돌린다.
+    expect(find.byType(V2OrderDeliveryPage), findsNothing);
+
+    await tester.tap(find.byKey(const Key('v2_order_done')));
+    await tester.pumpAndSettle();
+    expect(find.byType(V2Shell), findsOneWidget);
+    expect(find.byType(V2OrderRevealPage), findsNothing);
+  });
 }

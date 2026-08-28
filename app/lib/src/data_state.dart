@@ -276,6 +276,8 @@ class AppStore extends ChangeNotifier {
   String? selectedCategoryKey;
   List<ProductItem> categoryProducts = const [];
   Map<String, dynamic>? lastOrderSummary;
+  // 참아서 굳은 돈 — 'YYYY-MM' → 누적액. v2 주문 흐름(배송 안내 → 주문 결과)이 읽고 쓴다.
+  Map<String, int> savedByMonth = <String, int>{};
   Map<String, String> newsletter = const {'eyebrow': '— 매주 수요일 발송', 'title': '조용한 신상품을\n가장 먼저.', 'note': '// 언제든 한 번의 클릭으로 구독 취소'};
   bool usingFallback = true;
 
@@ -409,6 +411,13 @@ class AppStore extends ChangeNotifier {
         cartQuantities = Map.fromEntries(
           loaded.entries.where((e) => !e.key.startsWith('new-') && !e.key.startsWith('deal-')),
         );
+      }
+    }
+    final rawSaved = prefs.getString('savedByMonth');
+    if (rawSaved != null) {
+      final decoded = jsonDecode(rawSaved);
+      if (decoded is Map) {
+        savedByMonth = decoded.map((key, value) => MapEntry(key.toString(), (value as num).toInt()));
       }
     }
     _selectedCartIds = cartQuantities.keys.toSet();
@@ -635,6 +644,22 @@ class AppStore extends ChangeNotifier {
   void rememberOrderSummary(Map<String, dynamic>? summary) {
     lastOrderSummary = summary;
     notifyListeners();
+  }
+
+  static String savedMonthKey(DateTime at) => '${at.year}-${at.month.toString().padLeft(2, '0')}';
+
+  /// 해당 달에 참아서 굳은 누적액.
+  int savedInMonth(DateTime at) => savedByMonth[savedMonthKey(at)] ?? 0;
+
+  /// 주문 한 건을 '참은 돈'으로 적립하고 누적액을 돌려준다(로컬 저장).
+  Future<int> recordResistedAmount(int amount, {required DateTime at}) async {
+    final key = savedMonthKey(at);
+    final next = (savedByMonth[key] ?? 0) + amount;
+    savedByMonth = {...savedByMonth, key: next};
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('savedByMonth', jsonEncode(savedByMonth));
+    notifyListeners();
+    return next;
   }
 
   Future<Map<String, dynamic>> submitSelectedOrder() async {

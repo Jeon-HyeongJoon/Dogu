@@ -514,18 +514,30 @@ class _V2WishBodyState extends State<V2WishBody> {
 class V2CartBody extends StatelessWidget {
   const V2CartBody({super.key});
 
-  void _checkout(BuildContext context) {
+  Future<void> _checkout(BuildContext context) async {
     final store = AppStateScope.read(context);
-    if (store.selectedCartLines.isEmpty) {
+    final lines = store.selectedCartLines;
+    if (lines.isEmpty) {
       store.showCartToast('선택된 상품이 없습니다.');
       return;
     }
-    // 결제는 UI-only(로컬 모의 주문 요약) — 실제 PG 연동 없음.
-    store.rememberOrderSummary({
-      'item_count': store.selectedCartCount,
-      'total_price': store.selectedCartTotal,
-    });
-    store.showCartToast('${store.selectedCartCount}개 · ${formatWon(store.selectedCartTotal)} 결제가 완료되었습니다 (데모).');
+    // 결제는 UI-only(로컬 모의 주문) — 실제 PG 연동 없음. 여기서 장바구니를 비우고
+    // 그 금액을 '참아서 굳은 돈'으로 적립한 뒤, 배송 안내 → 주문 결과 흐름을 띄운다.
+    final placedAt = DateTime.now();
+    final total = store.selectedCartTotal;
+    store.rememberOrderSummary({'item_count': store.selectedCartCount, 'total_price': total});
+    final receipt = V2OrderReceipt(
+      code: V2OrderReceipt.buildCode(placedAt, Random()),
+      lines: List.of(lines),
+      total: total,
+      placedAt: placedAt,
+      savedThisMonth: await store.recordResistedAmount(total, at: placedAt),
+    );
+    for (final line in receipt.lines) {
+      await store.changeCartQuantity(line.product.id, -line.quantity);
+    }
+    if (!context.mounted) return;
+    openV2OrderFlow(context, receipt);
   }
 
   @override
