@@ -20,6 +20,8 @@ void main() {
     // 없으므로, 앱의 폰트 상수로 직접 로드한다(한글 글리프 보장).
     await _loadFont(doguFontFamily, doguFontAssets);
     await _loadFont(doguHeroFontFamily, doguHeroFontAssets);
+    // 주문 결과 화면의 농담 한 줄이 쓰는 손글씨체(HSBombaram).
+    await _loadFont(doguTitleFontFamily, doguTitleEssentialFontAssets);
     // MaterialIcons 등 프레임워크/pubspec 등록 폰트는 FontManifest에서 로드(아이콘 글리프).
     final manifest = json.decode(await rootBundle.loadString('FontManifest.json')) as List<dynamic>;
     for (final entry in manifest.cast<Map<String, dynamic>>()) {
@@ -64,6 +66,23 @@ void main() {
       );
     });
   }
+
+  // 주문 완료 흐름 — 배송 안내와 그 다음 장(주문 결과)을 각각 스냅샷한다.
+  testWidgets('v2 order delivery notice renders', (tester) async {
+    await _pumpOrder(tester, const Size(390, 844), reveal: false);
+    await expectLater(
+      find.byType(V2OrderDeliveryPage),
+      matchesGoldenFile('goldens/v2_order_delivery.png'),
+    );
+  });
+
+  testWidgets('v2 order result renders', (tester) async {
+    await _pumpOrder(tester, const Size(390, 844), reveal: true);
+    await expectLater(
+      find.byType(V2OrderRevealPage),
+      matchesGoldenFile('goldens/v2_order_reveal.png'),
+    );
+  });
 
   // 액션바의 수량 스테퍼(− 1 +)만 정밀 스냅샷 — +/- 버튼 크기·정렬 회귀를 좁게 잡는다.
   testWidgets('v2 detail quantity stepper renders', (tester) async {
@@ -132,5 +151,45 @@ Future<void> _pumpDetail(WidgetTester tester, Size size) async {
       ),
     ),
   );
+  await tester.pumpAndSettle();
+}
+
+/// 주문 흐름 골든 — 날짜·주문번호·누적액을 고정한 영수증으로 결정적으로 렌더한다.
+Future<void> _pumpOrder(WidgetTester tester, Size size, {required bool reveal}) async {
+  tester.view.devicePixelRatio = 1.0;
+  tester.view.physicalSize = size;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
+  SharedPreferences.setMockInitialValues({});
+  final store = AppStore();
+  final products = store.newProducts;
+  final receipt = V2OrderReceipt(
+    code: 'DD-2608-0417',
+    lines: [
+      (product: products[0], quantity: 1),
+      (product: products[1], quantity: 2),
+    ],
+    total: products[0].numericPrice + products[1].numericPrice * 2,
+    placedAt: DateTime(2026, 8, 28, 21, 4),
+    savedThisMonth: 412300,
+  );
+  await tester.pumpWidget(
+    AppStateScope(
+      store: store,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: reveal ? V2OrderRevealPage(receipt: receipt) : V2OrderDeliveryPage(receipt: receipt),
+      ),
+    ),
+  );
+  if (reveal) {
+    await tester.runAsync(() async {
+      await precacheImage(
+        const AssetImage('assets/logo-square.png'),
+        tester.element(find.byType(V2OrderRevealPage)),
+      );
+    });
+  }
   await tester.pumpAndSettle();
 }
