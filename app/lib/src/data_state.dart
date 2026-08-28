@@ -276,7 +276,7 @@ class AppStore extends ChangeNotifier {
   String? selectedCategoryKey;
   List<ProductItem> categoryProducts = const [];
   Map<String, dynamic>? lastOrderSummary;
-  // 참아서 굳은 돈 — 'YYYY-MM' → 누적액. v2 주문 흐름(배송 안내 → 주문 결과)이 읽고 쓴다.
+  // 참아서 굳은 돈 — 'YYYY-MM' → 누적액. 주문 완료 흐름(배송 안내 → 주문 결과)이 읽고 쓴다.
   Map<String, int> savedByMonth = <String, int>{};
   Map<String, String> newsletter = const {'eyebrow': '— 매주 수요일 발송', 'title': '조용한 신상품을\n가장 먼저.', 'note': '// 언제든 한 번의 클릭으로 구독 취소'};
   bool usingFallback = true;
