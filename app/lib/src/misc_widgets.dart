@@ -4,7 +4,8 @@ class PaymentToastOverlay extends StatefulWidget {
   const PaymentToastOverlay({required this.orderSummary, this.onConfirm, super.key});
 
   final Map<String, dynamic> orderSummary;
-  final VoidCallback? onConfirm;
+  /// 확인 탭 — 완료된 주문 응답을 넘겨 배송 안내 흐름으로 잇는다.
+  final void Function(Map<String, dynamic> response)? onConfirm;
 
   @override
   State<PaymentToastOverlay> createState() => _PaymentToastOverlayState();
@@ -102,8 +103,9 @@ class _PaymentToastOverlayState extends State<PaymentToastOverlay> {
                     ),
                   const SizedBox(height: 12),
                   AppButton(text: '확인', primary: true, large: true, onTap: () {
+                    final response = _response!;
                     Navigator.of(context).pop();
-                    widget.onConfirm?.call();
+                    widget.onConfirm?.call(response);
                   }),
                 ],
               ],
@@ -529,8 +531,8 @@ class StrikeText extends StatelessWidget {
 }
 
 /// 브랜드 마크 — 쇼핑백 실루엣 + 중앙의 "욕망의 도트".
-/// 벡터(CustomPainter)라 어떤 크기에서도 선명하고, 색을 테마(v1 그린/v2 블랙)에
-/// 맞춰 바꿀 수 있다. 기존 항아리 일러스트(logo-square.png)는 소형에서 뭉개져 교체.
+/// 벡터(CustomPainter)라 어떤 크기에서도 선명하고, 색을 테마에
+/// 맞춰 바꿀 수 있다. 기존 항아리 일러스트는 소형에서 뭉개져 벡터로 교체.
 class DoguBrandMark extends StatelessWidget {
   const DoguBrandMark({
     required this.size,

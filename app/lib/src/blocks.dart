@@ -663,13 +663,28 @@ class CheckoutBar extends StatelessWidget {
                 opacity: curved,
                 child: PaymentToastOverlay(
                   orderSummary: summary,
-                  onConfirm: () => AppNavigationScope.select(context, 0),
+                  onConfirm: (response) => _openOrderFlow(context, response),
                 ),
               ),
             ),
           ],
         );
       },
+    );
+  }
+
+  /// 결제 완료 → 배송 안내 → 주문 결과. 결제 금액은 '참은 돈'으로 적립하고,
+  /// 흐름이 끝나면 v1 기존 동작대로 홈 탭으로 돌아간다.
+  Future<void> _openOrderFlow(BuildContext context, Map<String, dynamic> response) async {
+    final store = AppStateScope.read(context);
+    final placedAt = DateTime.now();
+    final total = (response['total_price'] as num?)?.toInt() ?? 0;
+    final saved = await store.recordResistedAmount(total, at: placedAt);
+    if (!context.mounted) return;
+    await openOrderFlow(
+      context,
+      OrderReceipt.fromResponse(store, response, placedAt: placedAt, savedThisMonth: saved),
+      onDone: () => AppNavigationScope.select(context, 0),
     );
   }
 

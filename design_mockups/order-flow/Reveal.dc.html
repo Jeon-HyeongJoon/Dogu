@@ -7,89 +7,73 @@
 <body>
 <x-dc>
 <helmet>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;700;800;900&family=Gaegu:wght@700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;700&family=Gaegu:wght@700&display=swap">
   <style>
     body { margin: 0; font-family: 'Gothic A1', 'Apple SD Gothic Neo', sans-serif; -webkit-font-smoothing: antialiased; }
-    a { color: #8f7130; } a:hover { color: #1d4a33; }
+    a { color: #13402d; } a:hover { color: #0a0a0a; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: 0.1px; }
   </style>
 </helmet>
 
-<div style="width: 390px; height: 844px; background: #faf5ea; display: flex; flex-direction: column; overflow: hidden;">
+<div style="width: 390px; height: 844px; background: #ffffff; display: flex; flex-direction: column; overflow: hidden;">
 
   <div style="height: 44px; flex-shrink: 0;"></div>
 
-  <div style="height: 56px; flex-shrink: 0; background: #1d4a33; border-bottom: 2px solid #c9a24e; padding: 0 12px 0 20px; display: flex; align-items: center;">
-    <span style="font-size: 17px; font-weight: 800; letter-spacing: -0.3px; color: #f5eeda;">주문 결과</span>
-    <div style="flex-grow: 1;"></div>
-    <span style="font-size: 9px; font-weight: 700; letter-spacing: 1.1px; color: #c9a24e;">1F · CHECKOUT</span>
+  <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; padding: 0 20px;">
+    <span style="font-size: 18px; font-weight: 700; color: #0a0a0a;">주문 결과</span>
   </div>
 
-  <div style="flex-grow: 1; display: flex; flex-direction: column; padding: 0 20px;">
+  <div style="flex-grow: 1; display: flex; flex-direction: column; padding: 10px 20px 0;">
 
-    <!-- 섹션 헤더 -->
-    <div style="padding-top: 32px;">
-      <div style="height: 1px; background: #e2d8c2;"></div>
-      <div style="margin-top: 14px; display: flex; align-items: baseline; justify-content: space-between;">
-        <span style="font-size: 10px; font-weight: 700; letter-spacing: 1.1px; color: #92a097;">NO.02</span>
-        <span style="font-size: 11px; font-weight: 700; letter-spacing: 1.1px; color: #b3282d;">ORDER RESULT</span>
-      </div>
-      <div style="margin-top: 6px; font-size: 28px; font-weight: 800; letter-spacing: -0.6px; line-height: 1.18; color: #1a2b20;">사실은요,<br>안 보냈습니다</div>
-    </div>
+    <span class="mono" style="font-size: 10px; font-weight: 700; color: #ff3b1f;">ORDER RESULT</span>
 
-    <!-- 농담 한 줄 — 손글씨체로만 다른 목소리를 낸다 -->
-    <div style="margin-top: 10px; font-family: 'Gaegu', 'Gothic A1', cursive; font-size: 25px; line-height: 1.25; color: #b3282d;">상자는 비어 있었어요, 헤헤.</div>
+    <div style="margin-top: 14px; font-size: 30px; line-height: 1.05; letter-spacing: -1px; font-weight: 700; color: #0a0a0a;">사실은요,<br>안 보냈습니다</div>
 
-    <div style="margin-top: 12px; font-size: 13px; line-height: 1.5; color: #53645a;">결제도 이루어지지 않았습니다.</div>
+    <!-- 농담 한 줄만 손글씨체로 목소리를 바꾼다 -->
+    <div style="margin-top: 12px; font-family: 'Gaegu', 'Gothic A1', cursive; font-size: 30px; line-height: 1.25; color: #ff3b1f;">상자는 비어 있었어요, 헤헤.</div>
+
+    <div style="margin-top: 12px; font-size: 13.5px; line-height: 1.65; color: #2a2a2a;">결제도 이루어지지 않았습니다.</div>
 
     <!-- 전표 + 미발송 도장 -->
-    <div style="margin-top: 20px; position: relative; background: #faf5ea; border: 1px solid #e2d8c2; border-radius: 4px; padding: 14px; display: flex; flex-direction: column; gap: 9px;">
-      <div style="display: flex; align-items: baseline; justify-content: space-between;">
-        <span style="font-size: 9px; font-weight: 700; letter-spacing: 1.1px; color: #92a097;">DD-2608-0417</span>
-        <span style="font-size: 9px; font-weight: 700; letter-spacing: 1.1px; color: #92a097;">2건</span>
+    <div style="margin-top: 22px; position: relative; background: #ffffff; border: 1px solid #e6e6e5; padding: 16px;">
+      <span class="mono" style="font-size: 9px; color: #a3a3a3;">ord_local_002608</span>
+      <div style="margin-top: 12px; display: flex; align-items: baseline; justify-content: space-between;">
+        <span style="font-size: 13px; color: #2a2a2a;">결제 예정이던 금액</span>
+        <span class="mono" style="font-size: 10.5px; color: #a3a3a3; text-decoration: line-through;">₩82,900</span>
       </div>
+      <div style="margin: 10px 0; height: 1px; background: #e6e6e5;"></div>
       <div style="display: flex; align-items: baseline; justify-content: space-between;">
-        <span style="font-size: 13px; color: #53645a;">결제 예정이던 금액</span>
-        <span style="font-size: 13px; font-weight: 700; color: #92a097; text-decoration: line-through;">68,900원</span>
+        <span style="font-size: 14px; font-weight: 700; color: #0a0a0a;">실제로 나간 돈</span>
+        <span class="mono" style="font-size: 22px; font-weight: 800; color: #13402d;">₩0</span>
       </div>
-      <div style="height: 1px; background: #e2d8c2;"></div>
-      <div style="display: flex; align-items: baseline; justify-content: space-between;">
-        <span style="font-size: 15px; font-weight: 800; letter-spacing: -0.3px; color: #1a2b20;">실제로 나간 돈</span>
-        <span style="font-size: 20px; font-weight: 800; letter-spacing: -0.3px; color: #1d4a33;">0원</span>
-      </div>
-      <div style="position: absolute; right: 14px; top: 30px; transform: rotate(-11deg); border: 2px solid #b3282d; border-radius: 2px; padding: 5px 10px; background: rgba(250,245,234,0.78); display: flex; flex-direction: column; align-items: center; gap: 2px;">
-        <span style="font-size: 15px; font-weight: 800; letter-spacing: 2px; color: #b3282d;">미발송</span>
-        <span style="font-size: 7px; font-weight: 700; letter-spacing: 1.1px; color: #b3282d;">NOT SHIPPED</span>
+      <div style="position: absolute; right: 10px; top: -10px; transform: rotate(-11deg); background: #ffffff; border: 2px solid #ff3b1f; padding: 5px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px;">
+        <span style="font-size: 15px; font-weight: 800; letter-spacing: 2px; color: #ff3b1f;">미발송</span>
+        <span class="mono" style="font-size: 7px; font-weight: 700; color: #ff3b1f;">NOT SHIPPED</span>
       </div>
     </div>
 
-    <!-- 굳은 돈 — 앱 그린 블록(포트 + 골드 1.2px) 그대로 -->
-    <div style="margin-top: 18px; background: #1d4a33; border: 1.2px solid #c9a24e; border-radius: 4px; padding: 18px 16px; display: flex; flex-direction: column; gap: 6px;">
-      <span style="font-size: 12px; color: #a8bcae;">참아서 굳은 돈</span>
-      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
-        <div style="display: flex; align-items: baseline; gap: 3px;">
-          <span style="font-size: 42px; font-weight: 800; letter-spacing: -1.4px; line-height: 1; color: #f5eeda;">68,900</span>
-          <span style="font-size: 18px; font-weight: 800; color: #f5eeda;">원</span>
-        </div>
-        <span style="font-size: 11px; font-weight: 700; color: #c9a24e;">8월 누적 412,300원</span>
+    <!-- 굳은 돈 — 결제바와 같은 잉크 블랙 블록 -->
+    <div style="margin-top: 18px; background: #0a0a0a; padding: 18px;">
+      <span class="mono" style="font-size: 11px; color: #a3a3a3;">참아서 굳은 돈</span>
+      <div style="margin-top: 8px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;">
+        <span class="mono" style="font-size: 34px; font-weight: 800; color: #fafafa; line-height: 1;">₩82,900</span>
+        <span class="mono" style="font-size: 11px; font-weight: 700; color: #a3a3a3;">8월 누적 ₩412,300</span>
       </div>
     </div>
 
-    <!-- 항아리 한마디 -->
-    <div style="margin-top: 16px; display: flex; align-items: flex-start; gap: 11px;">
-      <img src="pot-emblem.png" style="width: 34px; height: 34px; border-radius: 50%; display: block; flex-shrink: 0;" alt="">
-      <span style="font-size: 13px; line-height: 1.5; color: #53645a;">욕망은 제 항아리에 잘 담아 뒀습니다.<br>돈은 손님 통장에 그대로 두고요.</span>
+    <div style="margin-top: 14px;">
+      <span class="mono" style="font-size: 10.5px; color: #a3a3a3;">// 욕망은 여기 두고 갑니다 — 돈은 그대로 손님 것</span>
     </div>
 
     <div style="flex-grow: 1;"></div>
-
-    <div style="padding-bottom: 24px; display: flex; flex-direction: column; gap: 12px;">
-      <div style="height: 54px; border-radius: 4px; background: #1d4a33; border: 1.2px solid #c9a24e; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
-        <span style="font-size: 16px; font-weight: 800; letter-spacing: -0.3px; color: #f5eeda;">오늘은 내가 이겼다</span>
-      </div>
-      <span style="font-size: 11px; font-weight: 700; letter-spacing: 1.1px; color: #8f7130; text-align: center;">절약 기록 보기</span>
-    </div>
-
   </div>
+
+  <div style="border-top: 1px solid #e6e6e5; padding: 14px 20px 16px;">
+    <div style="height: 48px; background: #13402d; border: 1px solid #13402d; display: flex; align-items: center; justify-content: center;">
+      <span style="font-size: 13.5px; font-weight: 600; color: #fafafa;">오늘은 내가 이겼다</span>
+    </div>
+  </div>
+
 </div>
 </x-dc>
 </body>

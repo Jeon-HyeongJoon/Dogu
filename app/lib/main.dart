@@ -19,12 +19,8 @@ part 'src/home_widgets.dart';
 part 'src/pages.dart';
 part 'src/blocks.dart';
 part 'src/misc_widgets.dart';
+part 'src/order_flow.dart';
 part 'src/bundled_seed.g.dart';
-part 'src/v2_theme.dart';
-part 'src/v2_home.dart';
-part 'src/v2_shell.dart';
-part 'src/v2_detail.dart';
-part 'src/v2_order.dart';
 
 const doguFontFamily = 'Pretendard';
 const doguFontAssets = <String>[
