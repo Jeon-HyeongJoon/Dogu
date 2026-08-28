@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:go_router/go_router.dart';
 
 import 'package:dogu_mobile_shop/main.dart';
 
@@ -1644,6 +1645,18 @@ void main() {
     // 여러 초 진행해도 오류 없음
     await tester.pump(const Duration(seconds: 3));
     await tester.pump(const Duration(seconds: 3));
+  });
+
+  testWidgets('unknown route (e.g. the retired /v2) lands on the home tab', (tester) async {
+    final store = AppStore(repository: _FakeRepository(results: const []));
+    await tester.pumpWidget(DoguApp(store: store, initializeStore: false));
+    await tester.pumpAndSettle();
+
+    final router = GoRouter.of(tester.element(find.byType(AppShell)));
+    router.go('/v2');
+    await tester.pumpAndSettle();
+
+    expect(find.text('찾고 싶은 욕망을 입력하세요'), findsOneWidget);
   });
 
   // ── TDD P1-1: 결제 완료 → 배송 안내 → 주문 결과 → 홈 이동 ────────────────────

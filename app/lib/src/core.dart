@@ -57,6 +57,11 @@ class _DoguAppState extends State<DoguApp> {
 
     return GoRouter(
       initialLocation: initialLocation,
+      // 없는 경로는 홈으로 — 정적 호스팅이 모든 경로를 index.html로 폴백하므로
+      // 예전 /v2 같은 죽은 링크가 라우터 에러 화면으로 떨어지지 않게 한다.
+      // (errorBuilder로 에러 페이지를 그린 뒤 이동하면 셸의 GlobalKey가 중복되므로
+      //  아예 라우팅 단계에서 홈으로 돌린다.)
+      onException: (context, state, router) => router.go(kTabPaths.first),
       routes: [
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) =>
