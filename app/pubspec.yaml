@@ -41,3 +41,6 @@ flutter:
     - assets/fonts/nanumsquareround/NanumSquareRoundEB.ttf
     # HSBombaram(봄바람) 손글씨체 — 상단 브랜드 타이틀 전용(Thin). assets: + 런타임 FontLoader.
     - assets/fonts/hsbombaram/HSBombaram-Thin.otf
+    # Gaegu Bold 서브셋 — 주문 결과 화면의 농담 한 줄 전용(디자인 시안과 같은 자형).
+    # 원본은 한글 2350자 2.9MB라 charset.txt의 글자만 남겼다(scripts/build_joke_font.sh).
+    - assets/fonts/gaegu/Gaegu-Bold-subset.ttf

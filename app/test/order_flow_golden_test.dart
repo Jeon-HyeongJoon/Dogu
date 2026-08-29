@@ -19,8 +19,9 @@ void main() {
     // 없으므로, 앱의 폰트 상수로 직접 로드한다(한글 글리프 보장).
     await _loadFont(doguFontFamily, doguFontAssets);
     await _loadFont(doguHeroFontFamily, doguHeroFontAssets);
-    // 주문 결과 화면의 농담 한 줄이 쓰는 손글씨체.
+    // 브랜드 손글씨체(폴백)와 농담 한 줄이 실제로 쓰는 Gaegu Bold 서브셋.
     await _loadFont(doguTitleFontFamily, doguTitleEssentialFontAssets);
+    await _loadFont(doguJokeFontFamily, doguJokeFontAssets);
     // MonoText의 'monospace'는 테스트 환경에서 Ahem(모든 글리프를 사각형으로 그리는
     // 테스트 폰트)으로 잡혀 폴백이 걸리지 않는다. 실제 기기/브라우저의 시스템 고정폭
     // 폰트를 대신해 본문체를 그 이름으로 등록해 골든이 읽히게 한다.
