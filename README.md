@@ -75,6 +75,41 @@ python3 scripts/sync_seed.py          # canonical -> app mirror
 python3 scripts/sync_seed.py --check  # verify (CI's SSOT guard enforces this)
 ```
 
+## Deploy
+
+The web bundle compiles `API_BASE_URL` in at build time (`--dart-define`). A plain
+`flutter build web --release` therefore ships a bundle that calls
+`http://localhost:8000` and silently loses the backend once deployed. Always build
+production through the script, which requires the value, refuses local addresses,
+and greps the built bundle to prove the host was compiled in:
+
+```sh
+cd app
+./scripts/build_prod.sh   # reads app/.env.production (or $API_BASE_URL)
+vercel --prod --yes       # serves build/web per app/vercel.json
+```
+
+CI builds the frontend the same way, so a missing or local `API_BASE_URL` fails the
+run instead of reaching production.
+
+## Frontend ↔ backend contract tests
+
+`app/test/backend_contract_test.dart` drives the real `DoguRepository` against a
+live API and asserts each response still parses into the app's models. It is
+tagged `integration` and skipped unless enabled, so plain `flutter test` stays
+offline:
+
+```sh
+backend/scripts/run_local.sh   # in another terminal
+cd app
+flutter test test/backend_contract_test.dart \
+  --dart-define=BACKEND_INTEGRATION=true \
+  --dart-define=API_BASE_URL=http://127.0.0.1:8000
+```
+
+CI's `Frontend ↔ backend contract (live API)` job starts `uvicorn` against the
+committed fixture DB and runs exactly that.
+
 ## Notes
 
 - Start the backend before the frontend so Flutter can load `/api/home` from `API_BASE_URL`.

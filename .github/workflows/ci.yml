@@ -66,8 +66,11 @@ jobs:
         # regenerated locally, so exclude them from the cross-platform CI run.
         run: flutter test --exclude-tags golden
 
-      - name: Build web (release)
-        run: flutter build web --release
+      - name: Build web (release, production API base)
+        # 배포와 같은 경로로 빌드한다 — 스크립트가 API_BASE_URL(app/.env.production) 주입을
+        # 강제하고, 번들에 실제로 박혔는지 grep으로 확인한다. 그냥 `flutter build web`으로
+        # 빌드해 배포하면 배포본이 사용자의 localhost를 호출한다(실제 사고).
+        run: ./scripts/build_prod.sh
 
       - name: Loading-performance budget (gzipped main.dart.js)
         run: |
@@ -80,3 +83,58 @@ jobs:
             echo "::error::main.dart.js gzipped ${GZ_KB} KB exceeds loading budget ${BUDGET_KB} KB"
             exit 1
           fi
+
+  backend-integration:
+    name: Frontend ↔ backend contract (live API)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.0"
+          channel: stable
+          cache: true
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt "uvicorn[standard]>=0.30,<1.0"
+
+      - name: Start the API
+        working-directory: backend
+        env:
+          # CI에는 크롤링된 dogu.db가 없다 — 커밋된 결정적 픽스처로 띄운다.
+          DOGU_DB_PATH: ${{ github.workspace }}/backend/app/data/test_fixture.db
+        run: |
+          nohup python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > /tmp/api.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sf -o /dev/null http://127.0.0.1:8000/health; then
+              echo "API up after ${i}s"; exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::API did not become healthy in 30s"; cat /tmp/api.log; exit 1
+
+      - name: Install frontend dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Contract tests (DoguRepository against the live API)
+        working-directory: app
+        run: |
+          flutter test test/backend_contract_test.dart \
+            --dart-define=BACKEND_INTEGRATION=true \
+            --dart-define=API_BASE_URL=http://127.0.0.1:8000
+
+      - name: API log on failure
+        if: failure()
+        run: cat /tmp/api.log
