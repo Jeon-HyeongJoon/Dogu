@@ -170,34 +170,10 @@ class Header extends StatelessWidget {
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 로고는 2px 위로 올린다(높이 유지). 36px 박스 안에 브랜드 로고(30)를
-                // 원형으로 앉힌다 — 락업 튜닝 보존(헤더에 위젯 추가 금지: 좁은 폭 오버플로).
-                Transform.translate(
-                  offset: const Offset(0, -2),
-                  child: const SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: Center(child: DoguLogoMark(size: 30)),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                // 타이틀은 아래로 4px 이동(높이 유지).
-                Transform.translate(
-                  offset: const Offset(0, 4),
-                  child: const Text(
-                    '욕망의 장바구니',
-                    style: TextStyle(
-                      fontFamily: doguTitleFontFamily,
-                      fontFamilyFallback: [doguHeroFontFamily, doguFontFamily],
-                      color: AppColors.accent,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w100,
-                      height: 1.0,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                ),
+              children: const [
+                // 락업(마크 크기·오프셋)은 DoguBrandLockup에 있다 — 푸터와 공유.
+                // 헤더에 위젯을 더 추가하지 말 것: 좁은 뷰포트에서 오버플로한다.
+                DoguBrandLockup(),
               ],
             ),
           ),

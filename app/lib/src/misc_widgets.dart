@@ -536,6 +536,46 @@ class DoguLogoMark extends StatelessWidget {
   }
 }
 
+/// 브랜드 락업 — 로고 마크 + 손글씨 타이틀. 상단 헤더와 푸터가 이 하나를 공유한다.
+/// 마크는 36px 박스 중앙에 앉혀 2px 위로, 타이틀은 4px 아래로 — 헤더에서 정밀 튜닝된
+/// 정렬을 그대로 옮긴 값이라 임의로 바꾸지 말 것(좁은 뷰포트 오버플로 회귀).
+class DoguBrandLockup extends StatelessWidget {
+  const DoguBrandLockup({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Transform.translate(
+          offset: const Offset(0, -2),
+          child: const SizedBox(
+            width: 36,
+            height: 36,
+            child: Center(child: DoguLogoMark(size: 30)),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Transform.translate(
+          offset: const Offset(0, 4),
+          child: const Text(
+            '욕망의 장바구니',
+            style: TextStyle(
+              fontFamily: doguTitleFontFamily,
+              fontFamilyFallback: [doguHeroFontFamily, doguFontFamily],
+              color: AppColors.accent,
+              fontSize: 24,
+              fontWeight: FontWeight.w100,
+              height: 1.0,
+              letterSpacing: 0.2,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class StrikeText extends StatelessWidget {
   const StrikeText(this.text, {super.key});
   final String text;

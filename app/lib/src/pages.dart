@@ -406,13 +406,8 @@ class FooterSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const DoguBrandMark(size: 26),
-              const SizedBox(width: 9),
-              const Text('욕망의장바구니', style: TextStyle(color: AppColors.accent, fontSize: 21, fontWeight: FontWeight.w900)),
-            ],
-          ),
+          // 상단 헤더와 같은 브랜드 락업(로고 이미지 + 손글씨 타이틀).
+          const DoguBrandLockup(),
           const SizedBox(height: 10),
           const Text('매주 한 번, 조용한 큐레이션.\nSeoul, KR — since 2024.', style: TextStyle(fontSize: 12.5, color: AppColors.ink3, height: 1.6)),
           const SizedBox(height: 24),
