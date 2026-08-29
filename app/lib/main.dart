@@ -55,6 +55,14 @@ const doguTitleEssentialFontAssets = <String>[
   'assets/fonts/hsbombaram/HSBombaram-Thin.otf',
 ];
 
+// 주문 결과 화면의 농담 한 줄 전용 손글씨체 — 디자인 시안이 쓴 Gaegu Bold와 같은 자형.
+// 장식용 한 줄이라 원본(한글 2350자, 2.9MB) 대신 필요한 글자만 남긴 서브셋(약 80KB)을
+// 쓴다. 첫 페인트 이후 비차단 로드하며, 로드 전/실패 시엔 폴백 서체로 그려진다.
+const doguJokeFontFamily = 'Gaegu';
+const doguJokeFontAssets = <String>[
+  'assets/fonts/gaegu/Gaegu-Bold-subset.ttf',
+];
+
 typedef AppRunner = void Function(Widget app);
 
 void main() => bootstrap();
@@ -98,6 +106,7 @@ Future<void> loadDoguFonts() async {
   await Future.wait([
     _loadFontFamily(doguFontFamily, doguFontAssets),
     _loadFontFamily(doguHeroFontFamily, doguHeroFontAssets),
+    _loadFontFamily(doguJokeFontFamily, doguJokeFontAssets),
   ]);
 }
 

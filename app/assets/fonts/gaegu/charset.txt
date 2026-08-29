@@ -1,0 +1,6 @@
+# Gaegu-Bold 서브셋에 포함할 문자 집합(정본).
+# 이 파일 아래 한 줄이 실제 문자열이다. 농담 한 줄에만 쓰는 장식용 서체라
+# 전체 한글(2350자, 2.9MB) 대신 필요한 글자만 남긴다.
+# 문구를 바꾸면 이 줄에 글자를 더하고 scripts/build_joke_font.sh 를 다시 돌릴 것.
+# (app/test/joke_font_test.dart 가 문구와 이 집합의 어긋남을 잡는다)
+ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~는비상어었요있자헤

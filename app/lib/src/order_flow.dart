@@ -329,6 +329,10 @@ class _TimelineRow extends StatelessWidget {
 /// 주문 결과 — 전표는 그대로 두고 '미발송' 도장만 얹어 앞 화면이 거짓이었음을 보여준다.
 class OrderRevealPage extends StatelessWidget {
   const OrderRevealPage({required this.receipt, this.onDone, super.key});
+
+  /// 손글씨체로 찍는 농담 한 줄. 이 문자열의 글자는 서브셋 폰트
+  /// (app/assets/fonts/gaegu/charset.txt)에 모두 들어 있어야 한다 — joke_font_test가 검증.
+  static const jokeLine = '상자는 비어 있었어요, 헤헤.';
   final OrderReceipt receipt;
   final VoidCallback? onDone;
 
@@ -356,14 +360,15 @@ class OrderRevealPage extends StatelessWidget {
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        '상자는 비어 있었어요, 헤헤.',
+                        OrderRevealPage.jokeLine,
                         key: Key('order_joke'),
                         maxLines: 1,
                         style: TextStyle(
-                          fontFamily: doguTitleFontFamily,
-                          // Thin 한 굵기만 등록된 손글씨체 — w100을 명시해야 폴백으로 새지 않는다.
-                          fontFamilyFallback: [doguHeroFontFamily, doguFontFamily],
-                          fontWeight: FontWeight.w100,
+                          // 디자인 시안과 같은 자형(Gaegu Bold 서브셋). 로드 전/실패 시엔
+                          // 브랜드 손글씨체 → 둥근 고딕 순으로 폴백한다.
+                          fontFamily: doguJokeFontFamily,
+                          fontFamilyFallback: [doguTitleFontFamily, doguHeroFontFamily, doguFontFamily],
+                          fontWeight: FontWeight.w700,
                           fontSize: 30,
                           height: 1.25,
                           color: AppColors.alert,
