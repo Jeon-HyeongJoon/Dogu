@@ -166,7 +166,7 @@ void main() {
     expect(theme.textTheme.bodyMedium?.fontFamily, doguFontFamily);
   });
 
-  // ── [ui] 폰트 적용: 브랜드 타이틀=둥근 고딕(NanumSquareRound), 광고 헤드라인=각진 Pretendard ──
+  // ── [ui] 폰트 적용: 브랜드 타이틀=손글씨체(HSBombaram), 광고 헤드라인=본문체(Dogu Sans) ──
   testWidgets('brand title uses the handwriting font; hero headline uses the angular base font', (tester) async {
     final store = AppStore(repository: _FakeRepository(results: const []));
     store.dealProducts = const [];
@@ -176,7 +176,7 @@ void main() {
     final brandTitle = tester.widget<Text>(find.text('욕망의 장바구니'));
     expect(brandTitle.style?.fontFamily, doguTitleFontFamily);
 
-    // 광고 메인 문구(44px 헤드라인)는 각진 기본 폰트(Pretendard)
+    // 광고 메인 문구(44px 헤드라인)는 각진 기본 본문체
     final heroHeadline = tester
         .widgetList<Text>(find.byType(Text))
         .firstWhere((t) => t.style?.fontSize == 44);

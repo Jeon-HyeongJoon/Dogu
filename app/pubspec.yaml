@@ -28,17 +28,13 @@ flutter:
     # 정본은 design/assets/logo-square.png, 파생본 동기화는 scripts/sync_logo.sh
     - assets/logo-square.png
     # 폰트를 fonts:가 아닌 assets:로 등록 — 엔진 FontManifest 프리로드(웹 첫 페인트 차단/이중 로드)를 피하고
-    # 런타임 FontLoader로만 'Pretendard'를 등록한다. (bootstrap이 첫 프레임 이후 비차단 로드)
-    - assets/fonts/pretendard/Pretendard-Regular.otf
-    - assets/fonts/pretendard/Pretendard-SemiBold.otf
-    - assets/fonts/pretendard/Pretendard-Bold.otf
-    - assets/fonts/pretendard/Pretendard-ExtraBold.otf
-    # NanumSquareRound도 Pretendard와 동일하게 assets:로만 등록 → 런타임 FontLoader가 굵기별로 로드
-    # (fonts:로 등록 시 웹 CanvasKit에서 다중 굵기 매칭이 어긋나 굵기가 적용되지 않는 문제 회피)
-    - assets/fonts/nanumsquareround/NanumSquareRoundL.ttf
-    - assets/fonts/nanumsquareround/NanumSquareRoundR.ttf
-    - assets/fonts/nanumsquareround/NanumSquareRoundB.ttf
-    - assets/fonts/nanumsquareround/NanumSquareRoundEB.ttf
+    # 런타임 FontLoader로만 등록한다. (bootstrap이 첫 프레임 이후 비차단 로드)
+    # Dogu Sans = Pretendard 서브셋(굵기당 1.5MB → 350KB). 개명 사유와 재생성은
+    # assets/fonts/dogusans/NOTICE.md 와 scripts/build_fonts.sh 참조.
+    - assets/fonts/dogusans/DoguSans-Regular.otf
+    - assets/fonts/dogusans/DoguSans-SemiBold.otf
+    - assets/fonts/dogusans/DoguSans-Bold.otf
+    - assets/fonts/dogusans/DoguSans-ExtraBold.otf
     # HSBombaram(봄바람) 손글씨체 — 상단 브랜드 타이틀 전용(Thin). assets: + 런타임 FontLoader.
     - assets/fonts/hsbombaram/HSBombaram-Thin.otf
     # Gaegu Bold 서브셋 — 주문 결과 화면의 농담 한 줄 전용(디자인 시안과 같은 자형).

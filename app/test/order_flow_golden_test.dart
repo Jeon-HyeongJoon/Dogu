@@ -18,7 +18,6 @@ void main() {
     // 앱 폰트는 pubspec `fonts:`가 아니라 런타임 FontLoader로 등록되어 FontManifest에
     // 없으므로, 앱의 폰트 상수로 직접 로드한다(한글 글리프 보장).
     await _loadFont(doguFontFamily, doguFontAssets);
-    await _loadFont(doguHeroFontFamily, doguHeroFontAssets);
     // 브랜드 손글씨체(폴백)와 농담 한 줄이 실제로 쓰는 Gaegu Bold 서브셋.
     await _loadFont(doguTitleFontFamily, doguTitleEssentialFontAssets);
     await _loadFont(doguJokeFontFamily, doguJokeFontAssets);
