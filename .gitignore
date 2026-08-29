@@ -40,3 +40,11 @@ images/
 # Local environment overrides
 backend/.env.local
 app/.env.local
+
+# 디자인 시안 — 아트보드 소스(.dc.html)와 레이아웃(canvas.json)만 추적한다.
+# 캔버스로 합성된 산출물(에디터가 통째로 박힌 수 MB HTML)과 지난 탐색 스케치는 무시.
+design_mockups/*
+!design_mockups/order-flow/
+design_mockups/order-flow/*
+!design_mockups/order-flow/*.dc.html
+!design_mockups/order-flow/canvas.json
