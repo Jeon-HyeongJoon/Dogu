@@ -367,7 +367,7 @@ class OrderRevealPage extends StatelessWidget {
                           // 디자인 시안과 같은 자형(Gaegu Bold 서브셋). 로드 전/실패 시엔
                           // 브랜드 손글씨체 → 둥근 고딕 순으로 폴백한다.
                           fontFamily: doguJokeFontFamily,
-                          fontFamilyFallback: [doguTitleFontFamily, doguHeroFontFamily, doguFontFamily],
+                          fontFamilyFallback: [doguTitleFontFamily, doguFontFamily],
                           fontWeight: FontWeight.w700,
                           fontSize: 30,
                           height: 1.25,

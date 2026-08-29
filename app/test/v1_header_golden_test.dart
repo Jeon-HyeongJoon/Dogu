@@ -17,7 +17,6 @@ void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     await _loadFont(doguFontFamily, doguFontAssets);
-    await _loadFont(doguHeroFontFamily, doguHeroFontAssets);
     await _loadFont(doguTitleFontFamily, doguTitleEssentialFontAssets);
     // MonoText의 'monospace'는 테스트 환경에서 Ahem(모든 글리프를 사각형으로 그리는
     // 테스트 폰트)으로 잡혀 폴백이 걸리지 않는다. 실제 기기/브라우저의 시스템 고정폭

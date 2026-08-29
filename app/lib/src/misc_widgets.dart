@@ -562,7 +562,7 @@ class DoguBrandLockup extends StatelessWidget {
             '욕망의 장바구니',
             style: TextStyle(
               fontFamily: doguTitleFontFamily,
-              fontFamilyFallback: [doguHeroFontFamily, doguFontFamily],
+              fontFamilyFallback: [doguFontFamily],
               color: AppColors.accent,
               fontSize: 24,
               fontWeight: FontWeight.w100,

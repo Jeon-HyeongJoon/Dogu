@@ -22,30 +22,23 @@ part 'src/misc_widgets.dart';
 part 'src/order_flow.dart';
 part 'src/bundled_seed.g.dart';
 
-const doguFontFamily = 'Pretendard';
+// 본문체 — Pretendard 서브셋(assets/fonts/dogusans). 원본은 한글 11,172자를 다 담아
+// 굵기당 1.5MB라, 앱이 실제로 그리는 글자만 남겨 굵기당 약 350KB로 줄였다.
+// OFL 예약 폰트 이름 때문에 서브셋은 원본 이름을 쓸 수 없어 'Dogu Sans'로 담는다(NOTICE.md).
+const doguFontFamily = 'DoguSans';
 const doguFontAssets = <String>[
-  'assets/fonts/pretendard/Pretendard-Regular.otf',
-  'assets/fonts/pretendard/Pretendard-SemiBold.otf',
-  'assets/fonts/pretendard/Pretendard-Bold.otf',
-  'assets/fonts/pretendard/Pretendard-ExtraBold.otf',
+  'assets/fonts/dogusans/DoguSans-Regular.otf',
+  'assets/fonts/dogusans/DoguSans-SemiBold.otf',
+  'assets/fonts/dogusans/DoguSans-Bold.otf',
+  'assets/fonts/dogusans/DoguSans-ExtraBold.otf',
 ];
 
-// 첫 페인트 전에 먼저 등록할 필수 폰트 — 한글 글리프가 포함된 기본 본문체(Pretendard Regular).
+// 첫 페인트 전에 먼저 등록할 필수 폰트 — 한글 글리프가 포함된 기본 본문체(Dogu Sans Regular).
 // 이게 없으면 첫 프레임에서 한글이 fallback(한글 없음) 폰트로 그려져 ⊠(두부) 박스가 보인다.
 const doguEssentialFontAssets = <String>[
-  'assets/fonts/pretendard/Pretendard-Regular.otf',
+  'assets/fonts/dogusans/DoguSans-Regular.otf',
 ];
 
-// 메인 광고(히어로) 헤드라인/타이틀 전용 — 굴림 느낌의 둥근 고딕
-// Pretendard와 동일하게 assets: + 런타임 FontLoader로 등록한다.
-// (FontLoader는 각 파일의 내장 굵기를 인식해 굵기 매칭이 정상 동작 — 웹 CanvasKit에서 FontManifest 다중 굵기 매칭이 어긋나는 문제 회피)
-const doguHeroFontFamily = 'NanumSquareRound';
-const doguHeroFontAssets = <String>[
-  'assets/fonts/nanumsquareround/NanumSquareRoundL.ttf',
-  'assets/fonts/nanumsquareround/NanumSquareRoundR.ttf',
-  'assets/fonts/nanumsquareround/NanumSquareRoundB.ttf',
-  'assets/fonts/nanumsquareround/NanumSquareRoundEB.ttf',
-];
 
 // 상단 브랜드 타이틀('욕망의 장바구니') 전용 손글씨체 HSBombaram(봄바람) — 가벼운 Thin 굵기.
 const doguTitleFontFamily = 'HSBombaram';
@@ -68,7 +61,7 @@ typedef AppRunner = void Function(Widget app);
 void main() => bootstrap();
 
 /// 첫 페인트에서 한글이 ⊠(두부) 박스로 보이지 않도록, 한글 글리프가 있는 필수 본문체
-/// (Pretendard Regular, 약 1.5MB)만 첫 페인트 전에 먼저 로드한다.
+/// (Dogu Sans Regular, 약 350KB)만 첫 페인트 전에 먼저 로드한다.
 /// 나머지 굵기·둥근 헤더체는 첫 프레임 이후 비차단 로드해 첫 페인트 지연을 최소화한다.
 /// 로드된 폰트가 등록되면 system fonts change 알림으로 텍스트 레이아웃이 재계산된다.
 Future<void> bootstrap({
@@ -94,7 +87,7 @@ void _onFontLoadError(Object error, StackTrace stack) {
 }
 
 Future<void> loadDoguEssentialFont() async {
-  // 첫 페인트 전에 함께 로드: 본문 한글(Pretendard Regular) + 브랜드 타이틀(HSBombaram Regular).
+  // 첫 페인트 전에 함께 로드: 본문 한글(Dogu Sans Regular) + 브랜드 타이틀(HSBombaram Regular).
   // 둘 다 등록된 뒤 첫 프레임을 그리므로 본문·타이틀 어디에도 두부(⊠) 깜빡임이 없다.
   await Future.wait([
     _loadFontFamily(doguFontFamily, doguEssentialFontAssets),
@@ -105,7 +98,6 @@ Future<void> loadDoguEssentialFont() async {
 Future<void> loadDoguFonts() async {
   await Future.wait([
     _loadFontFamily(doguFontFamily, doguFontAssets),
-    _loadFontFamily(doguHeroFontFamily, doguHeroFontAssets),
     _loadFontFamily(doguJokeFontFamily, doguJokeFontAssets),
   ]);
 }
