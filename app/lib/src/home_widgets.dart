@@ -171,14 +171,14 @@ class Header extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // 로고는 2px 위로 올린다(높이 유지). 36px 원형 이미지와 같은 박스를
-                // 유지하도록 마크(30)를 36 박스 중앙에 앉힌다 — 락업 튜닝 보존.
+                // 로고는 2px 위로 올린다(높이 유지). 36px 박스 안에 브랜드 로고(30)를
+                // 원형으로 앉힌다 — 락업 튜닝 보존(헤더에 위젯 추가 금지: 좁은 폭 오버플로).
                 Transform.translate(
                   offset: const Offset(0, -2),
                   child: const SizedBox(
                     width: 36,
                     height: 36,
-                    child: Center(child: DoguBrandMark(size: 30)),
+                    child: Center(child: DoguLogoMark(size: 30)),
                   ),
                 ),
                 const SizedBox(width: 6),

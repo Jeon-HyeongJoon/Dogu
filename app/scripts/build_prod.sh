@@ -34,4 +34,13 @@ if ! grep -q "$HOST" build/web/main.dart.js; then
   echo "::error::built bundle does not contain $HOST — API_BASE_URL was not compiled in" >&2
   exit 1
 fi
-echo "OK: build/web/main.dart.js targets $HOST"
+
+# 역방향 확인 — 로컬 폴백 주소가 번들에 남아 있으면 주입이 제대로 안 된 것이다.
+for LOCAL in "localhost:8000" "127.0.0.1:8000" "10.0.2.2:8000"; do
+  if grep -q "$LOCAL" build/web/main.dart.js; then
+    echo "::error::built bundle still contains the local API fallback $LOCAL" >&2
+    exit 1
+  fi
+done
+
+echo "OK: build/web/main.dart.js targets $HOST (no local API fallback)"

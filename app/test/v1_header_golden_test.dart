@@ -45,7 +45,13 @@ void main() {
         ),
       ),
     );
-    // 로고는 벡터 마크(DoguBrandMark)라 이미지 디코딩 없이 바로 렌더된다.
+    // 헤더 로고는 PNG 에셋이라 디코딩을 강제해야 골든에 실제로 찍힌다.
+    await tester.runAsync(() async {
+      await precacheImage(
+        const AssetImage(DoguLogoMark.assetKey),
+        tester.element(find.byType(Header)),
+      );
+    });
     await tester.pumpAndSettle();
 
     await expectLater(find.byType(Header), matchesGoldenFile('goldens/v1_header.png'));

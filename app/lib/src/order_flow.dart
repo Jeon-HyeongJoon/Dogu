@@ -73,8 +73,7 @@ String _shortDate(DateTime at) => '${at.month}.${at.day}';
 
 String _longDate(DateTime at) => '${at.month}월 ${at.day}일 (${_orderWeekdays[at.weekday - 1]})';
 
-String _clockTime(DateTime at) =>
-    '${at.hour.toString().padLeft(2, '0')}:${at.minute.toString().padLeft(2, '0')}';
+String _clockTime(DateTime at) => '${at.hour.toString().padLeft(2, '0')}:${at.minute.toString().padLeft(2, '0')}';
 
 /// 주문 화면 상단 바 — 상품 정보 페이지와 같은 플랫 화이트 앱바.
 PreferredSizeWidget _orderAppBar(String title, {bool back = true}) {
@@ -184,41 +183,36 @@ class OrderDeliveryPage extends StatelessWidget {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: AppSpace.maxMobileWidth),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(AppSpace.pad, 10, AppSpace.pad, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        MonoText('ORDER — ${receipt.code}', size: 10, color: AppColors.ink3),
-                        const SizedBox(height: 14),
-                        const _OrderStatement('배송 준비 중'),
-                        const SizedBox(height: 12),
-                        const Text(
-                          '주문이 접수됐습니다. 아래 일정으로 보내드릴 예정입니다.',
-                          style: TextStyle(fontSize: 13.5, height: 1.65, color: AppColors.ink2),
-                        ),
-                        const SizedBox(height: 22),
-                        _arrivalBox(),
-                        const SizedBox(height: 24),
-                        _timeline(),
-                        const SizedBox(height: 26),
-                        MonoText('SHIPMENT — ${receipt.itemCount}건', size: 10, weight: FontWeight.w700),
-                        const SizedBox(height: 2),
-                        for (var i = 0; i < receipt.lines.length; i++)
-                          _OrderLineRow(
-                            index: i + 1,
-                            product: receipt.lines[i].product,
-                            quantity: receipt.lines[i].quantity,
-                          ),
-                        const SizedBox(height: 6),
-                        SummaryLine(label: '배송비', value: '무료'),
-                        SummaryLine(label: '결제 금액', value: formatWon(receipt.total), total: true),
-                      ],
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(AppSpace.pad, 10, AppSpace.pad, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    MonoText('ORDER — ${receipt.code}', size: 10, color: AppColors.ink3),
+                    const SizedBox(height: 14),
+                    const _OrderStatement('배송 준비 중'),
+                    const SizedBox(height: 12),
+                    const Text(
+                      '주문이 접수됐습니다. 아래 일정으로 보내드릴 예정입니다.',
+                      style: TextStyle(fontSize: 13.5, height: 1.65, color: AppColors.ink2),
                     ),
-                  ),
+                    const SizedBox(height: 22),
+                    _arrivalBox(),
+                    const SizedBox(height: 24),
+                    _timeline(),
+                    const SizedBox(height: 26),
+                    MonoText('SHIPMENT — ${receipt.itemCount}건', size: 10, weight: FontWeight.w700),
+                    const SizedBox(height: 2),
+                    for (var i = 0; i < receipt.lines.length; i++)
+                      _OrderLineRow(
+                        index: i + 1,
+                        product: receipt.lines[i].product,
+                        quantity: receipt.lines[i].quantity,
+                      ),
+                    const SizedBox(height: 6),
+                    SummaryLine(label: '배송비', value: '무료'),
+                    SummaryLine(label: '결제 금액', value: formatWon(receipt.total), total: true),
+                  ],
                 ),
               ),
             ),
@@ -254,11 +248,7 @@ class OrderDeliveryPage extends StatelessWidget {
 
   Widget _timeline() {
     final steps = <({String label, String meta, _StepState state})>[
-      (
-        label: '결제 완료',
-        meta: '${_shortDate(receipt.placedAt)} ${_clockTime(receipt.placedAt)}',
-        state: _StepState.done
-      ),
+      (label: '결제 완료', meta: '${_shortDate(receipt.placedAt)} ${_clockTime(receipt.placedAt)}', state: _StepState.done),
       (label: '상품 준비 중', meta: 'NOW', state: _StepState.current),
       (label: '배송 중', meta: '${_shortDate(receipt.shippingAt)} 예정', state: _StepState.todo),
       (label: '배송 완료', meta: '${_shortDate(receipt.arrivalAt)} 예정', state: _StepState.todo),
@@ -351,56 +341,51 @@ class OrderRevealPage extends StatelessWidget {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: AppSpace.maxMobileWidth),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(AppSpace.pad, 10, AppSpace.pad, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const MonoText('ORDER RESULT', size: 10, color: AppColors.alert, weight: FontWeight.w700),
-                        const SizedBox(height: 14),
-                        const _OrderStatement('사실은요,\n안 보냈습니다'),
-                        const SizedBox(height: 12),
-                        // 농담 한 줄만 손글씨체로 목소리를 바꾼다 — 나머지는 본문체 그대로.
-                        // 두 줄로 접히면 농담이 죽으므로 좁은 화면에선 축소해 한 줄을 지킨다.
-                        const FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            '상자는 비어 있었어요, 헤헤.',
-                            key: Key('order_joke'),
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontFamily: doguTitleFontFamily,
-                              // Thin 한 굵기만 등록된 손글씨체 — w100을 명시해야 폴백으로 새지 않는다.
-                              fontFamilyFallback: [doguHeroFontFamily, doguFontFamily],
-                              fontWeight: FontWeight.w100,
-                              fontSize: 30,
-                              height: 1.25,
-                              color: AppColors.alert,
-                            ),
-                          ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(AppSpace.pad, 10, AppSpace.pad, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const MonoText('ORDER RESULT', size: 10, color: AppColors.alert, weight: FontWeight.w700),
+                    const SizedBox(height: 14),
+                    const _OrderStatement('사실은요,\n안 보냈습니다'),
+                    const SizedBox(height: 12),
+                    // 농담 한 줄만 손글씨체로 목소리를 바꾼다 — 나머지는 본문체 그대로.
+                    // 두 줄로 접히면 농담이 죽으므로 좁은 화면에선 축소해 한 줄을 지킨다.
+                    const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '상자는 비어 있었어요, 헤헤.',
+                        key: Key('order_joke'),
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontFamily: doguTitleFontFamily,
+                          // Thin 한 굵기만 등록된 손글씨체 — w100을 명시해야 폴백으로 새지 않는다.
+                          fontFamilyFallback: [doguHeroFontFamily, doguFontFamily],
+                          fontWeight: FontWeight.w100,
+                          fontSize: 30,
+                          height: 1.25,
+                          color: AppColors.alert,
                         ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          '결제도 이루어지지 않았습니다.',
-                          style: TextStyle(fontSize: 13.5, height: 1.65, color: AppColors.ink2),
-                        ),
-                        const SizedBox(height: 22),
-                        _slip(),
-                        const SizedBox(height: 18),
-                        _savedBlock(),
-                        const SizedBox(height: 14),
-                        const MonoText(
-                          '// 욕망은 여기 두고 갑니다 — 돈은 그대로 손님 것',
-                          size: 10.5,
-                          color: AppColors.ink4,
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      '결제도 이루어지지 않았습니다.',
+                      style: TextStyle(fontSize: 13.5, height: 1.65, color: AppColors.ink2),
+                    ),
+                    const SizedBox(height: 22),
+                    _slip(),
+                    const SizedBox(height: 18),
+                    _savedBlock(),
+                    const SizedBox(height: 14),
+                    const MonoText(
+                      '// 욕망은 여기 두고 갑니다 — 돈은 그대로 손님 것',
+                      size: 10.5,
+                      color: AppColors.ink4,
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -543,23 +528,18 @@ class _OrderBottomBar extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: AppSpace.maxMobileWidth),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpace.pad, 14, AppSpace.pad, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AppButton(key: buttonKey, text: label, primary: true, large: true, onTap: onTap),
-                  if (note != null) ...[
-                    const SizedBox(height: 10),
-                    Center(child: MonoText(note!, size: 10.5, color: AppColors.ink4)),
-                  ],
-                ],
-              ),
-            ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpace.pad, 14, AppSpace.pad, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AppButton(key: buttonKey, text: label, primary: true, large: true, onTap: onTap),
+              if (note != null) ...[
+                const SizedBox(height: 10),
+                Center(child: MonoText(note!, size: 10.5, color: AppColors.ink4)),
+              ],
+            ],
           ),
         ),
       ),

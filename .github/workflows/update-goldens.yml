@@ -1,0 +1,39 @@
+name: Update goldens
+
+# 골든 PNG의 정본 생성기. CI(ubuntu-latest)와 같은 렌더러로 만들어야 골든 잡이 통과한다.
+# 로컬 macOS에서 --update-goldens로 만든 이미지는 폰트/안티에일리어싱이 달라 CI에서 깨진다.
+#
+# 쓰는 법: Actions → Update goldens → Run workflow(브랜치 선택) → 끝나면 goldens 아티팩트를
+# 내려받아 app/test/goldens/에 덮어쓰고 커밋한다.
+on:
+  workflow_dispatch:
+
+jobs:
+  update:
+    name: Regenerate golden PNGs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.0"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Regenerate goldens
+        run: flutter test --update-goldens --tags golden
+
+      - name: Upload goldens
+        uses: actions/upload-artifact@v4
+        with:
+          name: goldens
+          path: app/test/goldens/*.png
+          retention-days: 7

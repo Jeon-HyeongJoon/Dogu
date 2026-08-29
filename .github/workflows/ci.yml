@@ -84,6 +84,44 @@ jobs:
             exit 1
           fi
 
+  goldens:
+    name: Golden snapshots (UI regressions)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.0"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Brand logo mirror is in sync
+        working-directory: .
+        run: ./scripts/sync_logo.sh --check
+
+      - name: Golden snapshot tests
+        # 골든 PNG는 이 잡(ubuntu-latest)에서 생성한 것이 정본이다. 로컬(macOS)에서
+        # --update-goldens로 만든 이미지는 폰트/AA가 달라 여기서 깨진다.
+        # 화면을 고쳤으면 Update goldens 워크플로를 돌려 산출물을 받아 커밋할 것.
+        run: flutter test --tags golden
+
+      - name: Upload golden diffs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          path: app/test/failures/**
+          if-no-files-found: ignore
+          retention-days: 7
+
   backend-integration:
     name: Frontend ↔ backend contract (live API)
     runs-on: ubuntu-latest

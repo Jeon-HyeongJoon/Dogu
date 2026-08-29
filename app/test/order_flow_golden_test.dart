@@ -36,21 +36,30 @@ void main() {
     }
   });
 
-  testWidgets('order delivery notice renders', (tester) async {
-    await _pumpOrder(tester, reveal: false);
-    await expectLater(
-      find.byType(OrderDeliveryPage),
-      matchesGoldenFile('goldens/order_delivery.png'),
-    );
-  });
+  // 모바일과 넓은 뷰포트 둘 다 — 두 화면이 앱의 다른 페이지들처럼 브라우저 폭을
+  // 그대로 따라가는지(390px 고정 컬럼으로 굳지 않는지) 회귀로 잡는다.
+  const sizes = <({String name, Size size})>[
+    (name: 'mobile', size: Size(390, 844)),
+    (name: 'wide', size: Size(1024, 844)),
+  ];
 
-  testWidgets('order result renders', (tester) async {
-    await _pumpOrder(tester, reveal: true);
-    await expectLater(
-      find.byType(OrderRevealPage),
-      matchesGoldenFile('goldens/order_reveal.png'),
-    );
-  });
+  for (final s in sizes) {
+    testWidgets('order delivery notice renders on ${s.name}', (tester) async {
+      await _pumpOrder(tester, size: s.size, reveal: false);
+      await expectLater(
+        find.byType(OrderDeliveryPage),
+        matchesGoldenFile('goldens/order_delivery_${s.name}.png'),
+      );
+    });
+
+    testWidgets('order result renders on ${s.name}', (tester) async {
+      await _pumpOrder(tester, size: s.size, reveal: true);
+      await expectLater(
+        find.byType(OrderRevealPage),
+        matchesGoldenFile('goldens/order_reveal_${s.name}.png'),
+      );
+    });
+  }
 }
 
 Future<void> _loadFont(String family, List<String> assets) async {
@@ -62,9 +71,9 @@ Future<void> _loadFont(String family, List<String> assets) async {
 }
 
 /// 날짜·주문번호·누적액을 고정한 영수증으로 결정적으로 렌더한다.
-Future<void> _pumpOrder(WidgetTester tester, {required bool reveal}) async {
+Future<void> _pumpOrder(WidgetTester tester, {required Size size, required bool reveal}) async {
   tester.view.devicePixelRatio = 1.0;
-  tester.view.physicalSize = const Size(390, 844);
+  tester.view.physicalSize = size;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 
