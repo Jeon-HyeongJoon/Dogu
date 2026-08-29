@@ -1,4 +1,9 @@
 tags:
+  integration:
+    description: >-
+      Frontend/backend contract tests that need a live backend. Skipped unless
+      run with --dart-define=BACKEND_INTEGRATION=true (CI's backend-integration
+      job starts uvicorn against the committed fixture DB first).
   golden:
     description: >-
       Golden image snapshot tests. Platform-sensitive (font/anti-aliasing
