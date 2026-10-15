@@ -542,6 +542,10 @@ class DoguLogoMark extends StatelessWidget {
 class DoguBrandLockup extends StatelessWidget {
   const DoguBrandLockup({super.key});
 
+  /// 손글씨체로 찍는 브랜드 타이틀. 이 문자열의 글자는 서브셋 폰트
+  /// (app/assets/fonts/doguhand/charset.txt)에 모두 들어 있어야 한다 — font_charset_test가 검증.
+  static const brandName = '욕망의 장바구니';
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -559,7 +563,7 @@ class DoguBrandLockup extends StatelessWidget {
         Transform.translate(
           offset: const Offset(0, 4),
           child: const Text(
-            '욕망의 장바구니',
+            brandName,
             style: TextStyle(
               fontFamily: doguTitleFontFamily,
               fontFamilyFallback: [doguFontFamily],

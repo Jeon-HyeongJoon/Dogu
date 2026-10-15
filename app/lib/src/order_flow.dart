@@ -6,7 +6,7 @@ part of '../main.dart';
 // 확인을 누른 다음 화면에서 전표에 '미발송' 도장을 찍어 참아서 굳은 돈을 돌려준다.
 // 두 화면 모두 v1 문법만 쓴다 — 흰 배경 + 헤어라인 박스, MonoText 마이크로 레이블,
 // 30px 대형 진술, AppButton(primary) 그린 CTA, 잉크 블랙 금액 블록(결제바와 같은 결).
-// 농담 한 줄만 브랜드 손글씨체(HSBombaram)로 목소리를 바꾼다.
+// 농담 한 줄만 브랜드 손글씨체(Dogu Hand)로 목소리를 바꾼다.
 // ─────────────────────────────────────────────────────────────────────────
 
 /// 주문 한 건의 스냅샷 — 결제 시점에 떠내어 두 화면이 함께 쓴다.
@@ -331,7 +331,7 @@ class OrderRevealPage extends StatelessWidget {
   const OrderRevealPage({required this.receipt, this.onDone, super.key});
 
   /// 손글씨체로 찍는 농담 한 줄. 이 문자열의 글자는 서브셋 폰트
-  /// (app/assets/fonts/gaegu/charset.txt)에 모두 들어 있어야 한다 — joke_font_test가 검증.
+  /// (app/assets/fonts/gaegu/charset.txt)에 모두 들어 있어야 한다 — font_charset_test가 검증.
   static const jokeLine = '상자는 비어 있었어요, 헤헤.';
   final OrderReceipt receipt;
   final VoidCallback? onDone;

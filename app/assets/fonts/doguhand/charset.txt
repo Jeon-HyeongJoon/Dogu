@@ -1,0 +1,3 @@
+# Dogu Hand(타이틀) 커버 문자 — 브랜드 타이틀 + 농담 한 줄 + ASCII
+# 생성물 — scripts/build_fonts.sh 가 쓴다. 아래 한 줄이 실제 문자열이다.
+ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~구는니망바비상어었요욕의있자장헤

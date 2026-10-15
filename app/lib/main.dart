@@ -40,12 +40,13 @@ const doguEssentialFontAssets = <String>[
 ];
 
 
-// 상단 브랜드 타이틀('욕망의 장바구니') 전용 손글씨체 HSBombaram(봄바람) — 가벼운 Thin 굵기.
-const doguTitleFontFamily = 'HSBombaram';
+// 상단 브랜드 타이틀('욕망의 장바구니') 전용 손글씨체 — HSBombaram 3.0 서브셋.
+// 등록상표라 수정본은 원본 이름을 쓸 수 없어 'Dogu Hand'로 담는다(NOTICE.md).
+const doguTitleFontFamily = 'DoguHand';
 // 타이틀은 이 손글씨체가 primary라, 미등록 상태로 첫 페인트되면 CanvasKit이 폴백 대신
 // 두부(⊠)를 그린다. 그래서 타이틀 굵기(Thin)를 필수 폰트와 함께 첫 페인트 전에 로드한다.
 const doguTitleEssentialFontAssets = <String>[
-  'assets/fonts/hsbombaram/HSBombaram-Thin.otf',
+  'assets/fonts/doguhand/DoguHand-Thin.otf',
 ];
 
 // 주문 결과 화면의 농담 한 줄 전용 손글씨체 — 디자인 시안이 쓴 Gaegu Bold와 같은 자형.
@@ -87,7 +88,7 @@ void _onFontLoadError(Object error, StackTrace stack) {
 }
 
 Future<void> loadDoguEssentialFont() async {
-  // 첫 페인트 전에 함께 로드: 본문 한글(Dogu Sans Regular) + 브랜드 타이틀(HSBombaram Regular).
+  // 첫 페인트 전에 함께 로드: 본문 한글(Dogu Sans Regular) + 브랜드 타이틀(Dogu Hand Thin).
   // 둘 다 등록된 뒤 첫 프레임을 그리므로 본문·타이틀 어디에도 두부(⊠) 깜빡임이 없다.
   await Future.wait([
     _loadFontFamily(doguFontFamily, doguEssentialFontAssets),

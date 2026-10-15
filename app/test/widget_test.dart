@@ -166,13 +166,13 @@ void main() {
     expect(theme.textTheme.bodyMedium?.fontFamily, doguFontFamily);
   });
 
-  // ── [ui] 폰트 적용: 브랜드 타이틀=손글씨체(HSBombaram), 광고 헤드라인=본문체(Dogu Sans) ──
+  // ── [ui] 폰트 적용: 브랜드 타이틀=손글씨체(Dogu Hand), 광고 헤드라인=본문체(Dogu Sans) ──
   testWidgets('brand title uses the handwriting font; hero headline uses the angular base font', (tester) async {
     final store = AppStore(repository: _FakeRepository(results: const []));
     store.dealProducts = const [];
     await tester.pumpWidget(DoguApp(store: store, initializeStore: false));
 
-    // 상단 브랜드 타이틀은 손글씨체(HSBombaram/봄바람)
+    // 상단 브랜드 타이틀은 손글씨체(Dogu Hand)
     final brandTitle = tester.widget<Text>(find.text('욕망의 장바구니'));
     expect(brandTitle.style?.fontFamily, doguTitleFontFamily);
 
