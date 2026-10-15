@@ -707,7 +707,7 @@ void main() {
     expect(previous.style!.color, AppColors.ink2);
   });
 
-  testWidgets('home category grid shows the featured categories, not the first nine alphabetically', (tester) async {
+  testWidgets('home category grid shows the backend picks in demand order and hides counts', (tester) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(900, 1200);
     addTearDown(() {
@@ -715,22 +715,22 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    // 실제 백엔드 순서(가나다) — 앞의 9개를 자르면 공구가 들어오고 여성의류가 빠진다.
-    CategoryItem category(String name, {bool featured = false}) =>
-        CategoryItem(name, '100', PatternKind.dots, id: name, featured: featured);
+    // 백엔드는 가나다순으로 주고 메인 노출분에만 featured + home_rank(수요 순)를 단다.
+    CategoryItem category(String name, {int? rank}) =>
+        CategoryItem(name, '100', PatternKind.dots, id: name, featured: rank != null, homeRank: rank);
     final store = AppStore(repository: _FakeRepository(results: const []));
     store.categories = [
-      category('E쿠폰/티켓/생활편의', featured: true),
-      category('PC/주변기기', featured: true),
-      category('가공식품', featured: true),
-      category('가구', featured: true),
-      category('가전', featured: true),
-      category('건강/의료용품', featured: true),
-      category('건강식품', featured: true),
+      category('E쿠폰/티켓/생활편의'),
+      category('가공식품', rank: 2),
+      category('건강/의료용품', rank: 6),
+      category('건강식품', rank: 3),
       category('공구'),
-      category('남성의류', featured: true),
-      category('렌탈관'),
-      category('여성의류', featured: true),
+      category('반려동물용품', rank: 5),
+      category('생활용품', rank: 4),
+      category('신선식품', rank: 1),
+      category('여성의류', rank: 9),
+      category('출산/유아동', rank: 8),
+      category('화장품/미용', rank: 7),
     ];
 
     await tester.pumpWidget(
@@ -740,12 +740,15 @@ void main() {
       ),
     );
 
-    expect(find.byType(CategoryCard), findsNWidgets(9));
-    expect(find.text('여성의류'), findsOneWidget);
+    final cards = tester.widgetList<CategoryCard>(find.byType(CategoryCard)).map((card) => card.item.name);
+    expect(cards, ['신선식품', '가공식품', '건강식품', '생활용품', '반려동물용품', '건강/의료용품', '화장품/미용', '출산/유아동', '여성의류']);
     expect(find.text('공구'), findsNothing);
-    expect(find.text('렌탈관'), findsNothing);
+    // 상품 수(크롤링 한도라 전부 100)는 그리지 않는다.
+    expect(find.text('100'), findsNothing);
 
-    // featured가 하나도 없는 응답(구 백엔드)이면 예전처럼 앞에서부터 9개.
+    // 순위가 없는 featured(번들 seed)는 받은 순서, featured가 없으면(구 백엔드) 앞에서부터 9개.
+    final seeded = [for (final name in ['b', 'a', 'c']) CategoryItem(name, '1', PatternKind.dots, id: name, featured: true)];
+    expect(homeCategories(seeded).map((item) => item.name), ['b', 'a', 'c']);
     final plain = List.generate(12, (i) => CategoryItem('c$i', '1', PatternKind.dots, id: 'c$i'));
     expect(homeCategories(plain).map((item) => item.name), List.generate(9, (i) => 'c$i'));
   });

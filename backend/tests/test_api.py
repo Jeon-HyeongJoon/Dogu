@@ -50,17 +50,20 @@ def test_home_collections_are_populated_from_catalog() -> None:
         assert client.get(f"/api/products/{product_id}").status_code == 200
 
 
-def test_home_categories_feature_the_main_screen_picks() -> None:
-    # 메인화면 '카테고리' 칸은 featured만 그린다 — 공구는 빠지고 여성의류가 들어간다.
+def test_home_categories_rank_by_demand_with_editorial_overrides() -> None:
+    # 메인화면 '카테고리' 칸 = 수요(리뷰 합) 순 상위 + 고정(여성의류), 공구는 제외.
     categories = client.get("/api/home").json()["categories"]
-    featured = [category["label"] for category in categories if category["featured"]]
+    picks = sorted((c for c in categories if c["featured"]), key=lambda c: c["home_rank"])
 
-    assert featured == [
-        "E쿠폰/티켓/생활편의", "PC/주변기기", "가공식품", "가구", "가전",
-        "건강/의료용품", "건강식품", "남성의류", "여성의류",
-    ]
-    # 카테고리 탭은 여전히 전부를 보여준다.
-    assert "공구" in [category["label"] for category in categories]
+    assert [c["home_rank"] for c in picks] == list(range(1, 10))
+    assert all(c["home_rank"] is None for c in categories if not c["featured"])
+    # fixture DB에서 리뷰가 가장 많은 건 여성의류(고정)이고, 그다음이 가구다.
+    assert picks[0]["label"] == "가구"
+    assert picks[-1]["label"] == "여성의류"
+    assert "공구" not in [c["label"] for c in picks]
+    # 카테고리 탭은 여전히 27개 전부, 가나다순.
+    assert len(categories) == 27
+    assert "공구" in [c["label"] for c in categories]
 
 
 def test_categories_endpoint() -> None:

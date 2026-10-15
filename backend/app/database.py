@@ -1,6 +1,7 @@
 import json
 import os
 import sqlite3
+from functools import lru_cache
 from pathlib import Path
 
 from app.models import SECTION_TAGS, Category, Product, ProductArtwork
@@ -8,19 +9,13 @@ from app.models import SECTION_TAGS, Category, Product, ProductArtwork
 _DEFAULT_DB = Path(__file__).parent / "data" / "dogu.db"
 DB_PATH = Path(os.environ.get("DOGU_DB_PATH", str(_DEFAULT_DB)))
 
-# 메인화면 '카테고리' 칸에 노출할 최상위 카테고리(featured). 크롤링 DB는 git 밖에 있고
-# featured 컬럼이 전부 0이라, 노출 대상은 여기서 정한다. 앱은 featured만 메인에 그린다.
-HOME_CATEGORY_IDS = frozenset({
-    "10000129",  # E쿠폰/티켓/생활편의
-    "10000122",  # PC/주변기기
-    "10000114",  # 가공식품
-    "10000112",  # 가구
-    "10000120",  # 가전
-    "10000124",  # 건강/의료용품
-    "10000115",  # 건강식품
-    "10000108",  # 남성의류
-    "10000107",  # 여성의류 (공구 대신)
-})
+# 메인화면 '카테고리' 칸 — 수요 순위로 자동 선정하고 편집 조정(제외·고정)을 더한다.
+# 수요 = 최상위 카테고리 자체를 크롤링한 상위 상품들의 누적 리뷰 합. 크롤러가 카테고리마다
+# 같은 수(상위 100개)를 담으므로 카테고리끼리 비교할 수 있다. 반대로 상품 수는 그 한도
+# 때문에 전부 ~100이라 공급 지표가 되지 못한다.
+HOME_CATEGORY_SLOTS = 9
+HOME_CATEGORY_EXCLUDED = frozenset({"10000126"})  # 공구 — 메인에서 뺀다
+HOME_CATEGORY_PINNED = ("10000107",)  # 여성의류 — 순위와 무관하게 메인 마지막 칸
 
 
 def db_exists() -> bool:
@@ -75,7 +70,33 @@ def _to_product(row: sqlite3.Row, category_ids: list[str]) -> Product:
     )
 
 
+@lru_cache(maxsize=4)
+def _home_category_ranks(db_path: str) -> dict[str, int]:
+    """메인 노출 카테고리 id → 노출 순위(1부터, 수요 순 + 고정은 끝).
+
+    배포 DB는 읽기 전용이라 경로별로 한 번만 계산한다(실 DB에서 ~100ms).
+    """
+    with _conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT c.id, COALESCE(SUM(p.reviews), 0) AS demand
+            FROM categories c
+            LEFT JOIN product_categories pc ON pc.category_id = c.id
+            LEFT JOIN products p ON p.id = pc.product_id
+            WHERE c.parent_id IS NULL
+            GROUP BY c.id
+            ORDER BY demand DESC, c.label
+            """
+        ).fetchall()
+    ids = [row["id"] for row in rows]
+    pinned = [category_id for category_id in HOME_CATEGORY_PINNED if category_id in ids]
+    ranked = [category_id for category_id in ids if category_id not in HOME_CATEGORY_EXCLUDED and category_id not in pinned]
+    picks = ranked[: HOME_CATEGORY_SLOTS - len(pinned)] + pinned
+    return {category_id: rank for rank, category_id in enumerate(picks, 1)}
+
+
 def db_list_categories() -> list[Category]:
+    home_ranks = _home_category_ranks(str(DB_PATH))
     with _conn() as conn:
         rows = conn.execute(
             "SELECT * FROM categories WHERE parent_id IS NULL ORDER BY label"
@@ -87,7 +108,8 @@ def db_list_categories() -> list[Category]:
                 count=row["count"],
                 description=row["description"] or "",
                 tone=row["tone"] or "#6b6b6b",
-                featured=bool(row["featured"]) or row["id"] in HOME_CATEGORY_IDS,
+                featured=row["id"] in home_ranks,
+                home_rank=home_ranks.get(row["id"]),
                 image_url=row["image_url"],
             )
             for row in rows

@@ -594,11 +594,18 @@ class _TickerStripState extends State<TickerStrip> {
   }
 }
 
-/// 메인화면 '카테고리' 칸에 그릴 카테고리 — 백엔드가 featured로 고른 것만, 최대 9개.
-/// featured가 하나도 없으면(구 백엔드 응답) 앞에서부터 9개. 카테고리 탭은 전부를 그린다.
+/// 메인화면 '카테고리' 칸에 그릴 카테고리 — 백엔드가 featured로 고른 것만, 노출 순위
+/// (수요 순)대로 최대 9개. 순위가 없으면(번들 seed) 받은 순서 그대로, featured가 하나도
+/// 없으면(구 백엔드 응답) 앞에서부터 9개. 카테고리 탭은 전부를 가나다순으로 그린다.
 List<CategoryItem> homeCategories(List<CategoryItem> all) {
-  final featured = all.where((item) => item.featured).toList();
-  return (featured.isEmpty ? all : featured).take(9).toList();
+  final featured = all.indexed.where((entry) => entry.$2.featured).toList();
+  if (featured.isEmpty) return all.take(9).toList();
+  const unranked = 1 << 30;
+  featured.sort((a, b) {
+    final byRank = (a.$2.homeRank ?? unranked).compareTo(b.$2.homeRank ?? unranked);
+    return byRank != 0 ? byRank : a.$1.compareTo(b.$1);
+  });
+  return featured.map((entry) => entry.$2).take(9).toList();
 }
 
 class CategorySection extends StatelessWidget {
@@ -672,9 +679,8 @@ class CategoryCard extends StatelessWidget {
           children: [
             MonoText(index.toString().padLeft(2, '0'), size: 8.5, color: AppColors.ink4),
             const SizedBox(height: 5),
+            // 상품 수는 그리지 않는다 — 크롤링 한도 때문에 전부 ~100이라 의미가 없다.
             Text(item.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: -0.3, height: 1.1), maxLines: 1, overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 4),
-            MonoText(item.count, size: 8.5, color: AppColors.ink3),
           ],
         ),
       ),
