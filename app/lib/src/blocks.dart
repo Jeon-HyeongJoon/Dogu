@@ -5,8 +5,17 @@ class CategoryListBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rows = AppStateScope.watch(context).categories;
-    final selectedCategoryKey = AppStateScope.watch(context).selectedCategoryKey;
+    final store = AppStateScope.watch(context);
+    // 메인 카테고리 칸과 같은 이유로, 백엔드 응답 전에는 seed 카테고리 대신 로딩 표시.
+    if (store.catalogLoading) {
+      return const Padding(
+        key: ValueKey('category-list-loading'),
+        padding: EdgeInsets.symmetric(vertical: 48),
+        child: Center(child: LoadingDots()),
+      );
+    }
+    final rows = store.categories;
+    final selectedCategoryKey = store.selectedCategoryKey;
     final visibleRows = selectedCategoryKey == null
         ? rows
         : rows.where((row) => _normalizeCategoryKey(row.id.isEmpty ? row.name : row.id) == selectedCategoryKey).toList();

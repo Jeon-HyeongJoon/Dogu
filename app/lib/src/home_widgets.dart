@@ -599,21 +599,31 @@ class _TickerStripState extends State<TickerStrip> {
 /// 없으면(구 백엔드 응답) 앞에서부터 9개. 카테고리 탭은 전부를 가나다순으로 그린다.
 List<CategoryItem> homeCategories(List<CategoryItem> all) {
   final featured = all.indexed.where((entry) => entry.$2.featured).toList();
-  if (featured.isEmpty) return all.take(9).toList();
+  if (featured.isEmpty) return all.take(homeCategorySlots).toList();
   const unranked = 1 << 30;
   featured.sort((a, b) {
     final byRank = (a.$2.homeRank ?? unranked).compareTo(b.$2.homeRank ?? unranked);
     return byRank != 0 ? byRank : a.$1.compareTo(b.$1);
   });
-  return featured.map((entry) => entry.$2).take(9).toList();
+  return featured.map((entry) => entry.$2).take(homeCategorySlots).toList();
 }
+
+const homeCategorySlots = 9;
+
+const _categoryGridDelegate = SliverGridDelegateWithMaxCrossAxisExtent(
+  maxCrossAxisExtent: 160,
+  mainAxisExtent: 72,
+  mainAxisSpacing: 8,
+  crossAxisSpacing: 8,
+);
 
 class CategorySection extends StatelessWidget {
   const CategorySection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final items = homeCategories(AppStateScope.watch(context).categories);
+    final store = AppStateScope.watch(context);
+    final items = homeCategories(store.categories);
     return Padding(
       padding: const EdgeInsets.only(top: 36),
       child: Column(
@@ -621,19 +631,33 @@ class CategorySection extends StatelessWidget {
           SectionHead(index: '01', eyebrow: 'SHOP BY CATEGORY', title: '카테고리', link: '전체 →', onLinkTap: () => AppNavigationScope.select(context, 1)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad),
-            child: GridView.builder(
-              padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: items.length,
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 160,
-                mainAxisExtent: 72,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-              ),
-              itemBuilder: (context, index) => CategoryCard(index: index + 1, item: items[index]),
-            ),
+            child: store.catalogLoading
+                // 백엔드 응답 전에는 번들 seed 카테고리(옛 6개)를 그리지 않는다 — 빠르게 넘기는
+                // 사용자가 곧 바뀔 칸을 누르지 않게. 9칸 격자 자리를 그대로 비워 두어 응답 뒤
+                // 카테고리가 나타날 때 아래 내용이 밀리지 않는다.
+                ? Stack(
+                    key: const ValueKey('category-loading'),
+                    alignment: Alignment.center,
+                    children: [
+                      GridView.builder(
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: homeCategorySlots,
+                        gridDelegate: _categoryGridDelegate,
+                        itemBuilder: (context, index) => const SizedBox.shrink(),
+                      ),
+                      const LoadingDots(),
+                    ],
+                  )
+                : GridView.builder(
+                    padding: EdgeInsets.zero,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: items.length,
+                    gridDelegate: _categoryGridDelegate,
+                    itemBuilder: (context, index) => CategoryCard(index: index + 1, item: items[index]),
+                  ),
           ),
         ],
       ),

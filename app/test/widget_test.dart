@@ -753,6 +753,71 @@ void main() {
     expect(homeCategories(plain).map((item) => item.name), List.generate(9, (i) => 'c$i'));
   });
 
+  testWidgets('home category grid shows loading dots in the nine-slot space until the backend answers', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 1200);
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    // 번들 seed의 옛 카테고리가 이미 들어 있어도, 백엔드 응답 전에는 그리지 않는다.
+    final store = AppStore(repository: _FakeRepository(results: const []));
+    store.categories = const [
+      CategoryItem('전자제품', '186', PatternKind.dots, id: 'gadget', featured: true),
+      CategoryItem('의류', '412', PatternKind.dots, id: 'fashion', featured: true),
+    ];
+    store.catalogLoading = true;
+
+    await tester.pumpWidget(
+      AppStateScope(
+        store: store,
+        child: const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: CategorySection()))),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.byType(LoadingDots), findsOneWidget);
+    expect(find.byType(CategoryCard), findsNothing);
+    expect(find.text('전자제품'), findsNothing);
+    final loadingHeight = tester.getSize(find.byType(CategorySection)).height;
+
+    // 응답 도착 → 9칸. 섹션 높이가 그대로라 아래 내용이 밀리지 않는다.
+    store.categories = [
+      for (var i = 1; i <= 9; i++) CategoryItem('카테고리$i', '100', PatternKind.dots, id: 'c$i', featured: true, homeRank: i),
+    ];
+    store.catalogLoading = false;
+    store.notifyListeners();
+    await tester.pump();
+
+    expect(find.byType(LoadingDots), findsNothing);
+    expect(find.byType(CategoryCard), findsNWidgets(9));
+    expect(tester.getSize(find.byType(CategorySection)).height, loadingHeight);
+  });
+
+  testWidgets('category tab list shows loading dots instead of the bundled categories while loading', (tester) async {
+    final store = AppStore(repository: _FakeRepository(results: const []));
+    store.categories = const [CategoryItem('의류', '412', PatternKind.dots, id: 'fashion')];
+    store.catalogLoading = true;
+
+    // 애니메이션 끄기 설정이면 점이 멈춘다 — pumpAndSettle이 끝나야 한다.
+    await tester.pumpWidget(
+      AppStateScope(
+        store: store,
+        child: const MaterialApp(
+          home: MediaQuery(
+            data: MediaQueryData(disableAnimations: true),
+            child: Scaffold(body: SingleChildScrollView(child: CategoryListBlock())),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LoadingDots), findsOneWidget);
+    expect(find.text('의류'), findsNothing);
+  });
+
   testWidgets('category card tap opens category tab and shows filtered product list', (tester) async {
     final store = AppStore(repository: _FakeRepository(results: const []));
     store.categories = const [
@@ -2267,6 +2332,7 @@ void main() {
     );
     await store.initialize();
     expect(store.usingFallback, isFalse);
+    expect(store.catalogLoading, isFalse);
     expect(store.catalogProducts.any((p) => p.id == 'backend-fresh'), isTrue,
         reason: '백엔드 최신 카탈로그가 번들 seed를 덮어씀');
     expect(store.heroTitle, '백엔드에서 온 타이틀', reason: '백엔드 hero로 갱신');
@@ -2278,9 +2344,26 @@ void main() {
       repository: _FakeRepository(shouldThrow: true), // 백엔드 다운
     );
     await store.initialize();
-    // 백엔드 갱신 실패해도 번들 seed로 정상 동작
+    // 백엔드 갱신 실패해도 번들 seed로 정상 동작 — 로딩 표시도 끝나고 seed 카테고리를 보여준다.
     expect(store.usingFallback, isFalse);
     expect(store.catalogProducts.length, 12);
+    expect(store.catalogLoading, isFalse);
+    expect(store.categories.map((c) => c.id), containsAll(['gadget', 'fashion']));
+  });
+
+  test('AppStore.catalogLoading stays true until the backend answers', () async {
+    final gate = Completer<void>();
+    final store = AppStore(seedSource: LocalSeedSource(), repository: _GatedRepository(gate.future));
+    final init = store.initialize();
+    await pumpEventQueue();
+
+    // 번들 seed는 이미 들어왔지만 백엔드는 아직 — 카테고리 칸은 로딩 표시.
+    expect(store.catalogLoading, isTrue);
+    expect(store.categories, isNotEmpty);
+
+    gate.complete();
+    await init;
+    expect(store.catalogLoading, isFalse);
   });
 
   // ── [ui] 이미지 로딩 전 placeholder를 통일된 "준비 이미지"로 ──
@@ -2351,6 +2434,17 @@ class _StubAssetBundle extends CachingAssetBundle {
 
   @override
   Future<String> loadString(String key, {bool cache = true}) async => _payload;
+}
+
+class _GatedRepository extends _FakeRepository {
+  _GatedRepository(this.gate);
+  final Future<void> gate;
+
+  @override
+  Future<Map<String, dynamic>> fetchHome() async {
+    await gate;
+    return super.fetchHome();
+  }
 }
 
 class _FakeRepository extends DoguRepository {

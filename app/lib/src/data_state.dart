@@ -280,6 +280,10 @@ class AppStore extends ChangeNotifier {
   Map<String, int> savedByMonth = <String, int>{};
   Map<String, String> newsletter = const {'eyebrow': '— 매주 수요일 발송', 'title': '조용한 신상품을\n가장 먼저.', 'note': '// 언제든 한 번의 클릭으로 구독 취소'};
   bool usingFallback = true;
+  /// 백엔드 카탈로그를 기다리는 중. 그동안 카테고리는 번들 seed(옛 6개 — 백엔드에 없는 id)를
+  /// 그리지 않고 로딩 표시를 한다. 응답이 오거나 실패하면(타임아웃 최대 6초) false가 되고,
+  /// 실패했을 때는 seed 카테고리로 계속 동작한다(오프라인).
+  bool catalogLoading = false;
 
   // 전역 장바구니 토스트 — 결제바 표시 여부에 따라 위치가 움직인다
   String? cartToastMessage;
@@ -389,6 +393,7 @@ class AppStore extends ChangeNotifier {
   }
 
   Future<void> initialize() async {
+    catalogLoading = true;
     await _loadLocalState();
     await _loadCatalogData();    // 1단계: 번들 seed로 즉시 페인트
     await _refreshFromBackend(); // 2단계: 백엔드 최신 데이터로 갱신(best-effort)
@@ -468,9 +473,11 @@ class AppStore extends ChangeNotifier {
         newsletter: results[4] as Map<String, String>,
       );
       usingFallback = false;
-      notifyListeners();
     } catch (_) {
       // 백엔드 미가용 → 번들 seed로 계속 동작
+    } finally {
+      catalogLoading = false;
+      notifyListeners();
     }
   }
 
