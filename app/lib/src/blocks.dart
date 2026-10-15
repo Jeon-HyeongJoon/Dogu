@@ -39,7 +39,7 @@ class CategoryListBlock extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Row(children: [MonoText(visibleRows[i].count, size: 11, color: AppColors.ink3), const SizedBox(width: 6), const Text('→')]),
+                  const Text('→'), // 상품 수는 그리지 않는다(메인 카드와 같은 이유)
                 ],
               ),
             ),

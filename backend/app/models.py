@@ -21,6 +21,8 @@ class Category(BaseModel):
     description: str
     tone: str
     featured: bool = False
+    # 메인화면 '카테고리' 칸의 노출 순위(1부터, 수요 순). 메인에 안 나오면 None.
+    home_rank: int | None = None
     image_url: str | None = None
 
 

@@ -543,7 +543,6 @@ class CategoryTabPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = AppStateScope.watch(context);
-    final categoryTotal = store.categories.fold<int>(0, (sum, item) => sum + (int.tryParse(item.count.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0));
     return ListView(
       key: const PageStorageKey('category-tab'),
       padding: EdgeInsets.only(bottom: bottomPadding),
@@ -563,7 +562,7 @@ class CategoryTabPage extends StatelessWidget {
             ),
           ),
         QuickFilterRow(
-          items: ['전체  $categoryTotal', '신상', '베스트', '세일', '딜'],
+          items: const ['전체', '신상', '베스트', '세일', '딜'],
           activeIndex: _categoryFilterIndexFor(store.categoryQuickFilter),
           onSelectedIndex: (index) {
             const filterKeys = ['all', 'new', 'best', 'sale', 'deal'];

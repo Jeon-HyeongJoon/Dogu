@@ -247,7 +247,7 @@ PatternKind patternFor(String seed) {
 }
 
 class CategoryItem {
-  const CategoryItem(this.name, this.count, this.pattern, {this.id = '', this.description = '', this.tone = '', this.featured = false, this.imageUrl});
+  const CategoryItem(this.name, this.count, this.pattern, {this.id = '', this.description = '', this.tone = '', this.featured = false, this.homeRank, this.imageUrl});
   final String id;
   final String name;
   final String count;
@@ -255,6 +255,8 @@ class CategoryItem {
   final String description;
   final String tone;
   final bool featured;
+  /// 메인화면 '카테고리' 칸의 노출 순위(1부터, 백엔드가 수요 순으로 매김). 없으면 null.
+  final int? homeRank;
   final String? imageUrl;
 
   factory CategoryItem.fromJson(Map<String, dynamic> json) {
@@ -269,6 +271,7 @@ class CategoryItem {
       description: readString(json, ['description', 'subtitle', 'summary']) ?? '',
       tone: readString(json, ['tone']) ?? '',
       featured: json['featured'] == true,
+      homeRank: (json['home_rank'] as num?)?.toInt(),
       imageUrl: readString(json, ['image_url', 'imageUrl', 'image']),
     );
   }
