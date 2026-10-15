@@ -1,6 +1,9 @@
+import sqlite3
+
 import pytest
 from fastapi.testclient import TestClient
 
+from app import database
 from app.config import get_settings
 from app.main import app
 
@@ -35,7 +38,7 @@ def test_home_endpoint_returns_seed_sections() -> None:
 
     assert response.status_code == 200
     assert payload["hero"]["title"] == "오늘 사고 싶은 것만, 가볍게 담아두세요."
-    assert len(payload["categories"]) == 27
+    assert len(payload["categories"]) == 25  # 27개 중 식품 셋이 하나로 묶인다
     assert [product["id"] for product in payload["deals"][:3]] == ["83781891828", "90975233454", "90649753925"]
     assert payload["newsletter"]["cadence"] == "weekly"
 
@@ -51,7 +54,7 @@ def test_home_collections_are_populated_from_catalog() -> None:
 
 
 def test_home_categories_rank_by_demand_with_editorial_overrides() -> None:
-    # 메인화면 '카테고리' 칸 = 수요(리뷰 합) 순 상위 + 고정(여성의류), 공구는 제외.
+    # 메인화면 '카테고리' 칸 = 수요(리뷰 합) 순 상위 + 고정(여성의류·남성의류), 공구는 제외.
     categories = client.get("/api/home").json()["categories"]
     picks = sorted((c for c in categories if c["featured"]), key=lambda c: c["home_rank"])
 
@@ -59,11 +62,59 @@ def test_home_categories_rank_by_demand_with_editorial_overrides() -> None:
     assert all(c["home_rank"] is None for c in categories if not c["featured"])
     # fixture DB에서 리뷰가 가장 많은 건 여성의류(고정)이고, 그다음이 가구다.
     assert picks[0]["label"] == "가구"
-    assert picks[-1]["label"] == "여성의류"
+    assert [c["label"] for c in picks[-2:]] == ["여성의류", "남성의류"]
     assert "공구" not in [c["label"] for c in picks]
-    # 카테고리 탭은 여전히 27개 전부, 가나다순.
-    assert len(categories) == 27
-    assert "공구" in [c["label"] for c in categories]
+    # 카테고리 탭은 전부(식품 셋은 하나로), 가나다순.
+    labels = [c["label"] for c in categories]
+    assert labels == sorted(labels)
+    assert "공구" in labels
+    assert "식품" in labels and "가공식품" not in labels
+
+
+def test_food_categories_merge_into_one_group(tmp_path, monkeypatch) -> None:
+    # 식품(신선·가공·건강)은 목록에 '식품' 하나로 나오고, 수요는 멤버 합이며,
+    # 상품은 세 멤버에서 리뷰 많은 순으로 섞여 나온다. fixture DB엔 식품 상품이 없어 따로 만든다.
+    from datacrawler.db import _SCHEMA
+
+    db = tmp_path / "groups.db"
+    products = [
+        ("fresh-1", "10006530", 50),
+        ("fresh-2", "10006530", 10),
+        ("processed-1", "10000114", 40),
+        ("health-1", "10000115", 30),
+        ("tool-1", "10000126", 999),
+        ("kids-1", "10000116", 100),
+    ]
+    with sqlite3.connect(db) as conn:
+        conn.executescript(_SCHEMA)
+        conn.executemany(
+            "INSERT INTO categories (id, label) VALUES (?, ?)",
+            [("10006530", "신선식품"), ("10000114", "가공식품"), ("10000115", "건강식품"),
+             ("10000126", "공구"), ("10000116", "출산/유아동"), ("10000107", "여성의류")],
+        )
+        conn.executemany(
+            "INSERT INTO products (id, name, brand, price, reviews) VALUES (?, ?, 'B', 1000, ?)",
+            [(product_id, product_id, reviews) for product_id, _, reviews in products],
+        )
+        conn.executemany(
+            "INSERT INTO product_categories VALUES (?, ?)",
+            [(product_id, category_id) for product_id, category_id, _ in products],
+        )
+    monkeypatch.setattr(database, "DB_PATH", db)
+
+    categories = {category.id: category for category in database.db_list_categories()}
+    assert set(categories) == {"food", "10000126", "10000116", "10000107"}
+    assert categories["food"].label == "식품"
+    assert categories["food"].description == "신선식품 · 가공식품 · 건강식품"
+    # 식품 수요 130(=50+10+40+30) > 출산/유아동 100. 공구 999는 제외, 여성의류는 고정(끝).
+    assert [categories[key].home_rank for key in ("food", "10000116", "10000107")] == [1, 2, 3]
+    assert categories["10000126"].home_rank is None
+
+    food_products = database.db_list_products(category_id="food")
+    assert [product.id for product in food_products] == ["fresh-1", "processed-1", "health-1", "fresh-2"]
+    assert [product.id for product in database.db_search_products(query="1", category_id="food")] == [
+        "fresh-1", "processed-1", "health-1",
+    ]
 
 
 def test_categories_endpoint() -> None:
@@ -71,8 +122,8 @@ def test_categories_endpoint() -> None:
     payload = response.json()
 
     assert response.status_code == 200
-    assert payload["count"] == 27
-    assert {category["id"] for category in payload["items"]} >= {"10000129", "10000122", "10000114"}
+    assert payload["count"] == 25
+    assert {category["id"] for category in payload["items"]} >= {"10000129", "10000122", "food"}
 
 
 def test_products_endpoint_and_filters() -> None:

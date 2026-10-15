@@ -3,6 +3,7 @@ import os
 import sqlite3
 from functools import lru_cache
 from pathlib import Path
+from typing import NamedTuple
 
 from app.models import SECTION_TAGS, Category, Product, ProductArtwork
 
@@ -15,7 +16,21 @@ DB_PATH = Path(os.environ.get("DOGU_DB_PATH", str(_DEFAULT_DB)))
 # 때문에 전부 ~100이라 공급 지표가 되지 못한다.
 HOME_CATEGORY_SLOTS = 9
 HOME_CATEGORY_EXCLUDED = frozenset({"10000126"})  # 공구 — 메인에서 뺀다
-HOME_CATEGORY_PINNED = ("10000107",)  # 여성의류 — 순위와 무관하게 메인 마지막 칸
+HOME_CATEGORY_PINNED = ("10000107", "10000108")  # 여성의류, 남성의류 — 순위와 무관하게 메인 끝 칸
+
+
+class CategoryGroup(NamedTuple):
+    label: str
+    member_ids: tuple[str, ...]
+
+
+# 하나로 묶어 보여줄 최상위 카테고리. 크롤링 원본(네이버)은 식품을 셋으로 나눠 두지만
+# 쇼핑몰에서는 한 품목이다 — 카테고리 목록에는 묶음만 나오고, 묶음 id로 상품을 조회하면
+# 멤버 전부에서 고른다. 묶음의 수요는 멤버 수요의 합.
+CATEGORY_GROUPS: dict[str, CategoryGroup] = {
+    "food": CategoryGroup("식품", ("10006530", "10000114", "10000115")),  # 신선식품 · 가공식품 · 건강식품
+}
+_GROUP_OF = {member_id: group_id for group_id, group in CATEGORY_GROUPS.items() for member_id in group.member_ids}
 
 
 def db_exists() -> bool:
@@ -40,6 +55,19 @@ def _cat_ids_for(conn: sqlite3.Connection, product_ids: list[str]) -> dict[str, 
     for row in rows:
         result[row["product_id"]].append(row["category_id"])
     return result
+
+
+def _category_condition(category_id: str) -> tuple[str, list[str]]:
+    """category_id(묶음 id 포함)로 상품을 거르는 product_categories 조건과 파라미터."""
+    group = CATEGORY_GROUPS.get(category_id)
+    if group is None:
+        return "pc.category_id = ?", [category_id]
+    placeholders = ",".join("?" * len(group.member_ids))
+    return f"pc.category_id IN ({placeholders})", list(group.member_ids)
+
+
+# 묶음은 리뷰 많은 순으로 준다 — 정렬이 없으면 한 멤버(신선식품)가 100개를 거의 다 차지한다.
+_GROUP_ORDER = " ORDER BY p.reviews DESC"
 
 
 def _to_product(row: sqlite3.Row, category_ids: list[str]) -> Product:
@@ -72,23 +100,28 @@ def _to_product(row: sqlite3.Row, category_ids: list[str]) -> Product:
 
 @lru_cache(maxsize=4)
 def _home_category_ranks(db_path: str) -> dict[str, int]:
-    """메인 노출 카테고리 id → 노출 순위(1부터, 수요 순 + 고정은 끝).
+    """메인 노출 카테고리 id(묶음 id 포함) → 노출 순위(1부터, 수요 순 + 고정은 끝).
 
     배포 DB는 읽기 전용이라 경로별로 한 번만 계산한다(실 DB에서 ~100ms).
     """
     with _conn() as conn:
         rows = conn.execute(
             """
-            SELECT c.id, COALESCE(SUM(p.reviews), 0) AS demand
+            SELECT c.id, c.label, COALESCE(SUM(p.reviews), 0) AS demand
             FROM categories c
             LEFT JOIN product_categories pc ON pc.category_id = c.id
             LEFT JOIN products p ON p.id = pc.product_id
             WHERE c.parent_id IS NULL
             GROUP BY c.id
-            ORDER BY demand DESC, c.label
             """
         ).fetchall()
-    ids = [row["id"] for row in rows]
+    demand: dict[str, int] = {}
+    labels: dict[str, str] = {}
+    for row in rows:
+        key = _GROUP_OF.get(row["id"], row["id"])
+        demand[key] = demand.get(key, 0) + row["demand"]
+        labels[key] = CATEGORY_GROUPS[key].label if key in CATEGORY_GROUPS else row["label"]
+    ids = sorted(demand, key=lambda key: (-demand[key], labels[key]))
     pinned = [category_id for category_id in HOME_CATEGORY_PINNED if category_id in ids]
     ranked = [category_id for category_id in ids if category_id not in HOME_CATEGORY_EXCLUDED and category_id not in pinned]
     picks = ranked[: HOME_CATEGORY_SLOTS - len(pinned)] + pinned
@@ -98,22 +131,40 @@ def _home_category_ranks(db_path: str) -> dict[str, int]:
 def db_list_categories() -> list[Category]:
     home_ranks = _home_category_ranks(str(DB_PATH))
     with _conn() as conn:
-        rows = conn.execute(
-            "SELECT * FROM categories WHERE parent_id IS NULL ORDER BY label"
-        ).fetchall()
-        return [
+        rows = conn.execute("SELECT * FROM categories WHERE parent_id IS NULL").fetchall()
+    categories = [
+        Category(
+            id=row["id"],
+            label=row["label"],
+            count=row["count"],
+            description=row["description"] or "",
+            tone=row["tone"] or "#6b6b6b",
+            featured=row["id"] in home_ranks,
+            home_rank=home_ranks.get(row["id"]),
+            image_url=row["image_url"],
+        )
+        for row in rows
+        if row["id"] not in _GROUP_OF
+    ]
+    for group_id, group in CATEGORY_GROUPS.items():
+        members = sorted(
+            (row for row in rows if row["id"] in group.member_ids),
+            key=lambda row: group.member_ids.index(row["id"]),
+        )
+        if not members:
+            continue
+        categories.append(
             Category(
-                id=row["id"],
-                label=row["label"],
-                count=row["count"],
-                description=row["description"] or "",
-                tone=row["tone"] or "#6b6b6b",
-                featured=row["id"] in home_ranks,
-                home_rank=home_ranks.get(row["id"]),
-                image_url=row["image_url"],
+                id=group_id,
+                label=group.label,
+                count=sum(row["count"] for row in members),
+                description=" · ".join(row["label"] for row in members),
+                tone="#6b6b6b",
+                featured=group_id in home_ranks,
+                home_rank=home_ranks.get(group_id),
             )
-            for row in rows
-        ]
+        )
+    return sorted(categories, key=lambda category: category.label)
 
 
 def db_list_products(
@@ -134,14 +185,18 @@ def db_list_products(
 
         conditions: list[str] = []
         if category_id:
-            conditions.append("pc.category_id = ?")
-            params.append(category_id)
+            condition, category_params = _category_condition(category_id)
+            conditions.append(condition)
+            params.extend(category_params)
         if effective_tag:
             conditions.append(f"p.tags LIKE ?")
             params.append(f'%"{effective_tag}"%')
 
         if conditions:
             sql += " WHERE " + " AND ".join(conditions)
+
+        if category_id in CATEGORY_GROUPS:
+            sql += _GROUP_ORDER
 
         if limit:
             sql += f" LIMIT {limit}"
@@ -176,8 +231,9 @@ def db_search_products(query: str | None = None, category_id: str | None = None,
 
         conditions: list[str] = []
         if category_id:
-            conditions.append("pc.category_id = ?")
-            params.append(category_id)
+            condition, category_params = _category_condition(category_id)
+            conditions.append(condition)
+            params.extend(category_params)
         if query:
             q = f"%{query.strip().lower()}%"
             # Match the seed-path search fields (name/brand/subtitle/blurb/tags)
@@ -191,6 +247,9 @@ def db_search_products(query: str | None = None, category_id: str | None = None,
 
         if conditions:
             sql += " WHERE " + " AND ".join(conditions)
+
+        if category_id in CATEGORY_GROUPS:
+            sql += _GROUP_ORDER
 
         sql += f" LIMIT {limit}"
 
