@@ -72,4 +72,67 @@ void main() {
       );
     }
   });
+
+  // ── 장식용 서체 두 벌 — 정해진 문구만 담는 아주 작은 서브셋이라,
+  //    문구를 고치면서 폰트를 다시 만들지 않으면 그 글자가 두부(⊠)로 찍힌다.
+
+  void expectCovers(String label, String fontAsset, String charsetPath, String text, int maxBytes) {
+    final charsetFile = File(charsetPath);
+    expect(charsetFile.existsSync(), isTrue, reason: '$charsetPath 가 없다');
+    final covered = charsetFile
+        .readAsLinesSync()
+        .where((line) => !line.startsWith('#'))
+        .join()
+        .runes
+        .toSet();
+
+    final missing = text.runes
+        .where((rune) => !covered.contains(rune))
+        .map(String.fromCharCode)
+        .toSet();
+    expect(
+      missing,
+      isEmpty,
+      reason: '$label 서브셋에 없는 글자: ${missing.join()} — scripts/build_fonts.sh 재실행',
+    );
+
+    final font = File(fontAsset);
+    expect(font.existsSync(), isTrue, reason: '$fontAsset 가 없다');
+    expect(
+      font.lengthSync(),
+      lessThan(maxBytes),
+      reason: '$fontAsset 가 서브셋이 아닌 것으로 보인다 (scripts/build_fonts.sh)',
+    );
+  }
+
+  test('브랜드 타이틀의 모든 글자를 타이틀 서체가 그릴 수 있다', () {
+    // 첫 페인트를 막고 로드되는 서체 — 통짜(416KB)를 되돌리면 첫 화면이 그만큼 늦어진다.
+    expectCovers(
+      '타이틀',
+      doguTitleEssentialFontAssets.single,
+      'assets/fonts/doguhand/charset.txt',
+      DoguBrandLockup.brandName,
+      64 * 1024,
+    );
+  });
+
+  test('농담 한 줄의 모든 글자를 농담 서체가 그릴 수 있다', () {
+    expectCovers(
+      '농담',
+      doguJokeFontAssets.single,
+      'assets/fonts/gaegu/charset.txt',
+      OrderRevealPage.jokeLine,
+      400 * 1024,
+    );
+  });
+
+  test('타이틀 서체는 농담 줄의 폴백이므로 그 글자도 담는다', () {
+    expectCovers(
+      '타이틀(폴백)',
+      doguTitleEssentialFontAssets.single,
+      'assets/fonts/doguhand/charset.txt',
+      OrderRevealPage.jokeLine,
+      64 * 1024,
+    );
+  });
 }
