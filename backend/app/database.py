@@ -8,6 +8,20 @@ from app.models import SECTION_TAGS, Category, Product, ProductArtwork
 _DEFAULT_DB = Path(__file__).parent / "data" / "dogu.db"
 DB_PATH = Path(os.environ.get("DOGU_DB_PATH", str(_DEFAULT_DB)))
 
+# 메인화면 '카테고리' 칸에 노출할 최상위 카테고리(featured). 크롤링 DB는 git 밖에 있고
+# featured 컬럼이 전부 0이라, 노출 대상은 여기서 정한다. 앱은 featured만 메인에 그린다.
+HOME_CATEGORY_IDS = frozenset({
+    "10000129",  # E쿠폰/티켓/생활편의
+    "10000122",  # PC/주변기기
+    "10000114",  # 가공식품
+    "10000112",  # 가구
+    "10000120",  # 가전
+    "10000124",  # 건강/의료용품
+    "10000115",  # 건강식품
+    "10000108",  # 남성의류
+    "10000107",  # 여성의류 (공구 대신)
+})
+
 
 def db_exists() -> bool:
     return DB_PATH.exists()
@@ -73,7 +87,7 @@ def db_list_categories() -> list[Category]:
                 count=row["count"],
                 description=row["description"] or "",
                 tone=row["tone"] or "#6b6b6b",
-                featured=bool(row["featured"]),
+                featured=bool(row["featured"]) or row["id"] in HOME_CATEGORY_IDS,
                 image_url=row["image_url"],
             )
             for row in rows

@@ -594,12 +594,19 @@ class _TickerStripState extends State<TickerStrip> {
   }
 }
 
+/// 메인화면 '카테고리' 칸에 그릴 카테고리 — 백엔드가 featured로 고른 것만, 최대 9개.
+/// featured가 하나도 없으면(구 백엔드 응답) 앞에서부터 9개. 카테고리 탭은 전부를 그린다.
+List<CategoryItem> homeCategories(List<CategoryItem> all) {
+  final featured = all.where((item) => item.featured).toList();
+  return (featured.isEmpty ? all : featured).take(9).toList();
+}
+
 class CategorySection extends StatelessWidget {
   const CategorySection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final items = AppStateScope.watch(context).categories;
+    final items = homeCategories(AppStateScope.watch(context).categories);
     return Padding(
       padding: const EdgeInsets.only(top: 36),
       child: Column(
@@ -611,7 +618,7 @@ class CategorySection extends StatelessWidget {
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: items.length > 9 ? 9 : items.length,
+              itemCount: items.length,
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 160,
                 mainAxisExtent: 72,

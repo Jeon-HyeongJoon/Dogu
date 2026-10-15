@@ -50,6 +50,19 @@ def test_home_collections_are_populated_from_catalog() -> None:
         assert client.get(f"/api/products/{product_id}").status_code == 200
 
 
+def test_home_categories_feature_the_main_screen_picks() -> None:
+    # 메인화면 '카테고리' 칸은 featured만 그린다 — 공구는 빠지고 여성의류가 들어간다.
+    categories = client.get("/api/home").json()["categories"]
+    featured = [category["label"] for category in categories if category["featured"]]
+
+    assert featured == [
+        "E쿠폰/티켓/생활편의", "PC/주변기기", "가공식품", "가구", "가전",
+        "건강/의료용품", "건강식품", "남성의류", "여성의류",
+    ]
+    # 카테고리 탭은 여전히 전부를 보여준다.
+    assert "공구" in [category["label"] for category in categories]
+
+
 def test_categories_endpoint() -> None:
     response = client.get("/api/categories")
     payload = response.json()

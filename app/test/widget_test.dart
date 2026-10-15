@@ -707,6 +707,49 @@ void main() {
     expect(previous.style!.color, AppColors.ink2);
   });
 
+  testWidgets('home category grid shows the featured categories, not the first nine alphabetically', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(900, 1200);
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    // 실제 백엔드 순서(가나다) — 앞의 9개를 자르면 공구가 들어오고 여성의류가 빠진다.
+    CategoryItem category(String name, {bool featured = false}) =>
+        CategoryItem(name, '100', PatternKind.dots, id: name, featured: featured);
+    final store = AppStore(repository: _FakeRepository(results: const []));
+    store.categories = [
+      category('E쿠폰/티켓/생활편의', featured: true),
+      category('PC/주변기기', featured: true),
+      category('가공식품', featured: true),
+      category('가구', featured: true),
+      category('가전', featured: true),
+      category('건강/의료용품', featured: true),
+      category('건강식품', featured: true),
+      category('공구'),
+      category('남성의류', featured: true),
+      category('렌탈관'),
+      category('여성의류', featured: true),
+    ];
+
+    await tester.pumpWidget(
+      AppStateScope(
+        store: store,
+        child: const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: CategorySection()))),
+      ),
+    );
+
+    expect(find.byType(CategoryCard), findsNWidgets(9));
+    expect(find.text('여성의류'), findsOneWidget);
+    expect(find.text('공구'), findsNothing);
+    expect(find.text('렌탈관'), findsNothing);
+
+    // featured가 하나도 없는 응답(구 백엔드)이면 예전처럼 앞에서부터 9개.
+    final plain = List.generate(12, (i) => CategoryItem('c$i', '1', PatternKind.dots, id: 'c$i'));
+    expect(homeCategories(plain).map((item) => item.name), List.generate(9, (i) => 'c$i'));
+  });
+
   testWidgets('category card tap opens category tab and shows filtered product list', (tester) async {
     final store = AppStore(repository: _FakeRepository(results: const []));
     store.categories = const [
