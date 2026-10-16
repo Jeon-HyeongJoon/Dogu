@@ -1,0 +1,34 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+
+// web/ 껍데기(index.html·manifest) 가드. Flutter가 첫 화면을 그리기 전에 사용자가 보는 것은 이것뿐이다 —
+// 탭 제목·아이콘이 Flutter 기본값(dogu_mobile_shop, 파란 F 로고)으로 돌아가거나 로딩 화면이 빠지면 여기서 잡는다.
+void main() {
+  final html = File('web/index.html').readAsStringSync();
+  final manifest = jsonDecode(File('web/manifest.json').readAsStringSync()) as Map<String, dynamic>;
+
+  test('index.html shows a splash right away and removes it on the first Flutter frame', () {
+    expect(html, contains('id="splash"'));
+    expect(html, contains("addEventListener('flutter-first-frame'"));
+    expect(html, contains('splash.remove()'));
+    // 로딩 화면의 로고는 앱이 번들하는 그 파일이다.
+    final logo = RegExp(r'<img src="assets/([^"]+)"').firstMatch(html)!.group(1)!;
+    expect(File(logo).existsSync(), isTrue, reason: '$logo 가 없다');
+    // 로딩 화면이 flutter_bootstrap.js보다 먼저 있어야 바로 그려진다.
+    expect(html.indexOf('id="splash"'), lessThan(html.indexOf('flutter_bootstrap.js')));
+  });
+
+  test('tab title, description and manifest use the brand, not Flutter defaults', () {
+    expect(html, contains('<title>욕망의 장바구니</title>'));
+    expect(html, isNot(contains('dogu_mobile_shop')));
+    expect(html, isNot(contains('A new Flutter project.')));
+    expect(manifest['name'], '욕망의 장바구니');
+    expect(manifest['description'], isNot('A new Flutter project.'));
+    expect(manifest['background_color'], '#ffffff', reason: '예전엔 Flutter 기본 파랑(#0175C2)');
+    for (final icon in (manifest['icons'] as List).cast<Map<String, dynamic>>()) {
+      expect(File('web/${icon['src']}').existsSync(), isTrue, reason: '${icon['src']} 가 없다');
+    }
+  });
+}
