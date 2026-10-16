@@ -33,11 +33,10 @@ const doguFontAssets = <String>[
   'assets/fonts/dogusans/DoguSans-ExtraBold.otf',
 ];
 
-// 첫 페인트 전에 먼저 등록할 필수 폰트 — 한글 글리프가 포함된 기본 본문체(Dogu Sans Regular).
-// 이게 없으면 첫 프레임에서 한글이 fallback(한글 없음) 폰트로 그려져 ⊠(두부) 박스가 보인다.
-const doguEssentialFontAssets = <String>[
-  'assets/fonts/dogusans/DoguSans-Regular.otf',
-];
+// 첫 페인트 전에 등록할 본문체 — 굵기 4개 전부. Regular가 없으면 첫 프레임 한글이 두부(⊠)로 찍히고,
+// 굵은 굵기를 나중에 받으면 굵은 제목이 얇게 그려졌다가 바뀐다(글자 폭이 달라져 줄바꿈도 바뀐다).
+// 대신 web/index.html이 같은 파일을 처음부터 미리 받아(preload as=fetch) 엔진과 나란히 내려받는다.
+const doguEssentialFontAssets = doguFontAssets;
 
 
 // 상단 브랜드 타이틀('욕망의 장바구니') 전용 손글씨체 — HSBombaram 3.0 서브셋.
@@ -96,11 +95,10 @@ Future<void> loadDoguEssentialFont() async {
   ]);
 }
 
+/// 첫 페인트 뒤에 받는 폰트 — 주문 결과 화면에서만 쓰는 농담 서체뿐이다.
+/// (본문체는 이미 굵기 4개를 첫 페인트 전에 등록했다 — 예전엔 Regular를 여기서 한 번 더 받았다.)
 Future<void> loadDoguFonts() async {
-  await Future.wait([
-    _loadFontFamily(doguFontFamily, doguFontAssets),
-    _loadFontFamily(doguJokeFontFamily, doguJokeFontAssets),
-  ]);
+  await _loadFontFamily(doguJokeFontFamily, doguJokeFontAssets);
 }
 
 Future<void> _loadFontFamily(String family, List<String> assets) {

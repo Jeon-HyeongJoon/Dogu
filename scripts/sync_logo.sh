@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # 브랜드 로고 SSOT — 정본은 design/assets/(git-ignored, 디자인 원본 보관소).
-# 앱은 패키지 밖 경로를 에셋으로 번들할 수 없어, 여기서 256px 파생본을 만들어
+# 앱은 패키지 밖 경로를 에셋으로 번들할 수 없어, 여기서 96px 파생본을 만들어
 # app/assets/에 커밋한다. 로고를 바꾸면 정본을 교체하고 이 스크립트를 다시 돌린다.
 #   scripts/sync_logo.sh          # 정본 -> app 미러
 #   scripts/sync_logo.sh --check  # 미러가 정본과 같은지 검증(CI 가드)
@@ -10,7 +10,8 @@ cd "$(dirname "$0")/.."
 
 SRC="design/assets/logo-square.png"
 DEST="app/assets/logo-square.png"
-SIZE=256
+# 헤더 로고는 30pt로 그린다 — 3배 화면에서도 90px이면 충분하다(256px은 116KB였다).
+SIZE=96
 
 if [ ! -f "$SRC" ]; then
   # 정본은 git-ignored라 CI 체크아웃에는 없다 — 그때는 커밋된 미러를 그대로 신뢰한다.
