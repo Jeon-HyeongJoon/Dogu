@@ -18,18 +18,18 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="새로 들어온 상품부터 오늘의 특가까지. 마음에 드는 것만 빠르게 골라 담는 쇼핑 리스트.">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="dogu_mobile_shop">
+  <meta name="apple-mobile-web-app-title" content="욕망의 장바구니">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>dogu_mobile_shop</title>
+  <title>욕망의 장바구니</title>
   <link rel="manifest" href="manifest.json">
   <!-- 첫 페인트 전에 등록하는 폰트(lib/main.dart의 doguEssentialFontAssets + 타이틀 서체)를 엔진·main.dart.js와
        나란히 처음부터 받는다. Flutter는 폰트를 fetch()로 읽으므로 as="fetch" + crossorigin이어야 같은 요청으로
@@ -39,8 +39,43 @@
   <link rel="preload" href="assets/assets/fonts/dogusans/DoguSans-Bold.otf" as="fetch" crossorigin>
   <link rel="preload" href="assets/assets/fonts/dogusans/DoguSans-ExtraBold.otf" as="fetch" crossorigin>
   <link rel="preload" href="assets/assets/fonts/doguhand/DoguHand-Thin.otf" as="fetch" crossorigin>
+
+  <!-- 로딩 화면 — Flutter가 첫 화면을 그리기 전(4G에서 수 초)의 빈 흰 화면 대신 바로 보인다.
+       첫 프레임(flutter-first-frame)에 사라진다. 점은 앱의 LoadingDots와 같은 모양·속도·밝기.
+       로고는 헤더처럼 원형으로 잘라 정본의 사각 바탕이 안 보이게 한다. -->
+  <style>
+    html, body { margin: 0; background: #ffffff; }
+    #splash {
+      position: fixed; inset: 0; z-index: 2147483647;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+      background: #ffffff; pointer-events: none; transition: opacity .18s ease-out;
+    }
+    #splash.done { opacity: 0; }
+    #splash img { width: 72px; height: 72px; border-radius: 50%; }
+    #splash .dots { display: flex; gap: 6px; }
+    #splash .dots span {
+      width: 6px; height: 6px; border-radius: 50%; background: #6b6b6b; opacity: .25;
+      animation: splash-dot 1s linear infinite;
+    }
+    #splash .dots span:nth-child(2) { animation-delay: .2s; }
+    #splash .dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes splash-dot { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { #splash .dots span { animation: none; opacity: .6; } }
+  </style>
 </head>
 <body>
+  <div id="splash" role="status" aria-label="불러오는 중">
+    <img src="assets/assets/logo-square.png" alt="" width="72" height="72">
+    <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      var splash = document.getElementById('splash');
+      if (!splash) return;
+      splash.classList.add('done');
+      setTimeout(function () { splash.remove(); }, 200);
+    }, { once: true });
+  </script>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader
