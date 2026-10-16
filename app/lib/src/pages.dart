@@ -82,7 +82,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         title: const Text('상품 정보', style: TextStyle(color: AppColors.ink, fontSize: 18, fontWeight: FontWeight.w700)),
         iconTheme: const IconThemeData(color: AppColors.ink),
       ),
-      body: Column(
+      // 상품 주소로 바로 들어와 아직 정보가 없으면 로딩 → 실패 시 안내(엉뚱한 상품 대신).
+      body: _product.isPending
+          ? Center(
+              child: _loading
+                  ? const LoadingDots()
+                  : const Text('상품 정보를 불러오지 못했어요', style: TextStyle(fontSize: 14, color: AppColors.ink3)),
+            )
+          : Column(
         children: [
           Expanded(
             child: SingleChildScrollView(
