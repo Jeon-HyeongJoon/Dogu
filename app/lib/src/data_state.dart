@@ -11,7 +11,7 @@ class DoguRepository {
 
   Future<dynamic> _getJson(String path, [Map<String, String>? query, Duration timeout = const Duration(seconds: 3)]) async {
     final response = await _client.get(_uri(path, query)).timeout(timeout);
-    if (response.statusCode < 200 || response.statusCode >= 300) throw StateError('GET $path failed: ${response.statusCode}');
+    if (response.statusCode < 200 || response.statusCode >= 300) throw ApiStatusError(path, response.statusCode);
     return jsonDecode(utf8.decode(response.bodyBytes));
   }
 
@@ -120,6 +120,12 @@ class DoguRepository {
 
 /// 번들된 seed.json에서 카탈로그를 읽는 서버리스 데이터 소스.
 /// 네트워크 없이 rootBundle만 사용하며, 백엔드 build_home 변환(ID → 상품 해석)을 재현한다.
+/// 백엔드가 2xx가 아닌 상태로 답했다 — 404(없는 상품)를 네트워크 실패와 구분하려고 쓴다.
+class ApiStatusError extends StateError {
+  ApiStatusError(String path, this.statusCode) : super('GET $path failed: $statusCode');
+  final int statusCode;
+}
+
 class LocalSeedSource {
   LocalSeedSource({AssetBundle? bundle, String assetKey = 'assets/seed.json'})
       : _bundle = bundle ?? rootBundle,
@@ -339,7 +345,12 @@ class AppStore extends ChangeNotifier {
   int get cartTotal => cartLines.fold(0, (sum, line) => sum + line.product.numericPrice * line.quantity);
   int get cartOldTotal => cartLines.fold(0, (sum, line) => sum + line.product.numericOldPrice * line.quantity);
   int get cartDiscount => cartOldTotal - cartTotal;
-  List<({ProductItem product, int quantity})> get cartLines => cartQuantities.entries.map((entry) => (product: productById(entry.key), quantity: entry.value)).toList();
+  // 정보를 아직 못 찾은 상품(스냅샷 도입 전에 담은 것)은 백엔드에서 받아올 때까지 뺀다 —
+  // 예전엔 엉뚱한 기본 상품과 가격을 대신 보여줬다.
+  List<({ProductItem product, int quantity})> get cartLines => [
+        for (final entry in cartQuantities.entries)
+          if (findProduct(entry.key) case final product?) (product: product, quantity: entry.value),
+      ];
   Set<String> get selectedCartIds {
     if (!_cartSelectionTouched) return cartQuantities.keys.toSet();
     return _selectedCartIds.intersection(cartQuantities.keys.toSet());
@@ -385,11 +396,12 @@ class AppStore extends ChangeNotifier {
     return items.toList();
   }
 
-  ProductItem productById(String id) {
+  /// 최신 카탈로그 → 이번 세션/기기에 저장된 스냅샷 순으로 찾는다. 없으면 null.
+  ProductItem? findProduct(String id) {
     for (final p in allProducts) {
       if (p.id == id) return p;
     }
-    return _productCache[id] ?? fallbackNewProducts.first;
+    return _productCache[id];
   }
 
   Future<void> initialize() async {
@@ -416,6 +428,15 @@ class AppStore extends ChangeNotifier {
         cartQuantities = Map.fromEntries(
           loaded.entries.where((e) => !e.key.startsWith('new-') && !e.key.startsWith('deal-')),
         );
+      }
+    }
+    final rawSnapshots = prefs.getString(_snapshotsKey);
+    if (rawSnapshots != null) {
+      final decoded = jsonDecode(rawSnapshots);
+      if (decoded is Map) {
+        for (final entry in decoded.entries) {
+          if (entry.value is Map) _productCache[entry.key.toString()] = ProductItem.fromJson(Map<String, dynamic>.from(entry.value as Map));
+        }
       }
     }
     final rawSaved = prefs.getString('savedByMonth');
@@ -473,12 +494,54 @@ class AppStore extends ChangeNotifier {
         newsletter: results[4] as Map<String, String>,
       );
       usingFallback = false;
+      unawaited(_refreshSavedProducts());
     } catch (_) {
       // 백엔드 미가용 → 번들 seed로 계속 동작
     } finally {
       catalogLoading = false;
       notifyListeners();
     }
+  }
+
+  /// 장바구니·찜에 담아 둔 상품 중 시작 카탈로그에 없는 것을 백엔드에서 받아 최신화한다
+  /// (가격 변동 반영, 스냅샷이 없던 예전 항목 복구). 없어진 상품(404)은 목록에서 뺀다.
+  Future<void> _refreshSavedProducts() async {
+    final catalogIds = {for (final p in allProducts) p.id};
+    final ids = {...cartQuantities.keys, ...wishlistIds}.where((id) => !catalogIds.contains(id)).toList();
+    if (ids.isEmpty) return;
+    final gone = <String>{};
+    await Future.wait(ids.map((id) async {
+      try {
+        _productCache[id] = await _repository.fetchProduct(id);
+      } on ApiStatusError catch (e) {
+        if (e.statusCode == 404) gone.add(id);
+      } catch (_) {
+        // 네트워크 실패 — 스냅샷으로 계속 표시
+      }
+    }));
+    if (gone.isNotEmpty) {
+      cartQuantities = {...cartQuantities}..removeWhere((id, _) => gone.contains(id));
+      _selectedCartIds = _selectedCartIds.difference(gone);
+      wishlistIds = wishlistIds.difference(gone);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('cartQuantities', jsonEncode(cartQuantities));
+      await prefs.setStringList('wishlistIds', wishlistIds.toList());
+    }
+    await _saveProductSnapshots();
+    notifyListeners();
+  }
+
+  static const _snapshotsKey = 'productSnapshots';
+
+  /// 장바구니·찜에 담긴 상품의 표시 정보를 기기에 저장한다. 다시 열었을 때 시작 카탈로그
+  /// (상위 100개 + 홈)에 없는 상품도 백엔드 응답을 기다리지 않고 바로 맞게 보인다.
+  Future<void> _saveProductSnapshots() async {
+    final snapshots = <String, dynamic>{
+      for (final id in {...cartQuantities.keys, ...wishlistIds})
+        if (findProduct(id) case final product? when !product.isPending) id: product.toJson(),
+    };
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_snapshotsKey, jsonEncode(snapshots));
   }
 
   /// home/products/trending/suggestions/newsletter를 스토어 필드에 반영한다.
@@ -602,6 +665,7 @@ class AppStore extends ChangeNotifier {
     _productCache[product.id] = product;
     if (!wishlistIds.add(product.id)) wishlistIds.remove(product.id);
     await _saveStringList('wishlistIds', wishlistIds.toList());
+    await _saveProductSnapshots();
     notifyListeners();
   }
 
@@ -619,6 +683,7 @@ class AppStore extends ChangeNotifier {
     }
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('cartQuantities', jsonEncode(cartQuantities));
+    await _saveProductSnapshots();
     notifyListeners();
   }
 

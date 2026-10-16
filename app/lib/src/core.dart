@@ -80,7 +80,7 @@ class _DoguAppState extends State<DoguApp> {
             final extra = state.extra;
             final product = extra is ProductItem
                 ? extra
-                : AppStateScope.read(context).productById(state.pathParameters['id']!);
+                : AppStateScope.read(context).findProduct(state.pathParameters['id']!) ?? ProductItem.pending(state.pathParameters['id']!);
             return ProductDetailPage(product: product);
           },
         ),
@@ -301,6 +301,8 @@ class ProductArtwork {
       motif: readString(json, ['motif']) ?? 'circle',
     );
   }
+
+  Map<String, dynamic> toJson() => {'hue': hue, 'saturation': saturation, 'lightness': lightness, 'mono': mono, 'motif': motif};
 }
 
 class SearchTrend {
@@ -357,6 +359,34 @@ class ProductItem {
   final List<String> tags;
   final ProductArtwork? artwork;
   final String meta;
+
+  /// 아직 정보를 못 받은 상품(상품 주소로 바로 들어온 경우). 화면은 로딩 표시를 하고
+  /// 상세 응답으로 채운다 — 예전엔 엉뚱한 기본 상품을 대신 보여줬다.
+  factory ProductItem.pending(String id) =>
+      ProductItem(id: id, brand: '', name: '', price: '', oldPrice: '', discount: '', pattern: patternFor(id), meta: '');
+
+  bool get isPending => name.isEmpty;
+
+  /// 기기 저장용 스냅샷 — fromJson으로 그대로 되살아난다(장바구니·찜을 다시 열 때 표시).
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'brand': brand,
+        'name': name,
+        'price_text': price,
+        'old_price_text': oldPrice,
+        'discount_text': discount,
+        'category_key': categoryKey,
+        'category_ids': categoryIds,
+        if (imageUrl != null) 'image_url': imageUrl,
+        if (badge != null) 'badge': badge,
+        'subtitle': subtitle,
+        'blurb': blurb,
+        'rating': rating,
+        'reviews': reviews,
+        'tags': tags,
+        if (artwork != null) 'artwork': artwork!.toJson(),
+        'meta': meta,
+      };
 
   factory ProductItem.fromJson(Map<String, dynamic> json) {
     final id = readString(json, ['id', 'product_id', 'sku', 'slug']) ?? readString(json, ['name', 'title']) ?? 'product';

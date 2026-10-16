@@ -2351,6 +2351,68 @@ void main() {
     expect(store.categories.map((c) => c.id), containsAll(['gadget', 'fashion']));
   });
 
+  // ── [bug] 장바구니·찜을 다시 열면 시작 카탈로그 밖의 상품이 엉뚱한 기본 상품으로 보이던 문제 ──
+  const knit = ProductItem(
+    id: 'food-honey', brand: '믿음벌꿀', name: '천연 아카시아꿀', price: '₩23,900', oldPrice: '₩29,000', discount: '-18%',
+    pattern: PatternKind.dots, categoryIds: ['10000114'], imageUrl: 'https://shopping-phinf.pstatic.net/a.jpg',
+    rating: 4.7, reviews: 1200, tags: ['today_deal'],
+    artwork: ProductArtwork(hue: 10, saturation: 20, lightness: 30, mono: '//', motif: 'dots'),
+  );
+
+  test('ProductItem snapshot round-trips through toJson/fromJson', () {
+    final restored = ProductItem.fromJson(knit.toJson());
+    expect(
+      [restored.id, restored.brand, restored.name, restored.price, restored.oldPrice, restored.discount, restored.imageUrl, restored.reviews, restored.tags, restored.categoryIds],
+      [knit.id, knit.brand, knit.name, knit.price, knit.oldPrice, knit.discount, knit.imageUrl, knit.reviews, knit.tags, knit.categoryIds],
+    );
+    expect(restored.artwork?.toJson(), knit.artwork?.toJson());
+  });
+
+  test('cart and wishlist reopen with the right product even when it is outside the startup catalog', () async {
+    // 1) 상세에서 담는다 — 시작 카탈로그(백엔드 상위 100개 + 홈)에 없는 상품.
+    final first = AppStore(seedSource: LocalSeedSource(), repository: _FakeRepository(shouldThrow: true));
+    first.cacheProduct(knit);
+    await first.changeCartQuantity(knit.id, 2);
+    await first.toggleWishlist(knit);
+
+    // 2) 다시 연다 — 백엔드가 아직(또는 아예) 답하지 않아도 맞는 상품으로 보인다.
+    final reopened = AppStore(seedSource: LocalSeedSource(), repository: _FakeRepository(shouldThrow: true));
+    await reopened.initialize();
+    expect(reopened.cartLines.map((line) => (line.product.name, line.product.price, line.quantity)), [('천연 아카시아꿀', '₩23,900', 2)]);
+    expect(reopened.wishlistProducts.map((p) => p.name), ['천연 아카시아꿀']);
+  });
+
+  test('saved products without a snapshot are fetched from the backend, and removed when gone', () async {
+    // 스냅샷 도입 전에 담긴 항목: id만 있다. 하나는 백엔드에 있고, 하나는 없어진 상품(404).
+    SharedPreferences.setMockInitialValues({
+      'cartQuantities': jsonEncode({'still-sold': 1, 'discontinued': 3}),
+      'wishlistIds': ['discontinued'],
+    });
+    final store = AppStore(seedSource: LocalSeedSource(), repository: _MissingProductRepository(missing: {'discontinued'}));
+    await store.initialize();
+    await pumpEventQueue();
+
+    expect(store.cartLines.map((line) => line.product.name), ['Fetched still-sold'], reason: '엉뚱한 기본 상품 대신 백엔드에서 받은 상품');
+    expect(store.cartQuantities.keys, ['still-sold'], reason: '없어진 상품은 장바구니에서 뺀다');
+    expect(store.wishlistIds, isEmpty);
+    expect(store.findProduct('never-seen'), isNull, reason: '못 찾으면 기본 상품이 아니라 null');
+  });
+
+  testWidgets('product page opened by address shows loading, then the fetched product', (tester) async {
+    final store = AppStore(repository: _FakeRepository(results: const []));
+    await tester.pumpWidget(
+      AppStateScope(
+        store: store,
+        child: MaterialApp(home: ProductDetailPage(product: ProductItem.pending('deep-1'))),
+      ),
+    );
+    expect(find.byType(LoadingDots), findsOneWidget);
+    await tester.pump();
+    await tester.pump();
+    expect(find.byType(LoadingDots), findsNothing);
+    expect(find.text('Fetched deep-1'), findsWidgets);
+  });
+
   test('AppStore.catalogLoading stays true until the backend answers', () async {
     final gate = Completer<void>();
     final store = AppStore(seedSource: LocalSeedSource(), repository: _GatedRepository(gate.future));
@@ -2434,6 +2496,17 @@ class _StubAssetBundle extends CachingAssetBundle {
 
   @override
   Future<String> loadString(String key, {bool cache = true}) async => _payload;
+}
+
+class _MissingProductRepository extends _FakeRepository {
+  _MissingProductRepository({required this.missing});
+  final Set<String> missing;
+
+  @override
+  Future<ProductItem> fetchProduct(String productId) async {
+    if (missing.contains(productId)) throw ApiStatusError('/api/products/$productId', 404);
+    return super.fetchProduct(productId);
+  }
 }
 
 class _GatedRepository extends _FakeRepository {

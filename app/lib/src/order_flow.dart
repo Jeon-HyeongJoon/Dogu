@@ -47,7 +47,7 @@ class OrderReceipt {
       lines: [
         for (final item in rawItems)
           (
-            product: store.productById((item['product_id'] ?? '').toString()),
+            product: store.findProduct((item['product_id'] ?? '').toString()) ?? ProductItem.pending((item['product_id'] ?? '').toString()),
             quantity: (item['quantity'] as num?)?.toInt() ?? 1,
           ),
       ],
