@@ -529,6 +529,7 @@ class FeaturedCard extends StatelessWidget {
               pattern: featured.pattern,
               imageUrl: featured.imageUrl,
               artwork: featured.artwork,
+              thumbnailWidth: 640,
               child: Stack(
                 children: [
                   const Positioned(top: 12, left: 12, child: MonoText('001 / FEATURED', size: 9.5, color: AppColors.ink3)),
@@ -978,10 +979,12 @@ class _ProductSectionContentState extends State<ProductSectionContent> {
 }
 
 class ProductImageSurface extends StatelessWidget {
-  const ProductImageSurface({required this.pattern, this.imageUrl, this.artwork, this.child, this.dark = false, super.key});
+  const ProductImageSurface({required this.pattern, this.imageUrl, this.artwork, this.child, this.dark = false, this.thumbnailWidth, super.key});
 
   final PatternKind pattern;
   final String? imageUrl;
+  /// 목록·썸네일이면 축소본 너비(300/640, ApiConfig.thumbnailWidths). null이면 원본(상세).
+  final int? thumbnailWidth;
   final ProductArtwork? artwork;
   final Widget? child;
   final bool dark;
@@ -1001,7 +1004,7 @@ class ProductImageSurface extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Image.network(
-            ApiConfig.imageUrl(trimmedUrl),
+            ApiConfig.imageUrl(trimmedUrl, thumbnailWidth: thumbnailWidth),
             fit: BoxFit.cover,
             loadingBuilder: (context, childWidget, loadingProgress) {
               if (loadingProgress == null) return childWidget;
@@ -1156,6 +1159,7 @@ class _ProductCardState extends State<ProductCard> {
               pattern: product.pattern,
               imageUrl: product.imageUrl,
               artwork: product.artwork,
+              thumbnailWidth: 640,
               dark: dark,
               child: Stack(
                 children: [

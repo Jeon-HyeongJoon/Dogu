@@ -124,6 +124,7 @@ class _OrderLineRow extends StatelessWidget {
               pattern: product.pattern,
               imageUrl: product.imageUrl,
               artwork: product.artwork,
+              thumbnailWidth: 300,
               child: Padding(
                 padding: const EdgeInsets.all(5),
                 child: MonoText(index.toString().padLeft(3, '0'), size: 9, color: AppColors.ink4),

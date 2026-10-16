@@ -183,11 +183,18 @@ class ApiConfig {
     return kIsWeb ? 'http://localhost:8000' : 'http://10.0.2.2:8000';
   }
 
-  static String imageUrl(String? url) {
-    final trimmed = url?.trim() ?? '';
+  /// 네이버 이미지 서버가 주는 축소본 너비(type=f300/f640 — f960 이상은 404). 원본은 1000px·장당
+  /// 약 455KB인데 카드는 그보다 훨씬 작게 그려서, 목록은 축소본(640px 약 28KB)을 받는다.
+  static const thumbnailWidths = {300, 640};
+
+  static String imageUrl(String? url, {int? thumbnailWidth}) {
+    var trimmed = url?.trim() ?? '';
     final uri = Uri.tryParse(trimmed);
     final host = uri?.host.toLowerCase() ?? '';
     if (host.endsWith('pstatic.net')) {
+      if (thumbnailWidth != null && thumbnailWidths.contains(thumbnailWidth)) {
+        trimmed = uri!.replace(queryParameters: {...uri.queryParameters, 'type': 'f$thumbnailWidth'}).toString();
+      }
       final base = Uri.parse(baseUrl);
       return base.replace(path: '/api/proxy/image', queryParameters: {'url': trimmed}).toString();
     }
