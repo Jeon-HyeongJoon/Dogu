@@ -65,7 +65,8 @@
 </head>
 <body>
   <div id="splash" role="status" aria-label="불러오는 중">
-    <img src="assets/assets/logo-square.png" alt="" width="72" height="72">
+    <!-- fetchpriority=high: 폰트 미리받기(약 1MB)와 대역폭을 나누면 4G에서 로고가 3초 넘게 늦었다. -->
+    <img src="assets/assets/logo-square.png" alt="" width="72" height="72" fetchpriority="high">
     <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
   </div>
   <script>

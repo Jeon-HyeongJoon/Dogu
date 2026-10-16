@@ -20,6 +20,17 @@ void main() {
     expect(html.indexOf('id="splash"'), lessThan(html.indexOf('flutter_bootstrap.js')));
   });
 
+  test('app code works in the WebAssembly build — no dart:html', () {
+    // 배포는 --wasm(dart2wasm + dart2js)이다. dart2wasm엔 dart:html이 없어서, 웹 판별을
+    // dart.library.html로 하면 WebAssembly 빌드에선 웹이 아닌 쪽 코드가 들어간다(실제로 경로 주소가
+    // 무시되고 늘 홈이 열렸다). 웹 판별은 dart.library.js_interop, DOM 접근은 package:web을 쓴다.
+    for (final file in Directory('lib').listSync(recursive: true).whereType<File>().where((f) => f.path.endsWith('.dart'))) {
+      final code = file.readAsLinesSync().where((line) => !line.trimLeft().startsWith('//')).join('\n');
+      expect(code, isNot(contains('dart.library.html')), reason: file.path);
+      expect(code, isNot(contains("'dart:html'")), reason: file.path);
+    }
+  });
+
   test('tab title, description and manifest use the brand, not Flutter defaults', () {
     expect(html, contains('<title>욕망의 장바구니</title>'));
     expect(html, isNot(contains('dogu_mobile_shop')));
