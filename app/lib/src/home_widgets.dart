@@ -283,21 +283,42 @@ class SearchBarBlock extends StatelessWidget {
 class CategoryNav extends StatelessWidget {
   const CategoryNav({super.key});
 
+  /// 가운데 카테고리 칸 수 — 메인 '카테고리' 칸과 같은 기준(수요 순위)의 상위 몇 개.
+  /// 따로 관리하는 목록이 없어 데이터가 바뀌면 같이 바뀐다(예전엔 백엔드에 없는 옛 키였다).
+  static const categorySlots = 4;
+
   @override
   Widget build(BuildContext context) {
-    const items = ['신상품', '베스트', '의류', '홈·리빙', '전자제품', '뷰티', 'SALE'];
-    const mappings = <String, (String, String?)>{
-      '신상품': ('new', null),
-      '베스트': ('best', null),
-      '의류': ('all', 'clothing'),
-      '홈·리빙': ('all', 'home'),
-      '전자제품': ('all', 'tech'),
-      '뷰티': ('all', 'beauty'),
-      'SALE': ('sale', null),
-    };
     final store = AppStateScope.watch(context);
     final currentFilter = store.categoryQuickFilter;
     final currentCategory = store.selectedCategoryKey;
+    // (라벨, 퀵필터, 카테고리 키)
+    final entries = <(String, String, String?)>[
+      ('신상품', 'new', null),
+      ('베스트', 'best', null),
+      if (!store.catalogLoading)
+        for (final item in homeCategories(store.categories).take(categorySlots))
+          (item.name, 'all', _normalizeCategoryKey(item.id.isEmpty ? item.name : item.id)),
+      ('SALE', 'sale', null),
+    ];
+    final cells = <Widget>[
+      for (final entry in entries)
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            AppStateScope.read(context).setCategoryQuickFilter(entry.$2);
+            AppStateScope.read(context).selectCategoryBrowse(entry.$3);
+            AppNavigationScope.select(context, 1);
+          },
+          child: NavLabel(
+            text: entry.$1,
+            sale: entry.$2 == 'sale',
+            active: entry.$2 == currentFilter && entry.$3 == currentCategory,
+          ),
+        ),
+    ];
+    // 백엔드 응답 전엔 카테고리 칸 자리에 로딩 점(메인 카테고리 칸과 같은 이유).
+    if (store.catalogLoading) cells.insert(2, const Padding(padding: EdgeInsets.only(top: 6), child: LoadingDots()));
     return Container(
       decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
       padding: const EdgeInsets.fromLTRB(AppSpace.pad, 12, AppSpace.pad, 14),
@@ -306,23 +327,9 @@ class CategoryNav extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (var i = 0; i < items.length; i++) ...[
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  final mapping = mappings[items[i]]!;
-                  AppStateScope.read(context).setCategoryQuickFilter(mapping.$1);
-                  AppStateScope.read(context).selectCategoryBrowse(mapping.$2);
-                  AppNavigationScope.select(context, 1);
-                },
-                child: NavLabel(
-                  text: items[i],
-                  sale: items[i] == 'SALE',
-                  active: mappings[items[i]]!.$1 == currentFilter &&
-                      mappings[items[i]]!.$2 == currentCategory,
-                ),
-              ),
-              if (i != items.length - 1)
+            for (var i = 0; i < cells.length; i++) ...[
+              cells[i],
+              if (i != cells.length - 1)
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 11),
                   child: Text('|', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w300, color: AppColors.ink4)),
@@ -463,7 +470,35 @@ class FeaturedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final featured = AppStateScope.watch(context).featuredProduct;
+    final store = AppStateScope.watch(context);
+    final featured = store.featuredProduct;
+    if (store.catalogLoading) {
+      // 백엔드 응답 전엔 seed 상품(이미지 없음) 대신 같은 틀의 로딩 자리 — 응답 뒤 크기가 거의 같다.
+      return Container(
+        decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.line)),
+        child: Column(
+          children: [
+            const AspectRatio(aspectRatio: 4 / 5, child: NeutralImageSurface(child: Center(child: LoadingDots()))),
+            Container(height: 1, color: AppColors.line),
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: SizedBox(
+                height: 37,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(height: 13, width: 160, color: AppColors.line),
+                    const SizedBox(height: 6),
+                    Container(height: 10, width: 72, color: AppColors.line),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     if (featured == null) {
       return Container(
         decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.line)),
@@ -765,8 +800,9 @@ class DealSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = AppStateScope.watch(context).dealProducts;
-    if (items.isEmpty) return const SizedBox.shrink();
+    final store = AppStateScope.watch(context);
+    final items = store.dealProducts;
+    if (items.isEmpty && !store.catalogLoading) return const SizedBox.shrink();
     return Container(
       margin: const EdgeInsets.only(top: 36),
       padding: const EdgeInsets.symmetric(vertical: 32),
@@ -796,10 +832,17 @@ class DealSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad),
             child: Row(
               children: [
-                for (final product in items) ...[
-                  SizedBox(width: 200, child: ProductCard(product: product, dark: true)),
-                  const SizedBox(width: 12),
-                ],
+                // 백엔드 응답 전엔 seed 상품 대신 스켈레톤 — 빠르게 넘기다 곧 바뀔 카드를 누르지 않게.
+                if (store.catalogLoading)
+                  for (var i = 0; i < 3; i++) ...[
+                    const SizedBox(width: 200, child: SkeletonProductCard(dark: true)),
+                    const SizedBox(width: 12),
+                  ]
+                else
+                  for (final product in items) ...[
+                    SizedBox(width: 200, child: ProductCard(product: product, dark: true)),
+                    const SizedBox(width: 12),
+                  ],
               ],
             ),
           ),
@@ -830,12 +873,6 @@ class ProductSectionContent extends StatefulWidget {
 
 class _ProductSectionContentState extends State<ProductSectionContent> {
   int _visibleCount = ProductSection.initialVisibleCount;
-  String _activeFilter = 'all';
-
-  List<ProductItem> _filterProducts(List<ProductItem> items) {
-    if (_activeFilter == 'all') return items;
-    return items.where((item) => item.categoryKey == _activeFilter).toList();
-  }
 
   void _showMore(int total) {
     setState(() {
@@ -843,18 +880,12 @@ class _ProductSectionContentState extends State<ProductSectionContent> {
     });
   }
 
-  void _selectFilter(String filter) {
-    setState(() {
-      _activeFilter = filter;
-      _visibleCount = ProductSection.initialVisibleCount;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final store = AppStateScope.watch(context);
 
-    if (store.usingFallback) {
+    // 번들 seed를 읽기 전, 그리고 백엔드 응답 전 — seed 상품 대신 스켈레톤.
+    if (store.usingFallback || store.catalogLoading) {
       return Padding(
         padding: const EdgeInsets.only(top: 36),
         child: Column(
@@ -885,15 +916,15 @@ class _ProductSectionContentState extends State<ProductSectionContent> {
     final newIds = newProds.map((p) => p.id).toSet();
     final supplement = store.catalogProducts.where((p) => !newIds.contains(p.id)).toList();
     final items = [...newProds, ...supplement];
-    final filteredItems = _filterProducts(items);
-    final visibleItems = filteredItems.take(_visibleCount).toList();
-    final hasMore = visibleItems.length < filteredItems.length;
+    final visibleItems = items.take(_visibleCount).toList();
+    final hasMore = visibleItems.length < items.length;
     return Padding(
       padding: const EdgeInsets.only(top: 36),
       child: Column(
         children: [
+          // 카테고리 필터 칩(의류·홈·테크·뷰티)은 뺐다 — 백엔드에 없는 옛 키라 실제 상품에선 항상 비었고,
+          // 신상품 태그가 DB 전체에 6개뿐이라 카테고리별 신상품으로 바꿀 수도 없다.
           const SectionHead(index: '03', eyebrow: 'NEW ARRIVALS', title: '이번 주 신상품'),
-          ChipRow(activeFilter: _activeFilter, onSelected: _selectFilter),
           Padding(
             // 좌우 AppSpace.pad만큼 들여쓰기 → 상품 이미지와 동일한 인셋
             padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad),
@@ -927,49 +958,7 @@ class _ProductSectionContentState extends State<ProductSectionContent> {
           if (hasMore)
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpace.pad, 28, AppSpace.pad, 0),
-              child: AppButton(text: '더 보기  +8', large: true, onTap: () => _showMore(filteredItems.length)),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class ChipRow extends StatelessWidget {
-  const ChipRow({required this.activeFilter, required this.onSelected, super.key});
-
-  final String activeFilter;
-  final ValueChanged<String> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    const chips = [
-      ('전체', 'all'),
-      ('의류', 'clothing'),
-      ('홈', 'home'),
-      ('테크', 'tech'),
-      ('뷰티', 'beauty'),
-    ];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.fromLTRB(AppSpace.pad, 0, AppSpace.pad, 16),
-      child: Row(
-        children: [
-          for (final chip in chips)
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => onSelected(chip.$2),
-              child: Container(
-                height: 30,
-                margin: const EdgeInsets.only(right: 6),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: chip.$2 == activeFilter ? AppColors.accent : AppColors.bg,
-                  border: Border.all(color: chip.$2 == activeFilter ? AppColors.accent : AppColors.line),
-                ),
-                child: Text(chip.$1, style: TextStyle(fontSize: 12, color: chip.$2 == activeFilter ? AppColors.invert : AppColors.ink2)),
-              ),
+              child: AppButton(text: '더 보기  +8', large: true, onTap: () => _showMore(items.length)),
             ),
         ],
       ),

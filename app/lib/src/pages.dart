@@ -577,7 +577,12 @@ class CategoryTabPage extends StatelessWidget {
           },
         ),
         const CategoryListBlock(),
-        if (store.selectedCategoryKey != null || store.categoryQuickFilter != 'all') CategoryProductsBlock(products: store.categoryBrowseProducts),
+        if (store.selectedCategoryKey != null || store.categoryQuickFilter != 'all')
+          CategoryProductsBlock(
+            products: store.categoryBrowseProducts,
+            // 카테고리 미선택(퀵필터만)이면 전체 상품 = 백엔드 카탈로그를, 선택했으면 그 카테고리 결과를 기다린다.
+            loading: store.selectedCategoryKey == null ? store.catalogLoading : store.categoryProductsLoading,
+          ),
         const SoftDividerBlock(child: BrandTagBlock(title: '[ + ] SHOP BY BRAND', action: '전체 보기 →')),
       ],
     );
@@ -611,6 +616,7 @@ class SearchTabPage extends StatelessWidget {
           title: '[ 01 ] 최근 검색',
           action: '전체 삭제',
           tags: store.recentSearches.map((term) => '$term  ×').toList(),
+          emptyText: '최근 검색어가 없어요',
           onAction: () => AppStateScope.read(context).clearRecentSearches(),
           onTagTap: (term) => AppStateScope.read(context).performSearch(term.replaceAll('  ×', '')),
         ),
@@ -618,6 +624,7 @@ class SearchTabPage extends StatelessWidget {
           child: SearchBlock(
             title: '[ 02 ] 추천 브랜드',
             tags: store.suggestions,
+            loading: store.catalogLoading,
             onTagTap: (term) => AppStateScope.read(context).performSearch(term),
           ),
         ),
