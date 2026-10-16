@@ -2,7 +2,16 @@ from functools import cached_property
 from uuid import uuid4
 
 from app import state
-from app.database import db_exists, db_get_product, db_list_categories, db_list_products, db_search_products
+from app import database
+from app.database import (
+    db_exists,
+    db_get_product,
+    db_home_brands,
+    db_home_stats,
+    db_list_categories,
+    db_list_products,
+    db_search_products,
+)
 from app.models import SECTION_TAGS, Category, HomeResponse, OrderCreateRequest, OrderLineResponse, OrderResponse, Product, SeedData
 from app.seed import load_seed_data, save_seed_data
 
@@ -75,8 +84,10 @@ class CatalogRepository:
             new_arrivals = self.products_for_ids(home.new_product_ids)
             featured = self.get_product(home.featured_product_id)
             collection_products = [self.products_for_ids(c.product_ids) for c in home.collections]
+        # 히어로 숫자: DB 모드면 계산값, seed 모드면 seed 그대로(이제 비어 있다 → 앱이 숫자 줄을 숨김).
+        hero = home.hero.model_copy(update={"stats": list(db_home_stats(str(database.DB_PATH)))}) if db_exists() else home.hero
         return HomeResponse(
-            hero=home.hero,
+            hero=hero,
             ticker=home.ticker,
             nav=home.nav,
             categories=categories,
@@ -121,6 +132,9 @@ class CatalogRepository:
         return products[:limit]
 
     def suggestions(self, query: str | None = None, limit: int = 8) -> list[str]:
+        # 검색 탭 '추천 브랜드'(검색어 없음)는 DB의 실제 브랜드. 검색어 자동완성은 seed 기반 그대로.
+        if query is None and db_exists():
+            return list(db_home_brands(str(database.DB_PATH), limit))
         values = [
             *self.data.suggestions,
             *(term.term for term in self.data.trending),

@@ -383,25 +383,12 @@ const String kBundledSeedJson = r'''
   ],
   "home": {
     "hero": {
-      "eyebrow": "● 2026 SPRING DROP · 05.12 — 05.26",
+      "eyebrow": "● 2026 SPRING DROP",
       "title": "오늘 사고 싶은 것만, 가볍게 담아두세요.",
       "subtitle": "새로 들어온 상품부터 오늘의 특가까지. 마음에 드는 것만 빠르게 골라 담는 쇼핑 리스트.",
       "primary_action": "지금 둘러보기 →",
       "secondary_action": "노트",
-      "stats": [
-        {
-          "value": "218",
-          "label": "신상품"
-        },
-        {
-          "value": "14",
-          "label": "브랜드"
-        },
-        {
-          "value": "−42%",
-          "label": "평균 할인"
-        }
-      ]
+      "stats": []
     },
     "ticker": [
       "FREE SHIPPING",
