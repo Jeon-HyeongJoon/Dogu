@@ -252,12 +252,13 @@ class AppStore extends ChangeNotifier {
   ProductItem? featuredProduct;
   List<ProductItem> recommendedProducts = const [];
   String heroEyebrow = '● 2026 SPRING DROP';
-  String heroDate = '05.12 — 05.26';
+  // 기간 날짜·숫자는 고정값을 두지 않는다 — 숫자는 백엔드가 DB에서 계산해 준다(없으면 숨김).
+  String heroDate = '';
   String heroTitle = '오늘 사고 싶은 것만, 가볍게 담아두세요.';
   String heroSubtitle = '새로 들어온 상품부터 오늘의 특가까지. 마음에 드는 것만 빠르게 골라 담는 쇼핑 리스트.';
   String heroPrimaryAction = '지금 둘러보기 →';
   String heroSecondaryAction = '노트';
-  List<(String, String)> heroStats = const [('218', '신상품'), ('14', '브랜드'), ('−42%', '평균 할인')];
+  List<(String, String)> heroStats = const [];
   List<SearchTrend> trendingItems = const [
     SearchTrend(term: '린넨 오버셔츠', movement: '▲ 12'),
     SearchTrend(term: '세라믹 푸어오버', movement: '▲ 8'),
@@ -576,7 +577,7 @@ class AppStore extends ChangeNotifier {
     final rawEyebrow = readString(hero, ['eyebrow']) ?? heroEyebrow;
     final eyebrowParts = rawEyebrow.split('·').map((part) => part.trim()).toList();
     heroEyebrow = eyebrowParts.isNotEmpty ? eyebrowParts.first : rawEyebrow;
-    heroDate = eyebrowParts.length > 1 ? eyebrowParts.sublist(1).join(' · ') : heroDate;
+    heroDate = eyebrowParts.length > 1 ? eyebrowParts.sublist(1).join(' · ') : '';
     heroTitle = readString(hero, ['title']) ?? heroTitle;
     heroSubtitle = readString(hero, ['subtitle']) ?? heroSubtitle;
     heroPrimaryAction = readString(hero, ['primary_action']) ?? heroPrimaryAction;

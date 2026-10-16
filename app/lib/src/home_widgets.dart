@@ -384,8 +384,10 @@ class HeroBlock extends StatelessWidget {
             Row(
               children: [
                 Tag(text: store.heroEyebrow, dark: true),
-                const SizedBox(width: 10),
-                MonoText(store.heroDate, size: 10.5, color: AppColors.heroInk3),
+                if (store.heroDate.isNotEmpty) ...[
+                  const SizedBox(width: 10),
+                  MonoText(store.heroDate, size: 10.5, color: AppColors.heroInk3),
+                ],
               ],
             ),
             const SizedBox(height: 20),
@@ -413,8 +415,11 @@ class HeroBlock extends StatelessWidget {
                 AppButton(text: store.heroSecondaryAction, onDark: true, onTap: () => AppNavigationScope.select(context, 2)),
               ],
             ),
-            const SizedBox(height: 28),
-            StatGrid(stats: store.heroStats, dark: true),
+            // 숫자는 백엔드가 DB에서 계산한다 — 응답 전엔 같은 틀의 로딩 자리, 없으면(오프라인) 숨김.
+            if (store.catalogLoading || store.heroStats.isNotEmpty) ...[
+              const SizedBox(height: 28),
+              StatGrid(stats: store.heroStats, dark: true, loading: store.catalogLoading),
+            ],
             if (store.featuredProduct != null) ...[
               const SizedBox(height: 22),
               const FeaturedCard(),
@@ -427,10 +432,11 @@ class HeroBlock extends StatelessWidget {
 }
 
 class StatGrid extends StatelessWidget {
-  const StatGrid({required this.stats, this.dark = false, super.key});
+  const StatGrid({required this.stats, this.dark = false, this.loading = false, super.key});
 
   final List<(String, String)> stats;
   final bool dark;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -440,7 +446,12 @@ class StatGrid extends StatelessWidget {
         border: Border(top: BorderSide(color: lineColor), bottom: BorderSide(color: lineColor)),
       ),
       padding: const EdgeInsets.symmetric(vertical: 14),
-      child: Row(
+      child: loading
+          ? SizedBox(
+              height: 44,
+              child: Align(alignment: Alignment.centerLeft, child: LoadingDots(color: dark ? AppColors.heroInk3 : AppColors.ink3)),
+            )
+          : Row(
         children: [
           for (var i = 0; i < stats.length; i++)
             Expanded(

@@ -117,6 +117,26 @@ def test_food_categories_merge_into_one_group(tmp_path, monkeypatch) -> None:
     ]
 
 
+def test_home_hero_stats_are_computed_from_the_catalog() -> None:
+    # seed의 고정값(218 · 14 · −42%) 대신 DB에서 계산한다. 고정 날짜(05.12 — 05.26)도 뺐다.
+    hero = client.get("/api/home").json()["hero"]
+    assert [stat["label"] for stat in hero["stats"]] == ["신상품", "브랜드", "평균 할인"]
+    assert [stat["value"] for stat in hero["stats"]] != ["218", "14", "−42%"]
+    new_count, brand_count, discount = (stat["value"] for stat in hero["stats"])
+    assert new_count.replace(",", "").isdigit() and brand_count.replace(",", "").isdigit()
+    assert discount.startswith("\u2212") and discount.endswith("%")
+    assert "·" not in hero["eyebrow"]
+
+
+def test_brand_suggestions_are_real_brands_that_return_results() -> None:
+    # 검색 탭 '추천 브랜드' — 실제 상품의 브랜드라 누르면 결과가 나온다(예전 seed 검색어는 0개가 많았다).
+    brands = client.get("/api/search/suggestions").json()["items"]
+    assert brands
+    assert len(brands) == len(set(brands))
+    for brand in brands:
+        assert client.get("/api/search", params={"q": brand}).json()["count"] > 0, brand
+
+
 def test_categories_endpoint() -> None:
     response = client.get("/api/categories")
     payload = response.json()

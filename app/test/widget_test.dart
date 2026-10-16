@@ -987,6 +987,35 @@ void main() {
     expect(find.text('보조 액션'), findsOneWidget);
   });
 
+  testWidgets('hero numbers wait for the backend and hide when absent; no fixed date', (tester) async {
+    final store = AppStore(repository: _FakeRepository(results: const []));
+    expect(store.heroStats, isEmpty, reason: '고정값(218 · 14 · −42%)을 두지 않는다');
+    expect(store.heroDate, isEmpty, reason: '고정 기간 날짜(05.12 — 05.26)를 두지 않는다');
+    store.featuredProduct = null;
+    store.catalogLoading = true;
+
+    await tester.pumpWidget(
+      AppStateScope(store: store, child: const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: HeroBlock())))),
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.byType(StatGrid), findsOneWidget);
+    expect(find.byType(LoadingDots), findsOneWidget);
+
+    // 백엔드가 계산한 숫자가 오면 그대로.
+    store.heroStats = const [('6', '신상품'), ('16,092', '브랜드'), ('−32%', '평균 할인')];
+    store.catalogLoading = false;
+    store.notifyListeners();
+    await tester.pump();
+    expect(find.text('16,092'), findsOneWidget);
+    expect(find.byType(LoadingDots), findsNothing);
+
+    // 숫자가 없으면(오프라인 seed) 숫자 줄을 숨긴다.
+    store.heroStats = const [];
+    store.notifyListeners();
+    await tester.pump();
+    expect(find.byType(StatGrid), findsNothing);
+  });
+
   testWidgets('recent search tags run searches through the app store', (tester) async {
     final store = AppStore(repository: _FakeRepository(results: [searchProduct]));
     store.recentSearches = const ['램프'];

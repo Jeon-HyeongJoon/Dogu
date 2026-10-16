@@ -167,6 +167,48 @@ def db_list_categories() -> list[Category]:
     return sorted(categories, key=lambda category: category.label)
 
 
+@lru_cache(maxsize=4)
+def db_home_stats(db_path: str) -> tuple[dict[str, str], ...]:
+    """메인 히어로 숫자 — seed의 고정값(218 · 14 · −42%) 대신 DB에서 계산한다.
+
+    신상품 = new_arrival 태그 상품 수, 브랜드 = 서로 다른 브랜드 수,
+    평균 할인 = 할인 중인 상품의 평균 할인율. 배포 DB는 읽기 전용이라 한 번만 계산한다.
+    """
+    with _conn() as conn:
+        new_count = conn.execute("SELECT COUNT(*) FROM products WHERE tags LIKE ?", ('%"new_arrival"%',)).fetchone()[0]
+        brand_count = conn.execute("SELECT COUNT(DISTINCT brand) FROM products WHERE trim(brand) <> ''").fetchone()[0]
+        avg_discount = conn.execute("SELECT AVG(discount_percent) FROM products WHERE discount_percent > 0").fetchone()[0]
+    return (
+        {"value": f"{new_count:,}", "label": "신상품"},
+        {"value": f"{brand_count:,}", "label": "브랜드"},
+        {"value": f"\u2212{round(avg_discount or 0)}%", "label": "평균 할인"},
+    )
+
+
+@lru_cache(maxsize=4)
+def db_home_brands(db_path: str, limit: int) -> tuple[str, ...]:
+    """검색 탭 '추천 브랜드' — 메인 카테고리 순서대로 각 카테고리에서 리뷰가 가장 많은 브랜드.
+
+    전체 리뷰 순으로만 뽑으면 식품·건강 브랜드가 다 차지해서 카테고리마다 하나씩 고른다.
+    실제 상품의 브랜드라 누르면 반드시 검색 결과가 나온다(예전 seed 검색어는 0개가 많았다).
+    """
+    ranks = _home_category_ranks(db_path)
+    brands: list[str] = []
+    with _conn() as conn:
+        for category_id in sorted(ranks, key=ranks.__getitem__):
+            condition, params = _category_condition(category_id)
+            row = conn.execute(
+                "SELECT p.brand FROM products p JOIN product_categories pc ON pc.product_id = p.id "
+                f"WHERE {condition} AND trim(p.brand) <> '' GROUP BY p.brand ORDER BY SUM(p.reviews) DESC LIMIT 1",
+                params,
+            ).fetchone()
+            if row and row["brand"] not in brands:
+                brands.append(row["brand"])
+            if len(brands) >= limit:
+                break
+    return tuple(brands)
+
+
 def db_list_products(
     category_id: str | None = None,
     tag: str | None = None,
