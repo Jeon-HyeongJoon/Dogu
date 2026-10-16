@@ -13,12 +13,19 @@ cd "$(dirname "$0")/.."
 echo "Deploying build/web to Vercel production"
 vercel --prod --yes
 
-# 배포본이 방금 빌드한 번들과 같은지 확인한다.
+# 배포본이 방금 빌드한 번들과 같은지 확인한다(JS·WebAssembly 둘 다).
+# alias가 막 바뀐 직후엔 엣지가 옛 파일을 줄 수 있어(실제로 거짓 실패가 났다) 몇 번 다시 받아 본다.
 DEPLOYED_URL="${DEPLOY_VERIFY_URL:-https://app-drab-six-24.vercel.app}"
-LOCAL_SHA="$(shasum -a 256 build/web/main.dart.js | cut -d' ' -f1)"
-REMOTE_SHA="$(curl -fsSL "$DEPLOYED_URL/main.dart.js" | shasum -a 256 | cut -d' ' -f1)"
-if [ "$LOCAL_SHA" != "$REMOTE_SHA" ]; then
-  echo "::error::deployed bundle ($REMOTE_SHA) differs from the local build ($LOCAL_SHA)" >&2
-  exit 1
-fi
-echo "OK: $DEPLOYED_URL serves the bundle just built ($LOCAL_SHA)"
+for FILE in main.dart.js main.dart.wasm; do
+  LOCAL_SHA="$(shasum -a 256 "build/web/$FILE" | cut -d' ' -f1)"
+  for TRY in 1 2 3 4 5; do
+    REMOTE_SHA="$(curl -fsSL "$DEPLOYED_URL/$FILE" | shasum -a 256 | cut -d' ' -f1)"
+    [ "$LOCAL_SHA" = "$REMOTE_SHA" ] && break
+    [ "$TRY" -lt 5 ] && sleep 3
+  done
+  if [ "$LOCAL_SHA" != "$REMOTE_SHA" ]; then
+    echo "::error::deployed $FILE ($REMOTE_SHA) differs from the local build ($LOCAL_SHA)" >&2
+    exit 1
+  fi
+  echo "OK: $DEPLOYED_URL/$FILE matches the local build ($LOCAL_SHA)"
+done

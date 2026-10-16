@@ -9,8 +9,10 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+// 웹 판별은 dart.library.js_interop — dart.library.html은 WebAssembly 빌드(dart2wasm)에 없어서
+// 경로 주소(/category)가 무시되고 늘 홈이 열렸다.
 import 'src/url_strategy_stub.dart'
-    if (dart.library.html) 'src/url_strategy_web.dart';
+    if (dart.library.js_interop) 'src/url_strategy_web.dart';
 
 
 part 'src/core.dart';

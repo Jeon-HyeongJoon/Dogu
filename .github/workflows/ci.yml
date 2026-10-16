@@ -72,17 +72,19 @@ jobs:
         # 빌드해 배포하면 배포본이 사용자의 localhost를 호출한다(실제 사고).
         run: ./scripts/build_prod.sh
 
-      - name: Loading-performance budget (gzipped main.dart.js)
+      - name: Loading-performance budget (gzipped main.dart.js / main.dart.wasm)
         run: |
           BUDGET_KB=1200
-          RAW=$(stat -c%s build/web/main.dart.js)
-          GZ=$(gzip -c build/web/main.dart.js | wc -c)
-          GZ_KB=$((GZ / 1024))
-          echo "main.dart.js: $((RAW / 1024)) KB raw, ${GZ_KB} KB gzipped (budget ${BUDGET_KB} KB)"
-          if [ "$GZ_KB" -gt "$BUDGET_KB" ]; then
-            echo "::error::main.dart.js gzipped ${GZ_KB} KB exceeds loading budget ${BUDGET_KB} KB"
-            exit 1
-          fi
+          for BUNDLE in main.dart.js main.dart.wasm; do
+            RAW=$(stat -c%s build/web/$BUNDLE)
+            GZ=$(gzip -c build/web/$BUNDLE | wc -c)
+            GZ_KB=$((GZ / 1024))
+            echo "$BUNDLE: $((RAW / 1024)) KB raw, ${GZ_KB} KB gzipped (budget ${BUDGET_KB} KB)"
+            if [ "$GZ_KB" -gt "$BUDGET_KB" ]; then
+              echo "::error::$BUNDLE gzipped ${GZ_KB} KB exceeds loading budget ${BUDGET_KB} KB"
+              exit 1
+            fi
+          done
 
   goldens:
     name: Golden snapshots (UI regressions)
