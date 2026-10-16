@@ -59,12 +59,32 @@ class CategoryListBlock extends StatelessWidget {
 }
 
 class CategoryProductsBlock extends StatelessWidget {
-  const CategoryProductsBlock({required this.products, super.key});
+  const CategoryProductsBlock({required this.products, this.loading = false, super.key});
 
   final List<ProductItem> products;
+  /// 서버 결과를 기다리는 중 — 먼저 보인 결과가 크게 바뀌거나 '상품 없음'이 깜빡이지 않게 스켈레톤.
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
+    if (loading) {
+      return Padding(
+        padding: const EdgeInsets.all(AppSpace.pad),
+        child: GridView.builder(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: 4,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.58,
+            mainAxisSpacing: 24,
+            crossAxisSpacing: 12,
+          ),
+          itemBuilder: (_, __) => const SkeletonProductCard(),
+        ),
+      );
+    }
     if (products.isEmpty) {
       return const EmptyStateBlock(
         title: '조건에 맞는 상품이 없습니다.',
@@ -219,12 +239,16 @@ class _BigSearchBoxState extends State<BigSearchBox> {
 }
 
 class SearchBlock extends StatelessWidget {
-  const SearchBlock({required this.title, required this.tags, this.action, this.onAction, this.onTagTap, super.key});
+  const SearchBlock({required this.title, required this.tags, this.action, this.onAction, this.onTagTap, this.loading = false, this.emptyText, super.key});
   final String title;
   final String? action;
   final List<String> tags;
   final VoidCallback? onAction;
   final ValueChanged<String>? onTagTap;
+  /// 백엔드 응답 전 — 태그 자리에 로딩 점.
+  final bool loading;
+  /// 태그가 없을 때 보일 안내. null이면 빈 자리.
+  final String? emptyText;
 
   @override
   Widget build(BuildContext context) {
@@ -237,10 +261,15 @@ class SearchBlock extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               MonoText(title, size: 10, weight: FontWeight.w700),
-              if (action != null) GestureDetector(onTap: onAction, child: Text(action!, style: const TextStyle(fontSize: 11, color: AppColors.ink4))),
+              if (action != null && tags.isNotEmpty) GestureDetector(onTap: onAction, child: Text(action!, style: const TextStyle(fontSize: 11, color: AppColors.ink4))),
             ],
           ),
           const SizedBox(height: 12),
+          if (loading)
+            const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: LoadingDots())
+          else if (tags.isEmpty && emptyText != null)
+            Text(emptyText!, style: const TextStyle(fontSize: 12.5, color: AppColors.ink4))
+          else
           Wrap(
             spacing: 6,
             runSpacing: 6,
@@ -618,8 +647,9 @@ class RecommendedCartBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final recos = AppStateScope.watch(context).recommendedProducts.take(4).toList();
-    if (recos.isEmpty) return const SizedBox.shrink();
+    final store = AppStateScope.watch(context);
+    final recos = store.recommendedProducts.take(4).toList();
+    if (recos.isEmpty && !store.catalogLoading) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.fromLTRB(AppSpace.pad, 24, 0, 12),
       child: Column(
@@ -627,7 +657,16 @@ class RecommendedCartBlock extends StatelessWidget {
         children: [
           const MonoText('[ → ] 함께 담으면 좋은', size: 10, weight: FontWeight.w700),
           const SizedBox(height: 12),
-          SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [for (final item in recos) Padding(padding: const EdgeInsets.only(right: 12), child: SizedBox(width: 160, child: ProductCard(product: item)))])),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(children: [
+              // 백엔드 응답 전엔 seed 상품 대신 스켈레톤.
+              if (store.catalogLoading)
+                for (var i = 0; i < 2; i++) const Padding(padding: EdgeInsets.only(right: 12), child: SizedBox(width: 160, child: SkeletonProductCard()))
+              else
+                for (final item in recos) Padding(padding: const EdgeInsets.only(right: 12), child: SizedBox(width: 160, child: ProductCard(product: item))),
+            ]),
+          ),
         ],
       ),
     );

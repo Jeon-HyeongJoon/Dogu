@@ -271,7 +271,8 @@ class AppStore extends ChangeNotifier {
     SearchTrend(term: '소이 캔들 220g', movement: '— 유지'),
   ];
   List<String> suggestions = const ['soft·studio', 'good machine', 'objet·han', 'QUIET CO.', 'NORM /', 'slow craft'];
-  List<String> recentSearches = const ['린넨 셔츠', '스피커', '머그컵', '메리노 니트', '디퓨저', 'soft·studio'];
+  // 처음 온 사용자에겐 비어 있다 — 예전엔 검색한 적 없는 기본값 6개를 보여줬다.
+  List<String> recentSearches = const [];
   List<ProductItem> searchResults = const [];
   String lastSearchTerm = '';
   Set<String> wishlistIds = <String>{};
@@ -281,6 +282,8 @@ class AppStore extends ChangeNotifier {
   String categoryQuickFilter = 'all';
   String? selectedCategoryKey;
   List<ProductItem> categoryProducts = const [];
+  /// 고른 카테고리의 상품을 서버에서 받는 중 — 그동안 목록 자리에 스켈레톤.
+  bool categoryProductsLoading = false;
   Map<String, dynamic>? lastOrderSummary;
   // 참아서 굳은 돈 — 'YYYY-MM' → 누적액. 주문 완료 흐름(배송 안내 → 주문 결과)이 읽고 쓴다.
   Map<String, int> savedByMonth = <String, int>{};
@@ -771,27 +774,32 @@ class AppStore extends ChangeNotifier {
     selectedCategoryKey = categoryKey;
     if (categoryKey == null) {
       categoryProducts = const [];
+      categoryProductsLoading = false;
       notifyListeners();
       return;
     }
     final key = _normalizeCategoryKey(categoryKey);
-    // 1차(즉시): 메모리에 적재된 allProducts에서 로컬 필터로 빠른 피드백.
+    // 메모리에 적재된 allProducts로 거른 결과(대개 0~몇 개)는 서버 실패 시의 폴백으로만 쓴다.
+    //   예전엔 이걸 먼저 보여줬다가 서버 결과로 바꿔 목록이 크게 바뀌었다 — 이제 그동안은 스켈레톤.
     //   raw seed id('gadget'/'fashion')·한글('의류')·정규화 키 모두 매칭.
     categoryProducts = allProducts
         .where((item) => item.categoryKey == key || item.categoryIds.contains(key))
         .toList();
+    categoryProductsLoading = true;
     notifyListeners();
-    // 2차(서버): 전체 카탈로그가 클 수 있으므로 해당 카테고리를 서버에서 직접 받아 보강한다.
-    //   (메모리에는 limit개만 적재돼 대부분 카테고리가 비어 보이는 문제 해결)
+    // 전체 카탈로그가 클 수 있으므로 해당 카테고리를 서버에서 직접 받는다
+    //   (메모리에는 limit개만 적재돼 대부분 카테고리가 비어 보이는 문제 해결).
     try {
       final fetched = await _repository.fetchProducts(categoryId: key);
       if (selectedCategoryKey != categoryKey) return; // 그새 선택이 바뀌면 무시
-      if (fetched.isNotEmpty) {
-        categoryProducts = fetched;
+      if (fetched.isNotEmpty) categoryProducts = fetched;
+    } catch (_) {
+      // 서버 미가용 → 로컬 필터 결과 유지
+    } finally {
+      if (selectedCategoryKey == categoryKey) {
+        categoryProductsLoading = false;
         notifyListeners();
       }
-    } catch (_) {
-      // 서버 미가용 → 1차 로컬 필터 결과 유지
     }
   }
 

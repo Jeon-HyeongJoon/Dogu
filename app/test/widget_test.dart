@@ -818,6 +818,109 @@ void main() {
     expect(find.text('의류'), findsNothing);
   });
 
+  testWidgets('top nav, featured card and deals wait for the backend, then nav shows the top home categories', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 3000);
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    final store = AppStore(repository: _FakeRepository(results: const []));
+    store.catalogLoading = true;
+    await tester.pumpWidget(
+      AppStateScope(
+        store: store,
+        child: const MaterialApp(
+          home: Scaffold(body: SingleChildScrollView(child: Column(children: [CategoryNav(), FeaturedCard(), DealSection()]))),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+
+    // 응답 전: 칩은 신상품·베스트·SALE + 로딩 점, 추천 카드·딜은 seed 상품 대신 자리만.
+    expect(find.text('신상품'), findsOneWidget);
+    expect(find.text('SALE'), findsOneWidget);
+    expect(find.text('전자제품'), findsNothing, reason: 'seed의 옛 카테고리를 칩으로 그리지 않는다');
+    expect(find.byType(LoadingDots), findsNWidgets(2)); // 칩 + 추천 카드
+    expect(find.byType(SkeletonProductCard), findsNWidgets(3)); // 오늘의 딜
+    expect(find.byType(ProductCard), findsNothing);
+
+    // 응답 후: 칩 가운데는 메인 카테고리 칸과 같은 순위의 상위 4개.
+    store.categories = [
+      for (final (i, name) in ['식품', '생활용품', '반려동물용품', '건강/의료용품', '화장품/미용'].indexed)
+        CategoryItem(name, '100', PatternKind.dots, id: 'c$i', featured: true, homeRank: i + 1),
+      const CategoryItem('공구', '100', PatternKind.dots, id: 'tools'),
+    ];
+    store.catalogLoading = false;
+    store.notifyListeners();
+    await tester.pump();
+
+    for (final label in ['식품', '생활용품', '반려동물용품', '건강/의료용품']) {
+      expect(find.text(label), findsOneWidget);
+    }
+    expect(find.text('화장품/미용'), findsNothing, reason: '상위 4개만');
+    expect(find.text('공구'), findsNothing);
+    expect(find.byType(LoadingDots), findsNothing);
+    expect(find.byType(SkeletonProductCard), findsNothing);
+
+    await tester.pumpWidget(const SizedBox()); // 딜 카운트다운 타이머 정리
+  });
+
+  testWidgets('choosing a category shows a skeleton until the server answers instead of the local guess', (tester) async {
+    final gate = Completer<void>();
+    final store = AppStore(repository: _GatedProductsRepository(gate.future, [homeProduct]));
+    store.selectCategoryBrowse('food');
+    await tester.pumpWidget(
+      AppStateScope(
+        store: store,
+        child: MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: Builder(
+                builder: (context) => CategoryProductsBlock(
+                  products: AppStateScope.watch(context).categoryBrowseProducts,
+                  loading: AppStateScope.watch(context).categoryProductsLoading,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(store.categoryProductsLoading, isTrue);
+    expect(find.byType(SkeletonProductCard), findsWidgets);
+    expect(find.text('조건에 맞는 상품이 없습니다.'), findsNothing, reason: "'상품 없음'이 깜빡이지 않는다");
+
+    gate.complete();
+    await tester.pumpAndSettle();
+    expect(store.categoryProductsLoading, isFalse);
+    expect(find.text(homeProduct.name), findsOneWidget);
+  });
+
+  testWidgets('search blocks: no fake recent searches, loading dots for suggestions', (tester) async {
+    final store = AppStore(repository: _FakeRepository(results: const []));
+    expect(store.recentSearches, isEmpty, reason: '처음 온 사용자에게 검색한 적 없는 기본값을 보이지 않는다');
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Column(children: [
+            SearchBlock(title: '[ 01 ] 최근 검색', action: '전체 삭제', tags: [], emptyText: '최근 검색어가 없어요'),
+            SearchBlock(title: '[ 02 ] 추천 브랜드', tags: ['아무거나'], loading: true),
+          ]),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('최근 검색어가 없어요'), findsOneWidget);
+    expect(find.text('전체 삭제'), findsNothing, reason: '지울 게 없으면 버튼도 없다');
+    expect(find.byType(LoadingDots), findsOneWidget);
+    expect(find.text('아무거나'), findsNothing);
+  });
+
   testWidgets('category card tap opens category tab and shows filtered product list', (tester) async {
     final store = AppStore(repository: _FakeRepository(results: const []));
     store.categories = const [
@@ -1242,7 +1345,7 @@ void main() {
     expect(find.text('로컬 상품 8'), findsOneWidget);
   });
 
-  testWidgets('home new-arrivals chips filter the visible products', (tester) async {
+  testWidgets('home new-arrivals show every product without the legacy category chips, skeleton while loading', (tester) async {
     final store = AppStore(repository: _FakeRepository(results: const []));
     store.usingFallback = false; // 스켈레톤 대신 실제 카드 표시
     store.newProducts = const [
@@ -1302,21 +1405,20 @@ void main() {
       ),
     );
 
-    expect(find.text('코튼 셔츠'), findsOneWidget);
-    expect(find.text('세라믹 머그'), findsOneWidget);
+    for (final name in ['코튼 셔츠', '세라믹 머그', '블루투스 스피커', '페이스 크림']) {
+      expect(find.text(name), findsOneWidget);
+    }
+    // 옛 키(clothing/home/tech/beauty)로 거르던 칩 — 실제 상품에선 항상 비어서 뺐다.
+    for (final chip in ['의류', '홈', '테크', '뷰티']) {
+      expect(find.text(chip), findsNothing);
+    }
 
-    await tester.tap(find.text('홈'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('세라믹 머그'), findsOneWidget);
+    // 백엔드 응답 전엔 seed 상품 대신 스켈레톤.
+    store.catalogLoading = true;
+    store.notifyListeners();
+    await tester.pump();
+    expect(find.byType(SkeletonProductCard), findsWidgets);
     expect(find.text('코튼 셔츠'), findsNothing);
-    expect(find.text('블루투스 스피커'), findsNothing);
-
-    await tester.tap(find.text('테크'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('블루투스 스피커'), findsOneWidget);
-    expect(find.text('세라믹 머그'), findsNothing);
   });
 
   testWidgets('deal section countdown decrements once per second', (tester) async {
@@ -2506,6 +2608,18 @@ class _MissingProductRepository extends _FakeRepository {
   Future<ProductItem> fetchProduct(String productId) async {
     if (missing.contains(productId)) throw ApiStatusError('/api/products/$productId', 404);
     return super.fetchProduct(productId);
+  }
+}
+
+class _GatedProductsRepository extends _FakeRepository {
+  _GatedProductsRepository(this.gate, this.products);
+  final Future<void> gate;
+  final List<ProductItem> products;
+
+  @override
+  Future<List<ProductItem>> fetchProducts({String? section, String? categoryId, String? tag, int limit = 100}) async {
+    await gate;
+    return products;
   }
 }
 
