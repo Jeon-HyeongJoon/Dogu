@@ -1,0 +1,4 @@
+.dart_tool/
+build/
+# 라이브러리 패키지 — 의존성 고정은 앱(app/pubspec.lock)이 한다.
+pubspec.lock

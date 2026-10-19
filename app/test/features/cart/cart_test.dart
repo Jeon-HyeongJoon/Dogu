@@ -169,7 +169,7 @@ void main() {
     await tester.pump();
     final raisedBottom = toastPos().bottom!;
     expect(raisedBottom, greaterThan(normalBottom), reason: '결제바 위로 올라감');
-    expect(raisedBottom - normalBottom, AppSpace.checkoutHeight,
+    expect(raisedBottom - normalBottom, AppLayout.checkoutHeight,
         reason: '결제바 높이만큼 위로 이동');
 
     // 결제바 사라짐 → 다시 원위치

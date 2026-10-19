@@ -40,10 +40,13 @@ void main() {
   });
 
   test('앱 소스의 하드코딩 문자열을 본문체가 그릴 수 있다', () {
+    // 앱과 디자인 시스템(packages/dogu_ui) 소스 모두 — 컴포넌트 문구('이미지 준비 중' 등)는 패키지에 있다.
     final missing = <String>{};
-    for (final entity in Directory('lib').listSync(recursive: true)) {
-      if (entity is File && entity.path.endsWith('.dart')) {
-        missing.addAll(missingFrom(entity.readAsStringSync()));
+    for (final dir in ['lib', '../packages/dogu_ui/lib']) {
+      for (final entity in Directory(dir).listSync(recursive: true)) {
+        if (entity is File && entity.path.endsWith('.dart')) {
+          missing.addAll(missingFrom(entity.readAsStringSync()));
+        }
       }
     }
     expect(

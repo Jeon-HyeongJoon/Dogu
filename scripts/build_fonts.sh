@@ -89,7 +89,7 @@ def ksx1001_hangul():
 
 
 ASCII = {chr(c) for c in range(0x20, 0x7F)}
-BRAND = dart_const('app/lib/src/misc_widgets.dart', 'brandName')
+BRAND = dart_const('packages/dogu_ui/lib/src/components/brand/dogu_brand_lockup.dart', 'brandName')
 JOKE = dart_const('app/lib/src/order_flow.dart', 'jokeLine')
 
 
@@ -98,7 +98,8 @@ def body_charset():
     chars |= {chr(c) for c in range(0x3131, 0x3164)}     # 호환 자모 ㄱ-ㅣ
     # 실제 콘텐츠와 소스에 등장하는 글자(상품명·카피·기호)를 빠짐없이 포함한다.
     chars |= set(open('backend/app/data/seed.json', encoding='utf-8').read())
-    for path in glob.glob('app/lib/**/*.dart', recursive=True):
+    # 앱과 디자인 시스템(packages/dogu_ui) 소스 모두 — 컴포넌트 문구('이미지 준비 중' 등)는 패키지에 있다.
+    for path in glob.glob('app/lib/**/*.dart', recursive=True) + glob.glob('packages/dogu_ui/lib/**/*.dart', recursive=True):
         chars |= set(open(path, encoding='utf-8').read())
     chars |= set('©®™·—–…“”‘’₩€$¥×÷±≤≥≠→←↑↓○●◇◆□■△▲▽▼★☆♡♥✓✔✕✖※')
     return chars

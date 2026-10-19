@@ -14,6 +14,9 @@ dependencies:
   go_router: ^14.6.2
   http: ^1.2.2
   shared_preferences: ^2.3.2
+  # 디자인 시스템(토큰 + 범용 컴포넌트) — 앱 데이터를 모르는 별도 패키지. 경계는 컴파일러가 지킨다.
+  dogu_ui:
+    path: ../packages/dogu_ui
 
 dev_dependencies:
   flutter_test:
@@ -24,9 +27,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/seed.json
-    # 브랜드 로고(항아리 엠블럼) — 상단 헤더 메인 로고.
-    # 정본은 design/assets/logo-square.png, 파생본 동기화는 scripts/sync_logo.sh
-    - assets/logo-square.png
     # 폰트를 fonts:가 아닌 assets:로 등록 — 엔진 FontManifest 프리로드(웹 첫 페인트 차단/이중 로드)를 피하고
     # 런타임 FontLoader로만 등록한다. (bootstrap이 첫 프레임 이후 비차단 로드)
     # Dogu Sans = Pretendard 서브셋(굵기당 1.5MB → 350KB). 개명 사유와 재생성은

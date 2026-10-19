@@ -94,6 +94,25 @@ compares the served `main.dart.js` against the bundle it just built.
 CI builds the frontend the same way, so a missing or local `API_BASE_URL` fails the
 run instead of reaching production.
 
+## Design system (`packages/dogu_ui`)
+
+Design tokens (colors, spacing, font family names, mono text style) and the generic UI
+components live in a separate Flutter package that the app depends on by path. One
+component per file under `lib/src/components/{atoms,molecules,brand}/`; the package also
+ships the brand logo (`assets/logo-square.png`). It knows nothing about app data: it
+cannot import the app (compiler-enforced) and depends on `flutter` only
+(`test/boundary_test.dart`). App-specific sections (store-connected widgets, content
+blocks, order-flow parts) stay in `app/lib`.
+
+```sh
+cd packages/dogu_ui
+flutter analyze && flutter test   # CI job: Design system (dogu_ui)
+```
+
+Font files stay in the app (`app/assets/fonts`) and are registered at runtime under the
+family names the package defines; `scripts/build_fonts.sh` scans both `app/lib` and
+`packages/dogu_ui/lib` for the characters to keep.
+
 ## Frontend tests (feature modules)
 
 Frontend tests are split by feature: each directory under `app/test/features/` is one

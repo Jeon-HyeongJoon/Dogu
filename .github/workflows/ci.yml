@@ -84,6 +84,33 @@ jobs:
             fi
           done
 
+  design-system:
+    # 디자인 시스템 패키지(packages/dogu_ui) — 토큰 + 범용 컴포넌트, 컴포넌트 파일 하나에 하나.
+    # 앱 데이터를 모른다: 앱 패키지는 import할 수 없고(컴파일러), 의존성은 flutter 하나(boundary_test).
+    name: Design system (dogu_ui)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/dogu_ui
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.0"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Static analysis
+        run: flutter analyze
+
+      - name: Component tests
+        run: flutter test
+
   # ── 프론트 기능 모듈 테스트 ──────────────────────────────────────────────
   # app/test/features/<기능>/ 디렉터리 하나가 잡 하나('Frontend · <기능>')다. 목록은 디렉터리에서
   # 찾으므로 새 기능은 디렉터리만 추가하면 여기 자동으로 들어간다. 로컬: app/scripts/test_modules.sh

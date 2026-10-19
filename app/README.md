@@ -8,7 +8,7 @@ The implementation keeps the original design DNA: a 390px-like centered mobile c
 
 - `pubspec.yaml` declares the Flutter app, logo asset, `http`, and `shared_preferences`.
 - `lib/main.dart` contains the safe-area tab shell, five visual pages, design tokens, API models/repository, local persisted app state, fallback seed data, widgets, and custom pattern painters.
-- `assets/logo-square.png` is copied from `../design/assets/logo-square.png`.
+- The brand logo lives in the design system (`../packages/dogu_ui/assets/logo-square.png`), derived from `../design/assets/logo-square.png` by `scripts/sync_logo.sh`.
 - `assets/seed.json` and `lib/src/bundled_seed.g.dart` are **generated** from the
   canonical backend seed (`../backend/app/data/seed.json`) for the offline
   instant-paint fallback (the asset is the async source; the `.g.dart` embeds the
