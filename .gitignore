@@ -48,3 +48,6 @@ design_mockups/*
 design_mockups/order-flow/*
 !design_mockups/order-flow/*.dc.html
 !design_mockups/order-flow/canvas.json
+
+# 골든 테스트 실패 산출물(모듈마다 test/features/<기능>/failures/에 생긴다) — CI 아티팩트로만 본다
+app/test/**/failures/

@@ -14,7 +14,7 @@ import 'package:dogu_mobile_shop/main.dart';
 // 기본은 skip — 백엔드 없이 도는 `flutter test`를 깨뜨리지 않는다.
 // 실행:
 //   backend/scripts/run_local.sh  (또는 CI의 backend-integration 잡)
-//   flutter test test/backend_contract_test.dart \
+//   flutter test test/integration/backend_contract_test.dart \
 //     --dart-define=BACKEND_INTEGRATION=true \
 //     --dart-define=API_BASE_URL=http://127.0.0.1:8000
 const _enabled = bool.fromEnvironment('BACKEND_INTEGRATION');

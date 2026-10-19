@@ -12,7 +12,8 @@ import 'package:dogu_mobile_shop/main.dart';
 
 // 브랜드 락업(로고 + '욕망의 장바구니' 손글씨 타이틀)을 상단 헤더와 하단 푸터
 // 양쪽에서 이미지로 확인한다 — 둘은 DoguBrandLockup 하나를 공유하므로 같아야 한다.
-// golden 태그 → CI 제외. (재)생성: flutter test --update-goldens --tags golden
+// 골든 정본은 CI(ubuntu) 렌더 — 이 모듈의 CI 잡이 함께 돌린다. 로컬(macOS)에선 폰트/AA 차이로 깨지니
+// scripts/test_modules.sh는 기본으로 제외한다. 정본 갱신: Actions → Update goldens.
 void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
