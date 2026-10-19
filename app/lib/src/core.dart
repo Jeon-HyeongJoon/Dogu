@@ -136,7 +136,8 @@ class _DoguAppState extends State<DoguApp> {
 class AppLayout {
   // 탭 바 높이는 컴포넌트(DoguTabBar)가 정한다 — 콘텐츠 하단 여백 계산이 같은 값을 쓰게.
   static const tabHeight = DoguTabBar.barHeight;
-  static const checkoutHeight = 83.0;
+  // 결제 바 높이는 컴포넌트(CheckoutBarView)가 정한다.
+  static const checkoutHeight = CheckoutBarView.barHeight;
   // 상단 헤더 높이: IconBox(38) + 위 패딩 10 + 아래 패딩 4 — 메뉴 드롭다운이 타이틀 구간 아래로 내려오도록 기준
   static const headerHeight = 52.0;
 }

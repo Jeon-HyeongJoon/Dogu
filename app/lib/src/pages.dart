@@ -581,16 +581,17 @@ class SearchTabPage extends StatelessWidget {
             query: store.lastSearchTerm,
             results: store.searchResults,
           ),
-        SearchBlock(
+        TagSection(
           title: '[ 01 ] 최근 검색',
           action: '전체 삭제',
-          tags: store.recentSearches.map((term) => '$term  ×').toList(),
+          tags: store.recentSearches,
           emptyText: '최근 검색어가 없어요',
           onAction: () => AppStateScope.read(context).clearRecentSearches(),
-          onTagTap: (term) => AppStateScope.read(context).performSearch(term.replaceAll('  ×', '')),
+          onTagTap: (term) => AppStateScope.read(context).performSearch(term),
+          onRemove: (term) => AppStateScope.read(context).removeRecentSearch(term),
         ),
         SoftDividerBlock(
-          child: SearchBlock(
+          child: TagSection(
             title: '[ 02 ] 추천 브랜드',
             tags: store.suggestions,
             loading: store.catalogLoading,
