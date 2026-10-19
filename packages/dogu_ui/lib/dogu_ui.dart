@@ -33,6 +33,8 @@ export 'src/components/molecules/quick_filter_row.dart';
 export 'src/components/molecules/countdown_timer.dart';
 export 'src/components/molecules/preparing_image_surface.dart';
 export 'src/components/molecules/neutral_image_surface.dart';
+export 'src/components/molecules/product_image.dart';
+export 'src/components/molecules/product_card_view.dart';
 
 // brand
 export 'src/components/brand/dogu_brand_mark.dart';

@@ -168,6 +168,13 @@ class ApiConfig {
     return trimmed;
   }
 
+  /// 화면에 넘길 이미지 주소 — 불러올 수 없으면 null('이미지 준비 중'), 네이버 이미지는 프록시·축소본으로.
+  static String? displayImageUrl(String? url, {int? thumbnailWidth}) {
+    final trimmed = url?.trim();
+    if (trimmed == null || trimmed.isEmpty || !canLoadImageDirectly(trimmed)) return null;
+    return imageUrl(trimmed, thumbnailWidth: thumbnailWidth);
+  }
+
   static bool canLoadImageDirectly(String? url) {
     final host = Uri.tryParse(url?.trim() ?? '')?.host.toLowerCase() ?? '';
     return host.isNotEmpty;
