@@ -272,35 +272,37 @@ void main() {
 
   // ── TDD P2-2: ProductCard 탭 피드백 ──────────────────────────────────────────
 
-  testWidgets('product card is stateful to support press animation', (tester) async {
+  testWidgets('ProductCard hands the product to ProductCardView and wires wishlist', (tester) async {
+    // 그리기(눌림 애니메이션 포함)는 디자인 시스템의 ProductCardView, 앱의 ProductCard는 데이터 연결만.
     final store = AppStore(repository: FakeRepository(results: const []));
-
+    const product = ProductItem(
+      id: 'wire-test',
+      brand: 'WIRE',
+      name: '연결 테스트',
+      price: '₩10,000',
+      oldPrice: '₩12,000',
+      discount: '-16%',
+      pattern: PatternKind.dots,
+      badge: 'BEST',
+    );
     await tester.pumpWidget(
       AppStateScope(
         store: store,
-        child: const MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 220,
-              child: ProductCard(
-                product: ProductItem(
-                  id: 'anim-test',
-                  brand: 'ANIM',
-                  name: '애니메이션 테스트',
-                  price: '₩10,000',
-                  oldPrice: '₩12,000',
-                  discount: '-16%',
-                  pattern: PatternKind.dots,
-                ),
-              ),
-            ),
-          ),
-        ),
+        child: const MaterialApp(home: Scaffold(body: SizedBox(width: 220, child: ProductCard(product: product)))),
       ),
     );
 
-    // StatefulWidget으로 변환됐는지 확인 (StatelessWidget이면 throws)
-    expect(tester.state(find.byType(ProductCard)), isNotNull);
+    ProductCardView view() => tester.widget<ProductCardView>(find.byType(ProductCardView));
+    expect([view().data.brand, view().data.name, view().data.price, view().data.oldPrice, view().data.discount, view().data.badge],
+        ['WIRE', '연결 테스트', '₩10,000', '₩12,000', '-16%', 'BEST']);
+    expect(view().data.hasDiscount, isTrue);
+    expect(view().data.imageUrl, isNull, reason: '이미지 주소가 없으면 디자인 시스템이 이미지 준비 중 자리를 그린다');
+    expect(view().wished, isFalse);
+
+    await tester.tap(find.text('WISH +'));
+    await tester.pump();
+    expect(store.wishlistIds, contains('wire-test'));
+    expect(view().wished, isTrue);
   });
 
   testWidgets('product card scale drops to 0.97 on press and returns to 1.0 on release', (tester) async {

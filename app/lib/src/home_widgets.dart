@@ -823,31 +823,8 @@ class ProductImageSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final trimmedUrl = imageUrl?.trim();
-    // 이미지 로딩 전/실패/부재 시 모두 통일된 "준비 이미지"를 보여준다(랜덤 패턴 배경 제거).
-    final preparing = PreparingImageSurface(dark: dark, child: child);
-    if (trimmedUrl == null || trimmedUrl.isEmpty || !ApiConfig.canLoadImageDirectly(trimmedUrl)) {
-      return preparing;
-    }
-
-    return Container(
-      decoration: BoxDecoration(border: Border.all(color: dark ? const Color(0xff1f1f1f) : AppColors.line)),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.network(
-            ApiConfig.imageUrl(trimmedUrl, thumbnailWidth: thumbnailWidth),
-            fit: BoxFit.cover,
-            loadingBuilder: (context, childWidget, loadingProgress) {
-              if (loadingProgress == null) return childWidget;
-              return preparing;
-            },
-            errorBuilder: (context, error, stackTrace) => preparing,
-          ),
-          if (child != null) child!,
-        ],
-      ),
-    );
+    // 그리기는 디자인 시스템(ProductImage)이, 주소 규칙(프록시·축소본)은 앱이 맡는다.
+    return ProductImage(url: ApiConfig.displayImageUrl(imageUrl, thumbnailWidth: thumbnailWidth), dark: dark, child: child);
   }
 }
 
@@ -888,122 +865,33 @@ class RemoteNeutralImageSurface extends StatelessWidget {
   }
 }
 
-class ProductCard extends StatefulWidget {
+/// 상품 카드 — 찜 상태·상세 열기·찜 토글을 연결하고, 그리기는 디자인 시스템의 ProductCardView가 맡는다.
+class ProductCard extends StatelessWidget {
   const ProductCard({required this.product, this.dark = false, super.key});
   final ProductItem product;
   final bool dark;
 
   @override
-  State<ProductCard> createState() => _ProductCardState();
-}
-
-class _ProductCardState extends State<ProductCard> {
-  bool _pressed = false;
-
-  void _openDetail(BuildContext context) {
-    openProductDetail(context, widget.product);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final store = AppStateScope.watch(context);
-    final wished = store.wishlistIds.contains(widget.product.id);
-    final product = widget.product;
-    final dark = widget.dark;
-    final line = dark ? const Color(0xff1f1f1f) : AppColors.line;
-    return AnimatedScale(
-      scale: _pressed ? 0.97 : 1.0,
-      duration: const Duration(milliseconds: 120),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => _openDetail(context),
-        onTapDown: (_) => setState(() => _pressed = true),
-        onTapUp: (_) => setState(() => _pressed = false),
-        onTapCancel: () => setState(() => _pressed = false),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AspectRatio(
-            aspectRatio: 1,
-            child: ProductImageSurface(
-              pattern: product.pattern,
-              imageUrl: product.imageUrl,
-              artwork: product.artwork,
-              thumbnailWidth: 640,
-              dark: dark,
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (product.hasDiscount)
-                          BadgePill(text: product.discount, color: dark ? AppColors.accent : AppColors.ink),
-                        if (product.badge != null) ...[
-                          const SizedBox(height: 3),
-                          BadgePill(text: product.badge!, color: dark ? const Color(0xff1a1a1a) : AppColors.bg, ink: dark ? AppColors.invert : AppColors.ink, bordered: true),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Container(height: 1, color: line),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4, 10, 4, 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MonoText(product.brand, size: 9.5, color: dark ? const Color(0xff7a7a7a) : AppColors.ink4),
-                const SizedBox(height: 3),
-                Text(
-                  product.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 12.5, height: 1.35, color: dark ? AppColors.invert : AppColors.ink, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 7),
-                if (product.subtitle.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 7),
-                    child: Text(product.subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11.5, color: dark ? const Color(0xff9a9a9a) : AppColors.ink3)),
-                  ),
-                Wrap(
-                  spacing: 6,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    if (product.hasDiscount)
-                      MonoText(product.discount, size: 12, color: AppColors.accent, weight: FontWeight.w700),
-                    MonoText(product.price, size: 13, color: dark ? AppColors.invert : AppColors.ink, weight: FontWeight.w700),
-                    if (product.hasDiscount) StrikeText(product.oldPrice),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: MonoText(product.meta, size: 9.5, color: dark ? const Color(0xff6a6a6a) : AppColors.ink4),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => AppStateScope.read(context).toggleWishlist(product),
-                      child: MonoText(wished ? 'WISH ♥' : 'WISH +', size: 9.5, color: wished ? AppColors.accent : (dark ? const Color(0xff6a6a6a) : AppColors.ink4)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),    // Column
-    ),    // GestureDetector
-  );    // AnimatedScale
+    final wished = AppStateScope.watch(context).wishlistIds.contains(product.id);
+    return ProductCardView(
+      data: ProductCardData(
+        brand: product.brand,
+        name: product.name,
+        price: product.price,
+        oldPrice: product.oldPrice,
+        discount: product.discount,
+        hasDiscount: product.hasDiscount,
+        badge: product.badge,
+        subtitle: product.subtitle,
+        meta: product.meta,
+        imageUrl: ApiConfig.displayImageUrl(product.imageUrl, thumbnailWidth: 640),
+      ),
+      wished: wished,
+      dark: dark,
+      onTap: () => openProductDetail(context, product),
+      onWishTap: () => AppStateScope.read(context).toggleWishlist(product),
+    );
   }
 }
 
