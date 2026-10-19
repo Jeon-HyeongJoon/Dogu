@@ -35,6 +35,12 @@ export 'src/components/molecules/preparing_image_surface.dart';
 export 'src/components/molecules/neutral_image_surface.dart';
 export 'src/components/molecules/product_image.dart';
 export 'src/components/molecules/product_card_view.dart';
+export 'src/components/molecules/category_tile.dart';
+
+// organisms
+export 'src/components/organisms/dogu_header_bar.dart';
+export 'src/components/organisms/dogu_tab_bar.dart';
+export 'src/components/organisms/dogu_nav_bar.dart';
 
 // brand
 export 'src/components/brand/dogu_brand_mark.dart';
