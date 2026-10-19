@@ -157,35 +157,13 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 그리기는 디자인 시스템(DoguHeaderBar), 장바구니 수·탭 이동·메뉴는 앱이 연결한다.
     final cartCount = AppStateScope.watch(context).cartCount;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(AppSpace.pad, 10, AppSpace.pad, 4),
-      decoration: const BoxDecoration(
-        color: AppColors.bg,
-        border: Border(bottom: BorderSide(color: AppColors.line)),
-      ),
-      child: Row(
-        children: [
-          IconBox(icon: Icons.menu, label: '메뉴', onTap: () => _openMenu(context)),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                // 락업(마크 크기·오프셋)은 DoguBrandLockup에 있다 — 푸터와 공유.
-                // 헤더에 위젯을 더 추가하지 말 것: 좁은 뷰포트에서 오버플로한다.
-                DoguBrandLockup(),
-              ],
-            ),
-          ),
-          Row(
-            children: [
-              IconBox(icon: Icons.search, label: '검색', onTap: () => AppNavigationScope.select(context, 2)),
-              const SizedBox(width: 8),
-              IconBox(icon: Icons.shopping_cart_outlined, label: '장바구니', inverted: true, count: cartCount > 0 ? cartCount.toString() : null, onTap: () => AppNavigationScope.select(context, 4)),
-            ],
-          ),
-        ],
-      ),
+    return DoguHeaderBar(
+      cartBadge: cartCount > 0 ? cartCount.toString() : null,
+      onMenu: () => _openMenu(context),
+      onSearch: () => AppNavigationScope.select(context, 2),
+      onCart: () => AppNavigationScope.select(context, 4),
     );
   }
 }
@@ -247,43 +225,19 @@ class CategoryNav extends StatelessWidget {
           (item.name, 'all', _normalizeCategoryKey(item.id.isEmpty ? item.name : item.id)),
       ('SALE', 'sale', null),
     ];
-    final cells = <Widget>[
-      for (final entry in entries)
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            AppStateScope.read(context).setCategoryQuickFilter(entry.$2);
-            AppStateScope.read(context).selectCategoryBrowse(entry.$3);
-            AppNavigationScope.select(context, 1);
-          },
-          child: NavLabel(
-            text: entry.$1,
-            sale: entry.$2 == 'sale',
-            active: entry.$2 == currentFilter && entry.$3 == currentCategory,
-          ),
-        ),
-    ];
-    // 백엔드 응답 전엔 카테고리 칸 자리에 로딩 점(메인 카테고리 칸과 같은 이유).
-    if (store.catalogLoading) cells.insert(2, const Padding(padding: EdgeInsets.only(top: 6), child: LoadingDots()));
-    return Container(
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
-      padding: const EdgeInsets.fromLTRB(AppSpace.pad, 12, AppSpace.pad, 14),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (var i = 0; i < cells.length; i++) ...[
-              cells[i],
-              if (i != cells.length - 1)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 11),
-                  child: Text('|', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w300, color: AppColors.ink4)),
-                ),
-            ],
-          ],
-        ),
-      ),
+    // 그리기(구분선·활성 표시·로딩 자리)는 디자인 시스템(DoguNavBar). 백엔드 응답 전엔 카테고리 칸 자리에 로딩 점.
+    return DoguNavBar(
+      items: [
+        for (final entry in entries)
+          DoguNavItem(label: entry.$1, sale: entry.$2 == 'sale', active: entry.$2 == currentFilter && entry.$3 == currentCategory),
+      ],
+      loadingIndex: store.catalogLoading ? 2 : null,
+      onTap: (i) {
+        final entry = entries[i];
+        AppStateScope.read(context).setCategoryQuickFilter(entry.$2);
+        AppStateScope.read(context).selectCategoryBrowse(entry.$3);
+        AppNavigationScope.select(context, 1);
+      },
     );
   }
 }
@@ -611,27 +565,15 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    // 그리기는 디자인 시스템(CategoryTile), 고르면 카테고리 탭으로 가는 건 앱이 연결한다.
+    return CategoryTile(
+      index: index,
+      name: item.name,
       onTap: () {
         AppStateScope.read(context).setCategoryQuickFilter('all');
         AppStateScope.read(context).selectCategoryBrowse(item.id.isEmpty ? _categoryKey() : _normalizeCategoryKey(item.id));
         AppNavigationScope.select(context, 1);
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(border: Border.all(color: AppColors.line)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            MonoText(index.toString().padLeft(2, '0'), size: 8.5, color: AppColors.ink4),
-            const SizedBox(height: 5),
-            // 상품 수는 그리지 않는다 — 크롤링 한도 때문에 전부 ~100이라 의미가 없다.
-            Text(item.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: -0.3, height: 1.1), maxLines: 1, overflow: TextOverflow.ellipsis),
-          ],
-        ),
-      ),
     );
   }
 }

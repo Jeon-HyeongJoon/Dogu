@@ -493,52 +493,21 @@ class BottomTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 그리기는 디자인 시스템(DoguTabBar), 찜·장바구니 배지 숫자는 앱이 넘긴다.
     final store = AppStateScope.watch(context);
     final cartCount = store.cartCount;
     final wishCount = store.wishlistIds.length;
-    const tabs = [
-      (Icons.home_outlined, '홈'),
-      (Icons.grid_view_outlined, '카테고리'),
-      (Icons.search, '검색'),
-      (Icons.favorite_border, '찜'),
-      (Icons.shopping_cart_outlined, '장바구니'),
-    ];
-    return Container(
-      height: AppLayout.tabHeight + bottomInset,
-      padding: EdgeInsets.only(bottom: bottomInset),
-      decoration: const BoxDecoration(
-        color: AppColors.bg,
-        border: Border(top: BorderSide(color: AppColors.line)),
-      ),
-      child: Row(
-        children: [
-          for (var i = 0; i < tabs.length; i++)
-            Expanded(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => onTap(i),
-                child: Stack(
-                  alignment: Alignment.topCenter,
-                  children: [
-                    if (i == currentIndex) Container(width: 38, height: 2, color: AppColors.ink),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 11),
-                      child: Column(
-                        children: [
-                          Icon(tabs[i].$1, size: 21, color: i == currentIndex ? AppColors.ink : AppColors.ink4),
-                          const SizedBox(height: 4),
-                          Text(tabs[i].$2, style: TextStyle(fontSize: 10.5, color: i == currentIndex ? AppColors.ink : AppColors.ink4, fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ),
-                    if (i == 3 && wishCount > 0) Positioned(top: 7, right: 20, child: BadgePill(text: wishCount.toString(), color: AppColors.accent, compact: true)),
-                    if (i == 4 && cartCount > 0) Positioned(top: 7, right: 20, child: BadgePill(text: cartCount.toString(), color: AppColors.alert, compact: true)),
-                  ],
-                ),
-              ),
-            ),
-        ],
-      ),
+    return DoguTabBar(
+      currentIndex: currentIndex,
+      onTap: onTap,
+      bottomInset: bottomInset,
+      tabs: [
+        const DoguTab(icon: Icons.home_outlined, label: '홈'),
+        const DoguTab(icon: Icons.grid_view_outlined, label: '카테고리'),
+        const DoguTab(icon: Icons.search, label: '검색'),
+        DoguTab(icon: Icons.favorite_border, label: '찜', badge: wishCount > 0 ? wishCount.toString() : null),
+        DoguTab(icon: Icons.shopping_cart_outlined, label: '장바구니', badge: cartCount > 0 ? cartCount.toString() : null, badgeColor: AppColors.alert),
+      ],
     );
   }
 }
