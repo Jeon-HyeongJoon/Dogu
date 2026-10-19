@@ -76,7 +76,7 @@ class Header extends StatelessWidget {
                 child: SafeArea(
                   bottom: false,
                   child: Padding(
-                    padding: const EdgeInsets.only(top: AppSpace.headerHeight),
+                    padding: const EdgeInsets.only(top: AppLayout.headerHeight),
                     child: Container(color: Colors.black54),
                   ),
                 ),
@@ -90,7 +90,7 @@ class Header extends StatelessWidget {
                   bottom: false,
                   child: Padding(
                     // 상단 타이틀 구간(헤더) 아래로 내려오도록 헤더 높이만큼 띄워 일체감 확보
-                    padding: const EdgeInsets.only(top: AppSpace.headerHeight),
+                    padding: const EdgeInsets.only(top: AppLayout.headerHeight),
                 // 헤더 하단 라인을 전경에 항상 고정 — 이 라인에서 메뉴가 빠져나오는 것처럼
                 child: DecoratedBox(
                   position: DecorationPosition.foreground,
@@ -190,60 +190,6 @@ class Header extends StatelessWidget {
   }
 }
 
-class IconBox extends StatelessWidget {
-  const IconBox({
-    required this.icon,
-    required this.label,
-    this.inverted = false,
-    this.count,
-    this.onTap,
-    super.key,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool inverted;
-  final String? count;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      label: label,
-      button: true,
-      enabled: onTap != null,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: SizedBox(
-          width: 38,
-          height: 38,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                width: 34,
-                height: 34,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: inverted ? AppColors.accent : AppColors.bg,
-                  border: Border.all(color: inverted ? AppColors.accent : AppColors.line),
-                ),
-                child: Icon(icon, size: 18, color: inverted ? AppColors.invert : AppColors.ink),
-              ),
-              if (count != null)
-                Positioned(
-                  top: -5,
-                  right: -1,
-                  child: BadgePill(text: count!, color: AppColors.alert, compact: true),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class SearchBarBlock extends StatelessWidget {
   const SearchBarBlock({super.key});
@@ -342,31 +288,6 @@ class CategoryNav extends StatelessWidget {
   }
 }
 
-class NavLabel extends StatelessWidget {
-  const NavLabel({required this.text, this.active = false, this.sale = false, super.key});
-  final String text;
-  final bool active;
-  final bool sale;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: sale ? FontWeight.w700 : FontWeight.w500,
-            color: sale ? AppColors.accent : (active ? AppColors.ink : AppColors.ink3),
-          ),
-        ),
-        const SizedBox(height: 14),
-        Container(width: active ? 42 : 0, height: 2, color: active ? AppColors.ink : Colors.transparent),
-      ],
-    );
-  }
-}
 
 class HeroBlock extends StatelessWidget {
   const HeroBlock({super.key});
@@ -431,50 +352,6 @@ class HeroBlock extends StatelessWidget {
   }
 }
 
-class StatGrid extends StatelessWidget {
-  const StatGrid({required this.stats, this.dark = false, this.loading = false, super.key});
-
-  final List<(String, String)> stats;
-  final bool dark;
-  final bool loading;
-
-  @override
-  Widget build(BuildContext context) {
-    final lineColor = dark ? AppColors.heroLine : AppColors.line;
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: lineColor), bottom: BorderSide(color: lineColor)),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      child: loading
-          ? SizedBox(
-              height: 44,
-              child: Align(alignment: Alignment.centerLeft, child: LoadingDots(color: dark ? AppColors.heroInk3 : AppColors.ink3)),
-            )
-          : Row(
-        children: [
-          for (var i = 0; i < stats.length; i++)
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.only(left: i == 0 ? 0 : 12, right: 8),
-                decoration: BoxDecoration(
-                  border: i == 0 ? null : Border(left: BorderSide(color: lineColor)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    MonoText(stats[i].$1, size: 20, weight: FontWeight.w500, color: dark ? AppColors.heroInk : AppColors.ink),
-                    const SizedBox(height: 2),
-                    MonoText(stats[i].$2, size: 10.5, color: dark ? AppColors.heroInk3 : AppColors.ink4),
-                  ],
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
 
 class FeaturedCard extends StatelessWidget {
   const FeaturedCard({super.key});
@@ -759,51 +636,6 @@ class CategoryCard extends StatelessWidget {
   }
 }
 
-// 매초 카운트다운 텍스트만 업데이트 — DealSection 전체 rebuild 방지
-class CountdownTimer extends StatefulWidget {
-  const CountdownTimer({required this.initialSeconds, super.key});
-  final int initialSeconds;
-
-  @override
-  State<CountdownTimer> createState() => _CountdownTimerState();
-}
-
-class _CountdownTimerState extends State<CountdownTimer> {
-  late final ValueNotifier<int> _seconds;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _seconds = ValueNotifier(widget.initialSeconds);
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (_seconds.value > 0) _seconds.value -= 1;
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _seconds.dispose();
-    super.dispose();
-  }
-
-  static String _format(int total) {
-    final h = (total ~/ 3600).toString().padLeft(2, '0');
-    final m = ((total % 3600) ~/ 60).toString().padLeft(2, '0');
-    final s = (total % 60).toString().padLeft(2, '0');
-    return '$h:$m:$s';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<int>(
-      valueListenable: _seconds,
-      builder: (_, remaining, __) =>
-          MonoText(_format(remaining), size: 18, color: AppColors.invert, weight: FontWeight.w600),
-    );
-  }
-}
 
 class DealSection extends StatelessWidget {
   const DealSection({super.key});
@@ -1019,68 +851,6 @@ class ProductImageSurface extends StatelessWidget {
   }
 }
 
-// 통일된 "준비 이미지" placeholder — 모든 상품 이미지 로딩 전/실패 시 동일하게 표시
-class PreparingImageSurface extends StatelessWidget {
-  const PreparingImageSurface({this.child, this.dark = false, super.key});
-
-  final Widget? child;
-  final bool dark;
-
-  @override
-  Widget build(BuildContext context) {
-    // 삽입 이미지(로고 워터마크) 없이 회색 스켈레톤 + 은은한 sheen으로 '로딩 중' 느낌만 준다.
-    final base = dark ? const Color(0xff161616) : AppColors.bgAlt;
-    final sheen = dark ? const Color(0xff202020) : const Color(0xfff1f1f0);
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [base, sheen, base],
-        ),
-        border: Border.all(color: dark ? const Color(0xff2a2a2a) : AppColors.line),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Center(
-            child: MonoText('이미지 준비 중', size: 9.5, color: dark ? const Color(0xff6a6a6a) : AppColors.ink4),
-          ),
-          if (child != null) child!,
-        ],
-      ),
-    );
-  }
-}
-
-class NeutralImageSurface extends StatelessWidget {
-  const NeutralImageSurface({this.child, super.key});
-
-  final Widget? child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.bg,
-        border: Border.all(color: AppColors.line),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          const Center(
-            child: Opacity(
-              opacity: 0.14,
-              // 워터마크는 단색 — 액센트 도트도 잉크로 눌러 은은하게.
-              child: DoguBrandMark(size: 52, bag: AppColors.ink3, dot: AppColors.ink3),
-            ),
-          ),
-          if (child != null) child!,
-        ],
-      ),
-    );
-  }
-}
 
 class RemoteNeutralImageSurface extends StatelessWidget {
   const RemoteNeutralImageSurface({this.imageUrl, this.child, super.key});

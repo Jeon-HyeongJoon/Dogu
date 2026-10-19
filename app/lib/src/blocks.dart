@@ -111,44 +111,6 @@ class CategoryProductsBlock extends StatelessWidget {
   }
 }
 
-class SoftDividerBlock extends StatelessWidget {
-  const SoftDividerBlock({required this.child, super.key});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 18),
-      decoration: const BoxDecoration(border: Border(top: BorderSide(color: AppColors.bgSoft, width: 8))),
-      child: child,
-    );
-  }
-}
-
-class EmptyStateBlock extends StatelessWidget {
-  const EmptyStateBlock({required this.title, required this.body, super.key});
-
-  final String title;
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.all(AppSpace.pad),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
-      decoration: BoxDecoration(color: AppColors.bgSoft, border: Border.all(color: AppColors.line)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.4)),
-          const SizedBox(height: 6),
-          Text(body, style: const TextStyle(fontSize: 12.5, height: 1.6, color: AppColors.ink3)),
-        ],
-      ),
-    );
-  }
-}
 
 class BrandTagBlock extends StatelessWidget {
   const BrandTagBlock({required this.title, this.action, super.key});
@@ -294,38 +256,6 @@ class SearchBlock extends StatelessWidget {
   }
 }
 
-class RecentSearchTag extends StatelessWidget {
-  const RecentSearchTag({required this.label, this.onTap, this.onRemove, super.key});
-
-  final String label;
-  final VoidCallback? onTap;
-  final VoidCallback? onRemove;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(border: Border.all(color: AppColors.line), color: AppColors.bg),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onTap,
-            child: Text(label, style: const TextStyle(fontSize: 12, color: AppColors.ink2)),
-          ),
-          const SizedBox(width: 6),
-          GestureDetector(
-            key: Key('recent-remove-$label'),
-            behavior: HitTestBehavior.opaque,
-            onTap: onRemove,
-            child: const Text('×', style: TextStyle(fontSize: 12, color: AppColors.ink4)),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class TrendingBlock extends StatelessWidget {
   const TrendingBlock({super.key});
@@ -398,22 +328,6 @@ class WishSummary extends StatelessWidget {
   }
 }
 
-class SmallChip extends StatelessWidget {
-  const SmallChip({required this.text, this.active = false, super.key});
-  final String text;
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 30,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(color: active ? AppColors.accent : AppColors.bg, border: Border.all(color: active ? AppColors.accent : AppColors.line)),
-      child: Text(text, style: TextStyle(fontSize: 12, color: active ? AppColors.invert : AppColors.ink2)),
-    );
-  }
-}
 
 class WishGridBlock extends StatelessWidget {
   const WishGridBlock({required this.items, required this.activeFilter, super.key});
@@ -584,22 +498,6 @@ class CartItemRow extends StatelessWidget {
   }
 }
 
-class QtyBox extends StatelessWidget {
-  const QtyBox({required this.value, this.onMinus, this.onPlus, this.buttonExtent = 48, this.valueExtent = 40, super.key});
-  final String value;
-  final VoidCallback? onMinus;
-  final VoidCallback? onPlus;
-  final double buttonExtent;
-  final double valueExtent;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(border: Border.all(color: AppColors.line)),
-      child: Row(children: [GestureDetector(behavior: HitTestBehavior.opaque, onTap: onMinus, child: SizedBox(width: buttonExtent, height: buttonExtent, child: const Center(child: MonoText('−', size: 16)))), Container(width: valueExtent, height: buttonExtent, alignment: Alignment.center, decoration: const BoxDecoration(border: Border(left: BorderSide(color: AppColors.line), right: BorderSide(color: AppColors.line))), child: MonoText(value, size: 13, weight: FontWeight.w700)), GestureDetector(behavior: HitTestBehavior.opaque, onTap: onPlus, child: SizedBox(width: buttonExtent, height: buttonExtent, child: const Center(child: MonoText('+', size: 16))))]),
-    );
-  }
-}
 
 class CartSummaryBlock extends StatelessWidget {
   const CartSummaryBlock({super.key});
@@ -626,21 +524,6 @@ class CartSummaryBlock extends StatelessWidget {
   }
 }
 
-class SummaryLine extends StatelessWidget {
-  const SummaryLine({required this.label, required this.value, this.accent = false, this.total = false, super.key});
-  final String label;
-  final String value;
-  final bool accent;
-  final bool total;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 7),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(label, style: TextStyle(fontSize: total ? 14 : 13, fontWeight: total ? FontWeight.w700 : FontWeight.w400, color: AppColors.ink2)), MonoText(value, size: total ? 22 : 13, color: accent ? AppColors.accent : AppColors.ink, weight: total ? FontWeight.w800 : FontWeight.w500)]),
-    );
-  }
-}
 
 class RecommendedCartBlock extends StatelessWidget {
   const RecommendedCartBlock({super.key});
@@ -688,7 +571,7 @@ class CheckoutBar extends StatelessWidget {
       barrierColor: Colors.transparent,
       transitionDuration: const Duration(milliseconds: 220),
       pageBuilder: (dialogContext, animation, __) {
-        final navBarHeight = AppSpace.tabHeight + MediaQuery.viewPaddingOf(dialogContext).bottom;
+        final navBarHeight = AppLayout.tabHeight + MediaQuery.viewPaddingOf(dialogContext).bottom;
         final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
         return Stack(
           children: [
@@ -740,7 +623,7 @@ class CheckoutBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final store = AppStateScope.watch(context);
     return Container(
-      height: AppSpace.checkoutHeight,
+      height: AppLayout.checkoutHeight,
       padding: const EdgeInsets.fromLTRB(AppSpace.pad, 16, AppSpace.pad, 18),
       decoration: const BoxDecoration(color: AppColors.ink, border: Border(top: BorderSide(color: Color(0xff1a1a1a)))),
       child: Row(

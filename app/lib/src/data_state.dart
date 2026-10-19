@@ -899,7 +899,7 @@ class _AppShellState extends State<AppShell> {
                     Positioned(
                       left: 0,
                       right: 0,
-                      bottom: AppSpace.tabHeight + bottomInset,
+                      bottom: AppLayout.tabHeight + bottomInset,
                       child: const CheckoutBar(),
                     ),
                   Align(

@@ -252,7 +252,7 @@ void main() {
     final panel = tester.getRect(find.byKey(const ValueKey('menuDropdown')));
     expect(panel.left, appRect.left, reason: '좌측 여백 없이 상단 바와 동일 정렬');
     expect(panel.width, appRect.width, reason: '상단 바와 동일한 풀폭');
-    expect(panel.top, closeTo(appRect.top + AppSpace.headerHeight, 1.0),
+    expect(panel.top, closeTo(appRect.top + AppLayout.headerHeight, 1.0),
         reason: '타이틀 구간(헤더) 아래로 내려와 밀착');
   });
 

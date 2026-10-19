@@ -9,11 +9,17 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:dogu_ui/dogu_ui.dart';
+
 // 웹 판별은 dart.library.js_interop — dart.library.html은 WebAssembly 빌드(dart2wasm)에 없어서
 // 경로 주소(/category)가 무시되고 늘 홈이 열렸다.
 import 'src/url_strategy_stub.dart'
     if (dart.library.js_interop) 'src/url_strategy_web.dart';
 
+
+// 디자인 시스템(토큰 + 범용 컴포넌트)은 packages/dogu_ui — 앱 데이터를 모른다. 테스트가 main.dart만
+// import해도 쓰도록 다시 내보낸다.
+export 'package:dogu_ui/dogu_ui.dart';
 
 part 'src/core.dart';
 part 'src/data_state.dart';
@@ -24,10 +30,7 @@ part 'src/misc_widgets.dart';
 part 'src/order_flow.dart';
 part 'src/bundled_seed.g.dart';
 
-// 본문체 — Pretendard 서브셋(assets/fonts/dogusans). 원본은 한글 11,172자를 다 담아
-// 굵기당 1.5MB라, 앱이 실제로 그리는 글자만 남겨 굵기당 약 350KB로 줄였다.
-// OFL 예약 폰트 이름 때문에 서브셋은 원본 이름을 쓸 수 없어 'Dogu Sans'로 담는다(NOTICE.md).
-const doguFontFamily = 'DoguSans';
+// 본문체(doguFontFamily, dogu_ui 토큰) — Pretendard 서브셋. 개명 사유는 assets/fonts/dogusans/NOTICE.md.
 const doguFontAssets = <String>[
   'assets/fonts/dogusans/DoguSans-Regular.otf',
   'assets/fonts/dogusans/DoguSans-SemiBold.otf',
@@ -43,7 +46,6 @@ const doguEssentialFontAssets = doguFontAssets;
 
 // 상단 브랜드 타이틀('욕망의 장바구니') 전용 손글씨체 — HSBombaram 3.0 서브셋.
 // 등록상표라 수정본은 원본 이름을 쓸 수 없어 'Dogu Hand'로 담는다(NOTICE.md).
-const doguTitleFontFamily = 'DoguHand';
 // 타이틀은 이 손글씨체가 primary라, 미등록 상태로 첫 페인트되면 CanvasKit이 폴백 대신
 // 두부(⊠)를 그린다. 그래서 타이틀 굵기(Thin)를 필수 폰트와 함께 첫 페인트 전에 로드한다.
 const doguTitleEssentialFontAssets = <String>[
@@ -53,7 +55,6 @@ const doguTitleEssentialFontAssets = <String>[
 // 주문 결과 화면의 농담 한 줄 전용 손글씨체 — 디자인 시안이 쓴 Gaegu Bold와 같은 자형.
 // 장식용 한 줄이라 원본(한글 2350자, 2.9MB) 대신 필요한 글자만 남긴 서브셋(약 80KB)을
 // 쓴다. 첫 페인트 이후 비차단 로드하며, 로드 전/실패 시엔 폴백 서체로 그려진다.
-const doguJokeFontFamily = 'Gaegu';
 const doguJokeFontAssets = <String>[
   'assets/fonts/gaegu/Gaegu-Bold-subset.ttf',
 ];
