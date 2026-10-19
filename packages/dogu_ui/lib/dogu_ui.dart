@@ -36,11 +36,15 @@ export 'src/components/molecules/neutral_image_surface.dart';
 export 'src/components/molecules/product_image.dart';
 export 'src/components/molecules/product_card_view.dart';
 export 'src/components/molecules/category_tile.dart';
+export 'src/components/molecules/category_list_row.dart';
 
 // organisms
 export 'src/components/organisms/dogu_header_bar.dart';
 export 'src/components/organisms/dogu_tab_bar.dart';
 export 'src/components/organisms/dogu_nav_bar.dart';
+export 'src/components/organisms/tag_section.dart';
+export 'src/components/organisms/cart_line_view.dart';
+export 'src/components/organisms/checkout_bar_view.dart';
 
 // brand
 export 'src/components/brand/dogu_brand_mark.dart';

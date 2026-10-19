@@ -127,8 +127,8 @@ void main() {
       const MaterialApp(
         home: Scaffold(
           body: Column(children: [
-            SearchBlock(title: '[ 01 ] 최근 검색', action: '전체 삭제', tags: [], emptyText: '최근 검색어가 없어요'),
-            SearchBlock(title: '[ 02 ] 추천 브랜드', tags: ['아무거나'], loading: true),
+            TagSection(title: '[ 01 ] 최근 검색', action: '전체 삭제', tags: [], emptyText: '최근 검색어가 없어요'),
+            TagSection(title: '[ 02 ] 추천 브랜드', tags: ['아무거나'], loading: true),
           ]),
         ),
       ),

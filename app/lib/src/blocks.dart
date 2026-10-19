@@ -22,36 +22,15 @@ class CategoryListBlock extends StatelessWidget {
     return Column(
       children: [
         for (var i = 0; i < visibleRows.length; i++)
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
+          // 그리기는 디자인 시스템(CategoryListRow). 상품 수는 그리지 않는다(메인 카드와 같은 이유).
+          CategoryListRow(
+            index: i + 1,
+            name: visibleRows[i].name,
+            description: visibleRows[i].description.isEmpty ? '큐레이션 · 베스트 · 신상품 · 한정판' : visibleRows[i].description,
             onTap: () {
               AppStateScope.read(context).setCategoryQuickFilter('all');
               AppStateScope.read(context).selectCategoryBrowse(_normalizeCategoryKey(visibleRows[i].id.isEmpty ? visibleRows[i].name : visibleRows[i].id));
             },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad, vertical: 14),
-              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 28,
-                    child: MonoText((i + 1).toString().padLeft(2, '0'), size: 11, color: AppColors.ink4),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(visibleRows[i].name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.3)),
-                        const SizedBox(height: 4),
-                        Text(visibleRows[i].description.isEmpty ? '큐레이션 · 베스트 · 신상품 · 한정판' : visibleRows[i].description, style: const TextStyle(fontSize: 11.5, color: AppColors.ink3, height: 1.5)),
-                      ],
-                    ),
-                  ),
-                  const Text('→'), // 상품 수는 그리지 않는다(메인 카드와 같은 이유)
-                ],
-              ),
-            ),
           ),
       ],
     );
@@ -120,7 +99,7 @@ class BrandTagBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const brands = ['soft·studio  42', 'good machine  18', 'objet·han  36', 'NORM /  24', 'QUIET CO.  19', 'paperhouse  12', 'flat·flat  28', 'ATELIER 04  31'];
-    return SearchBlock(title: title, action: action, tags: brands);
+    return TagSection(title: title, action: action, tags: brands);
   }
 }
 
@@ -199,63 +178,6 @@ class _BigSearchBoxState extends State<BigSearchBox> {
     );
   }
 }
-
-class SearchBlock extends StatelessWidget {
-  const SearchBlock({required this.title, required this.tags, this.action, this.onAction, this.onTagTap, this.loading = false, this.emptyText, super.key});
-  final String title;
-  final String? action;
-  final List<String> tags;
-  final VoidCallback? onAction;
-  final ValueChanged<String>? onTagTap;
-  /// 백엔드 응답 전 — 태그 자리에 로딩 점.
-  final bool loading;
-  /// 태그가 없을 때 보일 안내. null이면 빈 자리.
-  final String? emptyText;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpace.pad, 22, AppSpace.pad, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              MonoText(title, size: 10, weight: FontWeight.w700),
-              if (action != null && tags.isNotEmpty) GestureDetector(onTap: onAction, child: Text(action!, style: const TextStyle(fontSize: 11, color: AppColors.ink4))),
-            ],
-          ),
-          const SizedBox(height: 12),
-          if (loading)
-            const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: LoadingDots())
-          else if (tags.isEmpty && emptyText != null)
-            Text(emptyText!, style: const TextStyle(fontSize: 12.5, color: AppColors.ink4))
-          else
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              for (final tag in tags)
-                title == '[ 01 ] 최근 검색' && tag.endsWith('  ×')
-                    ? RecentSearchTag(
-                        label: tag.replaceAll('  ×', ''),
-                        onTap: onTagTap == null ? null : () => onTagTap!(tag.replaceAll('  ×', '')),
-                        onRemove: () => AppStateScope.read(context).removeRecentSearch(tag.replaceAll('  ×', '')),
-                      )
-                    : GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: onTagTap == null ? null : () => onTagTap!(tag),
-                        child: Tag(text: tag, compact: true),
-                      ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 
 class TrendingBlock extends StatelessWidget {
   const TrendingBlock({super.key});
@@ -463,37 +385,26 @@ class CartItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selected = AppStateScope.watch(context).selectedCartIds.contains(item.product.id);
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => AppStateScope.read(context).toggleCartSelection(item.product.id),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpace.pad - 2),
-        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(children: [SizedBox(width: 96, height: 96, child: ProductImageSurface(pattern: item.product.pattern, imageUrl: item.product.imageUrl, artwork: item.product.artwork, thumbnailWidth: 300, child: Padding(padding: const EdgeInsets.all(6), child: MonoText(index.toString().padLeft(3, '0'), size: 9, color: AppColors.ink4)))), Positioned(top: -2, left: -2, child: Container(width: 18, height: 18, alignment: Alignment.center, decoration: BoxDecoration(color: selected ? AppColors.accent : AppColors.bg, border: Border.all(color: selected ? AppColors.accent : AppColors.line)), child: Text(selected ? '✓' : '', style: const TextStyle(color: AppColors.invert, fontSize: 11))))]),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  MonoText(item.product.brand, size: 10, color: AppColors.ink4),
-                  const SizedBox(height: 4),
-                  Text(item.product.name, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 4),
-                  const MonoText('local cart · persisted on this device', size: 10.5, color: AppColors.ink3),
-                  const SizedBox(height: 10),
-                  Wrap(spacing: 6, children: [if (item.product.hasDiscount) MonoText(item.product.discount, size: 11, color: AppColors.accent, weight: FontWeight.w700), MonoText(item.product.price, size: 14, weight: FontWeight.w700), if (item.product.hasDiscount) StrikeText(item.product.oldPrice)]),
-                  const SizedBox(height: 12),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [QtyBox(value: item.quantity.toString(), onMinus: () => AppStateScope.read(context).changeCartQuantity(item.product.id, -1), onPlus: () => AppStateScope.read(context).changeCartQuantity(item.product.id, 1)), GestureDetector(onTap: () => AppStateScope.read(context).changeCartQuantity(item.product.id, -item.quantity), child: const MonoText('삭제 ×', size: 11, color: AppColors.ink4))]),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    // 그리기는 디자인 시스템(CartLineView), 선택·수량·삭제는 스토어에 연결한다.
+    final store = AppStateScope.watch(context);
+    final product = item.product;
+    return CartLineView(
+      index: index,
+      brand: product.brand,
+      name: product.name,
+      // TODO(문구): 개발용 안내가 사용자에게 보인다 — 화면을 바꾸지 않는 리팩터링이라 그대로 옮겼다.
+      note: 'local cart · persisted on this device',
+      price: product.price,
+      oldPrice: product.oldPrice,
+      discount: product.discount,
+      hasDiscount: product.hasDiscount,
+      imageUrl: ApiConfig.displayImageUrl(product.imageUrl, thumbnailWidth: 300),
+      quantity: item.quantity,
+      selected: store.selectedCartIds.contains(product.id),
+      onToggle: () => AppStateScope.read(context).toggleCartSelection(product.id),
+      onMinus: () => AppStateScope.read(context).changeCartQuantity(product.id, -1),
+      onPlus: () => AppStateScope.read(context).changeCartQuantity(product.id, 1),
+      onRemove: () => AppStateScope.read(context).changeCartQuantity(product.id, -item.quantity),
     );
   }
 }
@@ -621,22 +532,14 @@ class CheckoutBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 그리기는 디자인 시스템(CheckoutBarView), 금액·결제 진행은 앱이 연결한다.
     final store = AppStateScope.watch(context);
-    return Container(
-      height: AppLayout.checkoutHeight,
-      padding: const EdgeInsets.fromLTRB(AppSpace.pad, 16, AppSpace.pad, 18),
-      decoration: const BoxDecoration(color: AppColors.ink, border: Border(top: BorderSide(color: Color(0xff1a1a1a)))),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [const MonoText('결제 금액', size: 10, color: AppColors.ink4), MonoText(formatWon(store.selectedCartTotal), size: 18, color: AppColors.invert, weight: FontWeight.w800)]),
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: store.selectedCartCount == 0 ? null : () => _submitOrder(context),
-            child: Container(height: 48, padding: const EdgeInsets.symmetric(horizontal: 22), alignment: Alignment.center, color: store.selectedCartCount == 0 ? AppColors.ink2 : AppColors.alert, child: Text('결제하기 (${store.selectedCartCount})  →', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700))),
-          ),
-        ],
-      ),
+    return CheckoutBarView(
+      label: '결제 금액',
+      total: formatWon(store.selectedCartTotal),
+      buttonLabel: '결제하기 (${store.selectedCartCount})  →',
+      enabled: store.selectedCartCount > 0,
+      onCheckout: () => _submitOrder(context),
     );
   }
 }
