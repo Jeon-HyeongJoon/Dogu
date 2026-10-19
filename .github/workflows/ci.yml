@@ -38,8 +38,8 @@ jobs:
           DOGU_DB_PATH: ${{ github.workspace }}/backend/app/data/test_fixture.db
         run: pytest
 
-  frontend:
-    name: Frontend (analyze, widget tests, web build + load budget)
+  frontend-build:
+    name: Frontend build (analyze, brand assets, web build + load budget)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -60,11 +60,9 @@ jobs:
       - name: Static analysis (UI / code errors)
         run: flutter analyze
 
-      - name: Widget tests (UI behavior)
-        # Golden snapshot tests are platform-sensitive (font/AA differences between
-        # the dev machine and CI); they are committed as image deliverables and
-        # regenerated locally, so exclude them from the cross-platform CI run.
-        run: flutter test --exclude-tags golden
+      - name: Brand logo derivatives are in sync
+        working-directory: .
+        run: ./scripts/sync_logo.sh --check
 
       - name: Build web (release, production API base)
         # 배포와 같은 경로로 빌드한다 — 스크립트가 API_BASE_URL(app/.env.production) 주입을
@@ -86,9 +84,39 @@ jobs:
             fi
           done
 
-  goldens:
-    name: Golden snapshots (UI regressions)
+  # ── 프론트 기능 모듈 테스트 ──────────────────────────────────────────────
+  # app/test/features/<기능>/ 디렉터리 하나가 잡 하나('Frontend · <기능>')다. 목록은 디렉터리에서
+  # 찾으므로 새 기능은 디렉터리만 추가하면 여기 자동으로 들어간다. 로컬: app/scripts/test_modules.sh
+  frontend-modules:
+    name: Frontend modules (discover)
     runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.discover.outputs.modules }}
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Every test file belongs to a feature module
+        # 모듈 밖에 떨어진 테스트는 매트릭스에 안 잡혀 조용히 안 돈다 — 여기서 막는다.
+        run: ./scripts/test_modules.sh --check
+
+      - name: Discover feature modules
+        id: discover
+        run: |
+          MODULES="$(./scripts/test_modules.sh --json)"
+          echo "modules: $MODULES"
+          echo "modules=$MODULES" >> "$GITHUB_OUTPUT"
+
+  frontend-module:
+    name: Frontend · ${{ matrix.module }}
+    needs: frontend-modules
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.frontend-modules.outputs.modules) }}
     defaults:
       run:
         working-directory: app
@@ -105,24 +133,31 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Brand logo mirror is in sync
-        working-directory: .
-        run: ./scripts/sync_logo.sh --check
-
-      - name: Golden snapshot tests
-        # 골든 PNG는 이 잡(ubuntu-latest)에서 생성한 것이 정본이다. 로컬(macOS)에서
-        # --update-goldens로 만든 이미지는 폰트/AA가 달라 여기서 깨진다.
+      - name: Module tests (widgets + goldens)
+        # 골든 PNG의 정본은 이 잡(ubuntu-latest) 렌더다 — 모듈이 자기 골든도 함께 돌린다.
         # 화면을 고쳤으면 Update goldens 워크플로를 돌려 산출물을 받아 커밋할 것.
-        run: flutter test --tags golden
+        run: flutter test test/features/${{ matrix.module }}
 
       - name: Upload golden diffs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: golden-failures
-          path: app/test/failures/**
+          name: golden-failures-${{ matrix.module }}
+          path: app/test/features/${{ matrix.module }}/failures/**
           if-no-files-found: ignore
           retention-days: 7
+
+  frontend-tests:
+    # 매트릭스 잡 이름은 모듈에 따라 바뀌므로, '프론트 테스트 전체 통과' 하나로 모은다(필수 검사로 걸 때 이것).
+    name: Frontend tests (all modules)
+    needs: frontend-module
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: All feature modules passed
+        run: |
+          echo "feature module jobs: ${{ needs.frontend-module.result }}"
+          [ "${{ needs.frontend-module.result }}" = "success" ]
 
   backend-integration:
     name: Frontend ↔ backend contract (live API)
@@ -171,7 +206,7 @@ jobs:
       - name: Contract tests (DoguRepository against the live API)
         working-directory: app
         run: |
-          flutter test test/backend_contract_test.dart \
+          flutter test test/integration/backend_contract_test.dart \
             --dart-define=BACKEND_INTEGRATION=true \
             --dart-define=API_BASE_URL=http://127.0.0.1:8000
 

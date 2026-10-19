@@ -4,7 +4,7 @@ name: Update goldens
 # 로컬 macOS에서 --update-goldens로 만든 이미지는 폰트/안티에일리어싱이 달라 CI에서 깨진다.
 #
 # 쓰는 법: Actions → Update goldens → Run workflow(브랜치 선택) → 끝나면 goldens 아티팩트를
-# 내려받아 app/test/goldens/에 덮어쓰고 커밋한다.
+# 내려받아 app/test/features/에 풀어 덮어쓰고 커밋한다(아티팩트 안은 <기능>/goldens/*.png).
 on:
   workflow_dispatch:
 
@@ -35,5 +35,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: goldens
-          path: app/test/goldens/*.png
+          path: app/test/features/*/goldens/*.png
           retention-days: 7

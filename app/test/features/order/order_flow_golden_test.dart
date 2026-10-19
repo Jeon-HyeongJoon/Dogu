@@ -11,7 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dogu_mobile_shop/main.dart';
 
 // 주문 완료 흐름(배송 안내 → 주문 결과) 두 화면을 모바일 뷰포트로 스냅샷한다.
-// golden 태그 → CI 제외. (재)생성: flutter test --update-goldens --tags golden
+// 골든 정본은 CI(ubuntu) 렌더 — 이 모듈의 CI 잡이 함께 돌린다. 로컬(macOS)에선 폰트/AA 차이로 깨지니
+// scripts/test_modules.sh는 기본으로 제외한다. 정본 갱신: Actions → Update goldens.
 void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();

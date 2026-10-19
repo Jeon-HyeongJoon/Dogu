@@ -6,6 +6,7 @@ tags:
       job starts uvicorn against the committed fixture DB first).
   golden:
     description: >-
-      Golden image snapshot tests. Platform-sensitive (font/anti-aliasing
-      differences), so committed as image deliverables and regenerated locally
-      with `flutter test --update-goldens --tags golden`; excluded from CI.
+      Golden image snapshot tests. The canonical PNGs are rendered on CI
+      (ubuntu) — each feature module's CI job runs its goldens. Local macOS
+      renders differ (fonts/anti-aliasing), so scripts/test_modules.sh skips
+      them by default; regenerate via the "Update goldens" workflow.
