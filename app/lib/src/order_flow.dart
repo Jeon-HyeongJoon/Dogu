@@ -332,7 +332,7 @@ class OrderRevealPage extends StatelessWidget {
   const OrderRevealPage({required this.receipt, this.onDone, super.key});
 
   /// 손글씨체로 찍는 농담 한 줄. 이 문자열의 글자는 서브셋 폰트
-  /// (app/assets/fonts/gaegu/charset.txt)에 모두 들어 있어야 한다 — font_charset_test가 검증.
+  /// (packages/dogu_ui/assets/fonts/gaegu/charset.txt)에 모두 들어 있어야 한다 — font_charset_test가 검증.
   static const jokeLine = '상자는 비어 있었어요, 헤헤.';
   final OrderReceipt receipt;
   final VoidCallback? onDone;

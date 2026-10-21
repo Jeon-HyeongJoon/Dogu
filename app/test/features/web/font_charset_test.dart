@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:dogu_mobile_shop/main.dart';
 
+import '../../support/assets.dart';
+
 // 본문체(Dogu Sans)는 Pretendard 서브셋이라 charset.txt에 없는 글자는 두부(⊠)로 찍힌다.
 // 카피를 고치거나 카탈로그가 바뀌었을 때 그 사고를 여기서 잡는다.
 // 실패하면: scripts/build_fonts.sh 를 다시 돌릴 것(charset을 seed·소스에서 다시 만든다).
@@ -11,7 +13,7 @@ void main() {
   late Set<int> charset;
 
   setUpAll(() {
-    final file = File('assets/fonts/dogusans/charset.txt');
+    final file = File('$designFontsDir/dogusans/charset.txt');
     expect(file.existsSync(), isTrue, reason: '${file.path} 가 없다');
     charset = file
         .readAsLinesSync()
@@ -65,7 +67,7 @@ void main() {
 
   test('본문체 에셋이 서브셋이다 (통짜 원본을 커밋하지 않았다)', () {
     for (final asset in doguFontAssets) {
-      final file = File(asset);
+      final file = File(assetFile(asset));
       expect(file.existsSync(), isTrue, reason: '$asset 가 없다');
       // 원본 Pretendard는 굵기당 약 1.5MB — 실수로 통짜를 커밋하면 여기서 걸린다.
       expect(
@@ -99,7 +101,7 @@ void main() {
       reason: '$label 서브셋에 없는 글자: ${missing.join()} — scripts/build_fonts.sh 재실행',
     );
 
-    final font = File(fontAsset);
+    final font = File(assetFile(fontAsset));
     expect(font.existsSync(), isTrue, reason: '$fontAsset 가 없다');
     expect(
       font.lengthSync(),
@@ -113,7 +115,7 @@ void main() {
     expectCovers(
       '타이틀',
       doguTitleEssentialFontAssets.single,
-      'assets/fonts/doguhand/charset.txt',
+      '$designFontsDir/doguhand/charset.txt',
       DoguBrandLockup.brandName,
       64 * 1024,
     );
@@ -123,7 +125,7 @@ void main() {
     expectCovers(
       '농담',
       doguJokeFontAssets.single,
-      'assets/fonts/gaegu/charset.txt',
+      '$designFontsDir/gaegu/charset.txt',
       OrderRevealPage.jokeLine,
       400 * 1024,
     );
@@ -133,7 +135,7 @@ void main() {
     expectCovers(
       '타이틀(폴백)',
       doguTitleEssentialFontAssets.single,
-      'assets/fonts/doguhand/charset.txt',
+      '$designFontsDir/doguhand/charset.txt',
       OrderRevealPage.jokeLine,
       64 * 1024,
     );
