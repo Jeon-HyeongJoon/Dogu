@@ -111,6 +111,45 @@ jobs:
       - name: Component tests
         run: flutter test
 
+  design-catalog:
+    # 디자인 시스템 카탈로그(Widgetbook) — use_cases.dart의 사례가 카탈로그 화면이자 컴포넌트 골든이다.
+    # 골든 정본은 이 잡(ubuntu) 렌더. 모든 컴포넌트가 사례를 갖는지도 여기서 본다(catalog_coverage_test).
+    name: Design catalog (widgetbook)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/dogu_ui/widgetbook
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.0"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Static analysis
+        run: flutter analyze
+
+      - name: Catalog coverage + component goldens
+        run: flutter test
+
+      - name: Catalog builds for the web
+        run: flutter build web --release
+
+      - name: Upload golden diffs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures-catalog
+          path: packages/dogu_ui/widgetbook/test/failures/**
+          if-no-files-found: ignore
+          retention-days: 7
+
   # ── 프론트 기능 모듈 테스트 ──────────────────────────────────────────────
   # app/test/features/<기능>/ 디렉터리 하나가 잡 하나('Frontend · <기능>')다. 목록은 디렉터리에서
   # 찾으므로 새 기능은 디렉터리만 추가하면 여기 자동으로 들어간다. 로컬: app/scripts/test_modules.sh

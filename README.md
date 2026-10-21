@@ -109,6 +109,18 @@ cd packages/dogu_ui
 flutter analyze && flutter test   # CI job: Design system (dogu_ui)
 ```
 
+The component catalog is a Widgetbook app in `packages/dogu_ui/widgetbook`. Its
+`lib/use_cases.dart` is the single list of use cases: the catalog shows them, and
+`test/component_goldens_test.dart` snapshots each one (CI job: Design catalog (widgetbook);
+canonical PNGs come from CI, regenerate with the "Update goldens" workflow →
+`catalog-goldens`). `test/catalog_coverage_test.dart` fails if a component has no use case.
+
+```sh
+cd packages/dogu_ui/widgetbook
+flutter run -d chrome                       # browse the catalog
+flutter test --exclude-tags golden          # coverage guard (goldens are CI-rendered)
+```
+
 Font files (subsets) live in the package too (`packages/dogu_ui/assets/fonts`); the app
 registers them at runtime from the asset keys the package exports; `scripts/build_fonts.sh` scans both `app/lib` and
 `packages/dogu_ui/lib` for the characters to keep.

@@ -5,6 +5,7 @@ name: Update goldens
 #
 # 쓰는 법: Actions → Update goldens → Run workflow(브랜치 선택) → 끝나면 goldens 아티팩트를
 # 내려받아 app/test/features/에 풀어 덮어쓰고 커밋한다(아티팩트 안은 <기능>/goldens/*.png).
+# 디자인 시스템 컴포넌트 골든은 catalog-goldens 아티팩트 → packages/dogu_ui/widgetbook/test/goldens/에 푼다.
 on:
   workflow_dispatch:
 
@@ -36,4 +37,17 @@ jobs:
         with:
           name: goldens
           path: app/test/features/*/goldens/*.png
+          retention-days: 7
+
+      - name: Regenerate component goldens (design catalog)
+        working-directory: packages/dogu_ui/widgetbook
+        run: |
+          flutter pub get
+          flutter test --update-goldens --tags golden
+
+      - name: Upload component goldens
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-goldens
+          path: packages/dogu_ui/widgetbook/test/goldens/**
           retention-days: 7
