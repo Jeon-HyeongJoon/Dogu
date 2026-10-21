@@ -2,6 +2,7 @@
 //
 // 화면 전체 골든은 디자인 시스템 분리(packages/dogu_ui) 같은 "화면이 바뀌면 안 되는" 정리의 안전망이다.
 // 정본 PNG는 CI(ubuntu) 렌더 — 로컬 macOS에선 폰트/AA 차이로 깨진다(scripts/test_modules.sh 기본 제외).
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -47,6 +48,21 @@ void setGoldenViewport(WidgetTester tester, Size size) {
   addTearDown(tester.view.resetDevicePixelRatio);
 }
 
+/// 앱 셸의 탭 하나를 골든 크기로 띄운다(헤더 로고 디코딩까지).
+Future<void> pumpGoldenApp(WidgetTester tester, Size size, {required int tab, AppStore? store}) async {
+  setGoldenViewport(tester, size);
+  await tester.pumpWidget(DoguApp(store: store ?? goldenStore(), initializeStore: false, initialTabIndex: tab));
+  await precacheLogo(tester, find.byType(Header));
+}
+
+/// 셸 밖 화면(상품 상세 등)을 앱과 같은 테마로 띄운다.
+Widget goldenMaterialApp(AppStore store, Widget home) {
+  return AppStateScope(
+    store: store,
+    child: MaterialApp(debugShowCheckedModeBanner: false, theme: buildDoguTheme(), home: home),
+  );
+}
+
 /// 헤더·푸터 로고는 PNG 에셋이라 디코딩을 강제해야 골든에 실제로 찍힌다.
 Future<void> precacheLogo(WidgetTester tester, Finder context) async {
   await tester.runAsync(() async {
@@ -89,8 +105,8 @@ final goldenProducts = <ProductItem>[
 ];
 
 /// 화면 골든용 스토어 — 백엔드 응답이 끝난 뒤(로딩 아님)의 결정적인 상태.
-AppStore goldenStore() {
-  final store = AppStore(repository: FakeRepository(detailProduct: goldenProducts[7]));
+AppStore goldenStore({DoguRepository? repository}) {
+  final store = AppStore(repository: repository ?? FakeRepository(detailProduct: goldenProducts[7]));
   const labels = ['식품', '생활용품', '반려동물용품', '건강/의료용품', '화장품/미용', '출산/유아동', '조명/인테리어', '여성의류', '남성의류'];
   store.categories = [
     for (final (i, label) in labels.indexed)
@@ -112,5 +128,20 @@ AppStore goldenStore() {
     ..recentSearches = const ['가디건', '생수']
     ..wishlistIds = {goldenProducts[2].id, goldenProducts[6].id}
     ..cartQuantities = {goldenProducts[0].id: 2, goldenProducts[7].id: 1};
+  return store;
+}
+
+/// 첫 화면의 실제 로딩 상태 — 번들 seed는 들어왔지만 백엔드가 아직 답하지 않았다(응답은 끝내 오지 않는다).
+/// 카테고리·브랜드·히어로 숫자 자리에 로딩 표시가 있어야 한다(seed 내용을 먼저 보여주지 않는다).
+Future<AppStore> goldenLoadingStore(WidgetTester tester) async {
+  final store = AppStore(seedSource: LocalSeedSource(), repository: GatedRepository(Completer<void>().future));
+  await tester.runAsync(() async {
+    unawaited(store.initialize());
+    for (var i = 0; i < 50 && store.categories.isEmpty; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    }
+  });
+  expect(store.catalogLoading, isTrue, reason: '백엔드 응답 전이어야 한다');
+  expect(store.categories, isNotEmpty, reason: '번들 seed는 들어와 있어야 한다');
   return store;
 }
