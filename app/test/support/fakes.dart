@@ -46,6 +46,18 @@ class GatedProductsRepository extends FakeRepository {
   }
 }
 
+/// 상품 상세 응답을 gate가 열릴 때까지 붙잡는다 — 상품 주소로 바로 들어왔을 때의 로딩 화면.
+class GatedDetailRepository extends FakeRepository {
+  GatedDetailRepository(this.gate);
+  final Future<void> gate;
+
+  @override
+  Future<ProductItem> fetchProduct(String productId) async {
+    await gate;
+    return super.fetchProduct(productId);
+  }
+}
+
 class GatedRepository extends FakeRepository {
   GatedRepository(this.gate);
   final Future<void> gate;
