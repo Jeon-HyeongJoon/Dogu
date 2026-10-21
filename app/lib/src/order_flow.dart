@@ -97,7 +97,7 @@ class _OrderStatement extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 30, height: 1.05, letterSpacing: -1, fontWeight: FontWeight.w700),
+      style: const TextStyle(fontSize: 30, height: 1.05, letterSpacing: -1, fontWeight: FontWeight.w700, color: AppColors.accentBright),
     );
   }
 }
@@ -142,12 +142,12 @@ class _OrderLineRow extends StatelessWidget {
                   product.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500),
+                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: AppColors.accentBright),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    MonoText(formatWon(product.numericPrice * quantity), size: 14, weight: FontWeight.w700),
+                    PriceText(formatWon(product.numericPrice * quantity), size: 15),
                     const SizedBox(width: 8),
                     MonoText('× $quantity', size: 11, color: AppColors.ink3),
                   ],
@@ -240,7 +240,7 @@ class OrderDeliveryPage extends StatelessWidget {
           const Spacer(),
           Text(
             _longDate(receipt.arrivalAt),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: -0.5),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: -0.5, color: AppColors.accentBright),
           ),
         ],
       ),
@@ -315,7 +315,7 @@ class _TimelineRow extends StatelessWidget {
           size: isCurrent ? 10 : 11,
           weight: isCurrent ? FontWeight.w700 : FontWeight.w400,
           color: isCurrent
-              ? AppColors.alert
+              ? AppColors.alertBright
               : isTodo
                   ? AppColors.ink4
                   : AppColors.ink3,
@@ -351,7 +351,7 @@ class OrderRevealPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const MonoText('ORDER RESULT', size: 10, color: AppColors.alert, weight: FontWeight.w700),
+                    const MonoText('ORDER RESULT', size: 10, color: AppColors.alertBright, weight: FontWeight.w700),
                     const SizedBox(height: 14),
                     const _OrderStatement('사실은요,\n안 보냈습니다'),
                     const SizedBox(height: 12),
@@ -372,7 +372,7 @@ class OrderRevealPage extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                           fontSize: 30,
                           height: 1.25,
-                          color: AppColors.alert,
+                          color: AppColors.alertBright,
                         ),
                       ),
                     ),
@@ -437,7 +437,7 @@ class OrderRevealPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('실제로 나간 돈', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                  const MonoText('₩0', size: 22, weight: FontWeight.w800, color: AppColors.accent),
+                  const PriceText('₩0', size: 24, color: AppColors.accentBright),
                 ],
               ),
             ],
@@ -450,8 +450,9 @@ class OrderRevealPage extends StatelessWidget {
             angle: -11 * pi / 180,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              // 크림 종이에 찍힌 빨간 도장 — 초록 위 빨간 글씨는 안 보여서 도장 바탕을 크림으로.
               decoration: BoxDecoration(
-                color: AppColors.bg,
+                color: AppColors.ink,
                 border: Border.all(color: AppColors.alert, width: 2),
               ),
               child: const Column(
@@ -477,11 +478,11 @@ class OrderRevealPage extends StatelessWidget {
     );
   }
 
-  /// 굳은 돈 — 결제바와 같은 잉크 블랙 블록.
+  /// 굳은 돈 — 결제바와 같은 가장 깊은 초록에 금테.
   Widget _savedBlock() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-      color: AppColors.ink,
+      decoration: BoxDecoration(color: AppColors.deep, border: Border.all(color: AppColors.accentDeep)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -494,12 +495,7 @@ class OrderRevealPage extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.centerLeft,
-                  child: MonoText(
-                    formatWon(receipt.total),
-                    size: 34,
-                    color: AppColors.invert,
-                    weight: FontWeight.w800,
-                  ),
+                  child: PriceText(formatWon(receipt.total), size: 38, color: AppColors.accentBright),
                 ),
               ),
               const SizedBox(width: 12),
@@ -529,8 +525,8 @@ class _OrderBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.bg,
-        border: Border(top: BorderSide(color: AppColors.line)),
+        color: AppColors.potDeep,
+        border: Border(top: BorderSide(color: AppColors.accentDeep)),
       ),
       child: SafeArea(
         top: false,

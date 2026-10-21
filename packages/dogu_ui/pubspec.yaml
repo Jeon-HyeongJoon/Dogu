@@ -30,3 +30,5 @@ flutter:
     - assets/fonts/doguhand/DoguHand-Thin.otf
     # Gaegu Bold 서브셋 — 주문 결과 화면의 농담 한 줄 전용
     - assets/fonts/gaegu/Gaegu-Bold-subset.ttf
+    # Dogu Serif = Playfair Display Bold 서브셋 — 가격·숫자(294KB → 49KB), 개명·₩ 합성은 assets/fonts/doguserif/NOTICE.md
+    - assets/fonts/doguserif/DoguSerif-Bold.ttf

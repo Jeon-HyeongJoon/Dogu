@@ -56,6 +56,7 @@ class _PaymentToastOverlayState extends State<PaymentToastOverlay> {
           margin: EdgeInsets.only(bottom: navBarHeight),
           decoration: BoxDecoration(
             color: AppColors.bg,
+            border: Border.all(color: AppColors.accentDeep),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: const [BoxShadow(color: Color(0x26000000), blurRadius: 24, offset: Offset(0, -2))],
           ),
@@ -65,7 +66,7 @@ class _PaymentToastOverlayState extends State<PaymentToastOverlay> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (_response == null) ...[
-                  const Text('결제 진행', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                  const Text('결제 진행', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.accentBright)),
                   const SizedBox(height: 6),
                   Text('선택 상품 $count개 · ${formatWon(total)}', style: const TextStyle(fontSize: 13, color: AppColors.ink3)),
                   if (items.isNotEmpty) ...[
@@ -87,7 +88,7 @@ class _PaymentToastOverlayState extends State<PaymentToastOverlay> {
                   else
                     AppButton(text: '결제하기', primary: true, large: true, onTap: _completePayment),
                 ] else ...[
-                  const Text('결제가 완료되었습니다.', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                  const Text('결제가 완료되었습니다.', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.accentBright)),
                   const SizedBox(height: 6),
                   Text('주문번호: ${_response!['order_id']}', style: const TextStyle(fontSize: 13, color: AppColors.ink3)),
                   const SizedBox(height: 10),
@@ -160,7 +161,8 @@ class _CartToastState extends State<CartToast> {
               color: Colors.transparent,
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.ink,
+                  color: AppColors.potDeep,
+                  border: Border.all(color: AppColors.accent),
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 16, offset: Offset(0, 4))],
                 ),
@@ -172,7 +174,7 @@ class _CartToastState extends State<CartToast> {
                     Expanded(
                       child: Text(
                         _lastMessage,
-                        style: const TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w500),
+                        style: const TextStyle(color: AppColors.ink, fontSize: 13.5, fontWeight: FontWeight.w500),
                       ),
                     ),
                   ],

@@ -47,7 +47,7 @@ class DoguNavBar extends StatelessWidget {
               if (i != cells.length - 1)
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 11),
-                  child: Text('|', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w300, color: AppColors.ink4)),
+                  child: Text('|', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w300, color: AppColors.line)),
                 ),
             ],
           ],

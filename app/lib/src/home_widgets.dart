@@ -183,12 +183,12 @@ class SearchBarBlock extends StatelessWidget {
           height: 38,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: AppColors.bgSoft,
+            color: AppColors.bgAlt,
             border: Border.all(color: AppColors.line),
           ),
           child: const Row(
             children: [
-              Icon(Icons.search, size: 16, color: AppColors.ink3),
+              Icon(Icons.search, size: 16, color: AppColors.accent),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -251,7 +251,15 @@ class HeroBlock extends StatelessWidget {
     final store = AppStateScope.watch(context);
     return SectionBorder(
       child: Container(
-        color: AppColors.heroBg,
+        // 깊은 초록 위로 금빛이 위에서 번진다(시안의 광고 무대).
+        decoration: const BoxDecoration(
+          color: AppColors.heroBg,
+          gradient: RadialGradient(
+            center: Alignment(0, -1.1),
+            radius: 1.3,
+            colors: [Color(0x26efd493), Color(0x00efd493)],
+          ),
+        ),
         padding: const EdgeInsets.fromLTRB(AppSpace.pad, 28, AppSpace.pad, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,13 +276,15 @@ class HeroBlock extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               store.heroTitle.replaceFirst(', ', ',\n'),
+              // 금박 글씨 — 아래로 한 겹 짙은 금 그림자를 깔아 도드라지게(시안의 DESIRE).
               style: const TextStyle(
                 fontFamily: doguFontFamily,
-                color: Colors.white,
+                color: AppColors.accentBright,
                 fontSize: 44,
                 height: 1.08,
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.w700,
                 letterSpacing: -1.5,
+                shadows: [Shadow(color: AppColors.accentDeep, offset: Offset(0, 2))],
               ),
             ),
             const SizedBox(height: 18),
@@ -351,7 +361,7 @@ class FeaturedCard extends StatelessWidget {
       );
     }
     return Container(
-      decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.line)),
+      decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.accent)),
       child: Column(
         children: [
           AspectRatio(
@@ -363,13 +373,13 @@ class FeaturedCard extends StatelessWidget {
               thumbnailWidth: 640,
               child: Stack(
                 children: [
-                  const Positioned(top: 12, left: 12, child: MonoText('001 / FEATURED', size: 9.5, color: AppColors.ink3)),
+                  const Positioned(top: 12, left: 12, child: MonoText('001 / FEATURED', size: 9.5, color: AppColors.accent)),
                   if (featured.badge != null) Positioned(top: 12, right: 12, child: BadgePill(text: featured.badge!, color: AppColors.accent)),
                 ],
               ),
             ),
           ),
-          Container(height: 1, color: AppColors.line),
+          Container(height: 1, color: AppColors.accent),
           Padding(
             padding: const EdgeInsets.all(14),
             child: GestureDetector(
@@ -382,7 +392,7 @@ class FeaturedCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(featured.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                        Text(featured.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.accentBright)),
                         const SizedBox(height: 2),
                         MonoText(featured.brand, size: 11, color: AppColors.ink3),
                       ],
@@ -392,7 +402,7 @@ class FeaturedCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       if (featured.hasDiscount) StrikeText(featured.oldPrice),
-                      MonoText(featured.price, size: 14.5, color: AppColors.accent, weight: FontWeight.w700),
+                      PriceText(featured.price, size: 17, color: AppColors.accentBright),
                     ],
                   ),
                 ],
@@ -451,8 +461,8 @@ class _TickerStripState extends State<TickerStrip> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 11),
       decoration: const BoxDecoration(
-        color: AppColors.bgSoft,
-        border: Border(bottom: BorderSide(color: AppColors.line)),
+        color: AppColors.deep,
+        border: Border(bottom: BorderSide(color: AppColors.accentDeep)),
       ),
       child: SingleChildScrollView(
         controller: _sc,
@@ -462,8 +472,12 @@ class _TickerStripState extends State<TickerStrip> {
           children: [
             const SizedBox(width: AppSpace.pad),
             for (final item in [...items, ...items]) ...[
-              MonoText(item, size: 10.5, color: AppColors.ink2),
-              Container(width: 3, height: 3, margin: const EdgeInsets.symmetric(horizontal: 22), color: AppColors.ink3),
+              MonoText(item, size: 10.5, color: AppColors.accent, weight: FontWeight.w600),
+              // 금 마름모
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 22),
+                child: Transform.rotate(angle: pi / 4, child: Container(width: 4, height: 4, color: AppColors.accentDeep)),
+              ),
             ],
           ],
         ),
@@ -592,7 +606,10 @@ class DealSection extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 36),
       padding: const EdgeInsets.symmetric(vertical: 32),
-      color: AppColors.ink,
+      decoration: const BoxDecoration(
+        color: AppColors.deep,
+        border: Border(top: BorderSide(color: AppColors.accentDeep), bottom: BorderSide(color: AppColors.accentDeep)),
+      ),
       child: Column(
         children: [
           Padding(
@@ -601,13 +618,17 @@ class DealSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
+                // 좁은 폭에선 제목 쪽이 줄어든다 — 마감 시계(빨간 면)는 줄지 않는다.
+                const Flexible(
+                  child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Eyebrow(index: '02', text: 'TODAY ONLY', inverted: true),
-                    Text('오늘의 딜', style: TextStyle(fontSize: 34, height: 1, color: AppColors.invert, fontWeight: FontWeight.w800, letterSpacing: -1.2)),
+                    Text('오늘의 딜', style: TextStyle(fontSize: 34, height: 1, color: AppColors.accentBright, fontWeight: FontWeight.w800, letterSpacing: -1.2)),
                   ],
                 ),
+                ),
+                const SizedBox(width: 12),
                 const CountdownTimer(initialSeconds: _initialCountdownSeconds),
               ],
             ),

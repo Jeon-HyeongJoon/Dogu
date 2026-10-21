@@ -23,14 +23,14 @@ class SectionHead extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Eyebrow(index: index, text: eyebrow),
-              Text(title, style: const TextStyle(fontSize: 34, height: 1, fontWeight: FontWeight.w800, letterSpacing: -1.3)),
+              Text(title, style: const TextStyle(fontSize: 34, height: 1, fontWeight: FontWeight.w800, letterSpacing: -1.3, color: AppColors.accentBright)),
             ],
           ),
           if (link != null)
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: onLinkTap,
-              child: Text(link!, style: const TextStyle(fontSize: 12, decoration: TextDecoration.underline)),
+              child: Text(link!, style: const TextStyle(fontSize: 12, color: AppColors.accent, decoration: TextDecoration.underline, decorationColor: AppColors.accent)),
             ),
         ],
       ),

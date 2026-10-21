@@ -16,13 +16,6 @@ void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     await loadCatalogFonts();
-    // MonoText의 'monospace'는 테스트 환경에서 Ahem(모든 글리프를 사각형으로 그리는 테스트 폰트)으로 잡힌다.
-    // 앱 골든과 같게 본문체를 그 이름으로 등록한다.
-    final mono = FontLoader('monospace');
-    for (final asset in doguFontAssets) {
-      mono.addFont(rootBundle.load(asset));
-    }
-    await mono.load();
     // 머티리얼 아이콘 등 매니페스트 폰트.
     final manifest = json.decode(await rootBundle.loadString('FontManifest.json')) as List<dynamic>;
     for (final entry in manifest.cast<Map<String, dynamic>>()) {

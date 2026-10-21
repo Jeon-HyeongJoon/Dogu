@@ -24,7 +24,7 @@ class CategoryTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            MonoText(index.toString().padLeft(2, '0'), size: 8.5, color: AppColors.ink4),
+            MonoText(index.toString().padLeft(2, '0'), size: 8.5, color: AppColors.accent),
             const SizedBox(height: 5),
             Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: -0.3, height: 1.1), maxLines: 1, overflow: TextOverflow.ellipsis),
           ],

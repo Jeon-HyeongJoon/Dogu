@@ -41,7 +41,7 @@ class TagSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              MonoText(title, size: 10, weight: FontWeight.w700),
+              MonoText(title, size: 10, weight: FontWeight.w700, color: AppColors.accent),
               if (action != null && tags.isNotEmpty) GestureDetector(onTap: onAction, child: Text(action!, style: const TextStyle(fontSize: 11, color: AppColors.ink4))),
             ],
           ),

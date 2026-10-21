@@ -16,10 +16,10 @@ void main() {
   test('index.html preloads exactly the fonts registered before first paint', () {
     final hrefs = preloads.map((tag) => RegExp(r'href="([^"]+)"').firstMatch(tag)!.group(1)!).toSet();
     final expected = {
-      for (final asset in [...doguEssentialFontAssets, ...doguTitleEssentialFontAssets]) 'assets/$asset',
+      for (final asset in [...doguEssentialFontAssets, ...doguTitleEssentialFontAssets, ...doguSerifFontAssets]) 'assets/$asset',
     };
     expect(hrefs, expected);
-    for (final asset in [...doguEssentialFontAssets, ...doguTitleEssentialFontAssets]) {
+    for (final asset in [...doguEssentialFontAssets, ...doguTitleEssentialFontAssets, ...doguSerifFontAssets]) {
       expect(File(assetFile(asset)).existsSync(), isTrue, reason: '$asset 가 없다');
     }
   });

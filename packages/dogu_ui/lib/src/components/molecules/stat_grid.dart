@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../atoms/loading_dots.dart';
 import '../atoms/mono_text.dart';
+import '../atoms/price_text.dart';
 import '../../tokens/tokens.dart';
 
 /// 숫자 요약 줄(히어로의 신상품·브랜드·평균 할인 등). [loading]이면 같은 자리에 로딩 점.
@@ -36,7 +37,7 @@ class StatGrid extends StatelessWidget {
                   maintainState: true,
                   child: _row(stats.isEmpty ? _placeholder : stats, lineColor),
                 ),
-                LoadingDots(color: dark ? AppColors.heroInk3 : AppColors.ink3),
+                const LoadingDots(),
               ],
             )
           : _row(stats, lineColor),
@@ -56,7 +57,7 @@ class StatGrid extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  MonoText(stats[i].$1, size: 20, weight: FontWeight.w500, color: dark ? AppColors.heroInk : AppColors.ink),
+                  PriceText(stats[i].$1, size: 22, color: dark ? AppColors.accentBright : AppColors.ink),
                   const SizedBox(height: 2),
                   MonoText(stats[i].$2, size: 10.5, color: dark ? AppColors.heroInk3 : AppColors.ink4),
                 ],

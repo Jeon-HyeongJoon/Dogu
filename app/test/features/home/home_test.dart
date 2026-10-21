@@ -277,7 +277,8 @@ void main() {
       ),
     );
 
-    expect(find.text('● TEST DROP'), findsOneWidget);
+    // '● '는 글자 대신 빨간 점으로 그린다(Tag) — 문구는 점 뒤만 남는다.
+    expect(find.text('TEST DROP'), findsOneWidget);
     expect(find.text('06.01 — 06.15'), findsOneWidget);
     expect(find.text('관리페이지에서 바꾼\n광고 문구'), findsOneWidget);
     expect(find.text('관리페이지 수정 내용이 앱에도 반영됩니다.'), findsOneWidget);

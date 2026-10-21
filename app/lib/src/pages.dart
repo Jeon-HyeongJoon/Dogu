@@ -125,7 +125,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   children: [
                     MonoText(_product.brand, size: 10.5, color: AppColors.ink4),
                     const SizedBox(height: 10),
-                    Text(_product.name, style: const TextStyle(fontSize: 28, height: 1.08, letterSpacing: -0.8, fontWeight: FontWeight.w700)),
+                    Text(_product.name, style: const TextStyle(fontSize: 28, height: 1.08, letterSpacing: -0.8, fontWeight: FontWeight.w700, color: AppColors.accentBright)),
                     if (_product.subtitle.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Text(_product.subtitle, style: const TextStyle(fontSize: 13.5, color: AppColors.ink3, height: 1.5)),
@@ -138,8 +138,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         if (_product.hasDiscount)
-                          MonoText(_product.discount, size: 16, color: AppColors.accent, weight: FontWeight.w700),
-                        MonoText(_product.price, size: 20, weight: FontWeight.w800),
+                          PriceText(_product.discount, size: 17, color: AppColors.alertBright),
+                        PriceText(_product.price, size: 26, color: AppColors.accentBright),
                         if (_product.hasDiscount) StrikeText(_product.oldPrice),
                       ],
                     ),
@@ -181,7 +181,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             top: false,
             child: Container(
               padding: const EdgeInsets.fromLTRB(AppSpace.pad, 12, AppSpace.pad, 16),
-              decoration: const BoxDecoration(color: AppColors.bg, border: Border(top: BorderSide(color: AppColors.line))),
+              decoration: const BoxDecoration(color: AppColors.potDeep, border: Border(top: BorderSide(color: AppColors.accentDeep))),
               child: Row(
                 children: [
                   GestureDetector(
@@ -191,8 +191,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       width: 48,
                       height: 48,
                       alignment: Alignment.center,
-                      decoration: BoxDecoration(color: AppColors.bg, border: Border.all(color: AppColors.line)),
-                      child: Text(wished ? '♥' : '♡', style: TextStyle(color: wished ? AppColors.accent : AppColors.ink3, fontSize: 18)),
+                      decoration: BoxDecoration(border: Border.all(color: wished ? AppColors.alertBright : AppColors.accent)),
+                      child: Text(wished ? '♥' : '♡', style: TextStyle(color: wished ? AppColors.alertBright : AppColors.accent, fontSize: 18)),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -296,7 +296,7 @@ class BrandSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Padding(padding: EdgeInsets.symmetric(horizontal: AppSpace.pad), child: Eyebrow(index: '04', text: "THIS WEEK'S BRANDS")),
-          const Padding(padding: EdgeInsets.fromLTRB(AppSpace.pad, 8, AppSpace.pad, 20), child: Text('참여 브랜드', style: TextStyle(fontSize: 34, height: 1, fontWeight: FontWeight.w800, letterSpacing: -1.2))),
+          const Padding(padding: EdgeInsets.fromLTRB(AppSpace.pad, 8, AppSpace.pad, 20), child: Text('참여 브랜드', style: TextStyle(fontSize: 34, height: 1, fontWeight: FontWeight.w800, letterSpacing: -1.2, color: AppColors.accentBright))),
           // 응답 전엔 두 줄의 자리를 그대로 두고(보이지 않게) 로딩 점 — 브랜드가 나타날 때 밀리지 않게.
           if (store.catalogLoading)
             Stack(
@@ -337,7 +337,7 @@ class BrandRow extends StatelessWidget {
             for (final item in [...items, ...items])
               Padding(
                 padding: const EdgeInsets.only(right: 28),
-                child: Text(item, style: const TextStyle(fontSize: 20, color: AppColors.ink3, fontWeight: FontWeight.w600, letterSpacing: -0.5)),
+                child: Text(item, style: const TextStyle(fontSize: 20, color: AppColors.accent, fontWeight: FontWeight.w600, letterSpacing: -0.5)),
               ),
           ],
         ),
@@ -378,28 +378,31 @@ class _NewsletterSectionState extends State<NewsletterSection> {
   Widget build(BuildContext context) {
     final data = AppStateScope.watch(context).newsletter;
     return Container(
-      color: AppColors.ink,
+      decoration: const BoxDecoration(
+        color: AppColors.deep,
+        border: Border(top: BorderSide(color: AppColors.accentDeep)),
+      ),
       padding: const EdgeInsets.fromLTRB(AppSpace.pad, 44, AppSpace.pad, 36),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MonoText(data['eyebrow'] ?? '— 매주 수요일 발송', size: 10.5, color: AppColors.ink4),
+          MonoText(data['eyebrow'] ?? '— 매주 수요일 발송', size: 10.5, color: AppColors.accent),
           const SizedBox(height: 14),
-          Text(data['title'] ?? '조용한 신상품을\n가장 먼저.', style: const TextStyle(fontSize: 36, height: 1, color: AppColors.invert, fontWeight: FontWeight.w700, letterSpacing: -1.4)),
+          Text(data['title'] ?? '조용한 신상품을\n가장 먼저.', style: const TextStyle(fontSize: 36, height: 1, color: AppColors.accentBright, fontWeight: FontWeight.w700, letterSpacing: -1.4)),
           const SizedBox(height: 28),
           Container(
-            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.ink2))),
+            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.accent))),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _controller,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration.collapsed(hintText: 'you@email.com', hintStyle: TextStyle(fontSize: 13, color: Color(0xff555555), fontFamily: 'monospace')),
-                    style: const TextStyle(fontSize: 13, color: AppColors.invert, fontFamily: 'monospace'),
+                    decoration: const InputDecoration.collapsed(hintText: 'you@email.com', hintStyle: TextStyle(fontSize: 13, color: AppColors.ink4, letterSpacing: 0.8)),
+                    style: const TextStyle(fontSize: 13, color: AppColors.ink, letterSpacing: 0.8),
                   ),
                 ),
-                GestureDetector(onTap: _subscribe, child: const Padding(padding: EdgeInsets.symmetric(vertical: 14), child: Text('구독', style: TextStyle(color: AppColors.invert, fontWeight: FontWeight.w600)))),
+                GestureDetector(onTap: _subscribe, child: const Padding(padding: EdgeInsets.symmetric(vertical: 14), child: Text('구독', style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w700)))),
               ],
             ),
           ),
@@ -424,7 +427,7 @@ class FooterSection extends StatelessWidget {
     };
     return Container(
       padding: const EdgeInsets.fromLTRB(AppSpace.pad, 32, AppSpace.pad, 28),
-      decoration: const BoxDecoration(border: Border(top: BorderSide(color: AppColors.line))),
+      decoration: const BoxDecoration(color: AppColors.potDeep, border: Border(top: BorderSide(color: AppColors.accentDeep))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -475,7 +478,7 @@ class _FooterGroupState extends State<FooterGroup> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                MonoText(widget.title, size: 11, weight: FontWeight.w700),
+                MonoText(widget.title, size: 11, weight: FontWeight.w700, color: AppColors.accent),
                 Text(_expanded ? '−' : '+', style: const TextStyle(color: AppColors.ink3)),
               ],
             ),

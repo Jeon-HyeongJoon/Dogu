@@ -159,12 +159,12 @@ class _BigSearchBoxState extends State<BigSearchBox> {
       height: 48,
       margin: const EdgeInsets.all(AppSpace.pad - 4),
       padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(border: Border.all(color: AppColors.ink), color: AppColors.bg),
+      decoration: BoxDecoration(border: Border.all(color: AppColors.accent), color: AppColors.bgAlt),
       child: Row(
         children: [
           GestureDetector(
             onTap: () => _performSearch(_controller.text),
-            child: const Icon(Icons.search, size: 18),
+            child: const Icon(Icons.search, size: 18, color: AppColors.accent),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -286,7 +286,7 @@ class WishGridBlock extends StatelessWidget {
         itemBuilder: (context, index) => Stack(
           children: [
             ProductCard(product: items[index]),
-            Positioned(top: 8, right: 8, child: GestureDetector(onTap: () => AppStateScope.read(context).toggleWishlist(items[index]), child: Container(width: 26, height: 26, alignment: Alignment.center, decoration: BoxDecoration(color: AppColors.bg, border: Border.all(color: AppColors.line)), child: const Text('♥', style: TextStyle(color: AppColors.accent))))),
+            Positioned(top: 8, right: 8, child: GestureDetector(onTap: () => AppStateScope.read(context).toggleWishlist(items[index]), child: Container(width: 26, height: 26, alignment: Alignment.center, decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.alertBright)), child: const Text('♥', style: TextStyle(color: AppColors.alertBright))))),
           ],
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../tokens/tokens.dart';
 import '../atoms/badge_pill.dart';
 import '../atoms/mono_text.dart';
+import '../atoms/price_text.dart';
 import '../atoms/strike_text.dart';
 import 'product_image.dart';
 
@@ -59,7 +60,7 @@ class _ProductCardViewState extends State<ProductCardView> {
     final wished = widget.wished;
     final product = widget.data;
     final dark = widget.dark;
-    final line = dark ? const Color(0xff1f1f1f) : AppColors.line;
+    final line = dark ? AppColors.deepLine : AppColors.line;
     return AnimatedScale(
       scale: _pressed ? 0.97 : 1.0,
       duration: const Duration(milliseconds: 120),
@@ -86,10 +87,10 @@ class _ProductCardViewState extends State<ProductCardView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (product.hasDiscount)
-                          BadgePill(text: product.discount, color: dark ? AppColors.accent : AppColors.ink),
+                          BadgePill(text: product.discount, color: AppColors.alert), // 할인은 빨간 면
                         if (product.badge != null) ...[
                           const SizedBox(height: 3),
-                          BadgePill(text: product.badge!, color: dark ? const Color(0xff1a1a1a) : AppColors.bg, ink: dark ? AppColors.invert : AppColors.ink, bordered: true),
+                          BadgePill(text: product.badge!, color: dark ? AppColors.deep : AppColors.bgAlt, ink: AppColors.accentBright, bordered: true),
                         ],
                       ],
                     ),
@@ -104,27 +105,27 @@ class _ProductCardViewState extends State<ProductCardView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MonoText(product.brand, size: 9.5, color: dark ? const Color(0xff7a7a7a) : AppColors.ink4),
+                MonoText(product.brand, size: 9.5, color: AppColors.ink4),
                 const SizedBox(height: 3),
                 Text(
                   product.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 12.5, height: 1.35, color: dark ? AppColors.invert : AppColors.ink, fontWeight: FontWeight.w500),
+                  style: const TextStyle(fontSize: 12.5, height: 1.35, color: AppColors.accentBright, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 7),
                 if (product.subtitle.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 7),
-                    child: Text(product.subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11.5, color: dark ? const Color(0xff9a9a9a) : AppColors.ink3)),
+                    child: Text(product.subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11.5, color: AppColors.ink3)),
                   ),
                 Wrap(
                   spacing: 6,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     if (product.hasDiscount)
-                      MonoText(product.discount, size: 12, color: AppColors.accent, weight: FontWeight.w700),
-                    MonoText(product.price, size: 13, color: dark ? AppColors.invert : AppColors.ink, weight: FontWeight.w700),
+                      PriceText(product.discount, size: 12.5, color: AppColors.alertBright),
+                    PriceText(product.price, size: 14.5),
                     if (product.hasDiscount) StrikeText(product.oldPrice),
                   ],
                 ),
@@ -133,13 +134,13 @@ class _ProductCardViewState extends State<ProductCardView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: MonoText(product.meta, size: 9.5, color: dark ? const Color(0xff6a6a6a) : AppColors.ink4),
+                      child: MonoText(product.meta, size: 9.5, color: AppColors.ink4),
                     ),
                     const SizedBox(width: 8),
                     GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: widget.onWishTap,
-                      child: MonoText(wished ? 'WISH ♥' : 'WISH +', size: 9.5, color: wished ? AppColors.accent : (dark ? const Color(0xff6a6a6a) : AppColors.ink4)),
+                      child: MonoText(wished ? 'WISH ♥' : 'WISH +', size: 9.5, color: wished ? AppColors.alertBright : AppColors.ink3, weight: wished ? FontWeight.w700 : FontWeight.w400),
                     ),
                   ],
                 ),

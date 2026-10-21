@@ -21,7 +21,7 @@ class ProductImage extends StatelessWidget {
     if (source == null || source.isEmpty) return preparing;
 
     return Container(
-      decoration: BoxDecoration(border: Border.all(color: dark ? const Color(0xff1f1f1f) : AppColors.line)),
+      decoration: BoxDecoration(border: Border.all(color: dark ? AppColors.deepLine : AppColors.line)),
       child: Stack(
         fit: StackFit.expand,
         children: [

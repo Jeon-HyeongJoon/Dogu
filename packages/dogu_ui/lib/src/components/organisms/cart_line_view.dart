@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../tokens/tokens.dart';
 import '../atoms/mono_text.dart';
+import '../atoms/price_text.dart';
 import '../atoms/strike_text.dart';
 import '../molecules/product_image.dart';
 import '../molecules/qty_box.dart';
@@ -67,13 +68,13 @@ class CartLineView extends StatelessWidget {
                 children: [
                   MonoText(brand, size: 10, color: AppColors.ink4),
                   const SizedBox(height: 4),
-                  Text(name, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500)),
+                  Text(name, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: AppColors.accentBright)),
                   if (note != null) ...[
                     const SizedBox(height: 4),
                     MonoText(note!, size: 10.5, color: AppColors.ink3),
                   ],
                   const SizedBox(height: 10),
-                  Wrap(spacing: 6, children: [if (hasDiscount) MonoText(discount, size: 11, color: AppColors.accent, weight: FontWeight.w700), MonoText(price, size: 14, weight: FontWeight.w700), if (hasDiscount) StrikeText(oldPrice)]),
+                  Wrap(spacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [if (hasDiscount) PriceText(discount, size: 12, color: AppColors.alertBright), PriceText(price, size: 15), if (hasDiscount) StrikeText(oldPrice)]),
                   const SizedBox(height: 12),
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [QtyBox(value: quantity.toString(), onMinus: onMinus, onPlus: onPlus), GestureDetector(onTap: onRemove, child: const MonoText('삭제 ×', size: 11, color: AppColors.ink4))]),
                 ],

@@ -25,7 +25,7 @@ class CategoryListRow extends StatelessWidget {
           children: [
             SizedBox(
               width: 28,
-              child: MonoText(index.toString().padLeft(2, '0'), size: 11, color: AppColors.ink4),
+              child: MonoText(index.toString().padLeft(2, '0'), size: 11, color: AppColors.accent),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -38,7 +38,7 @@ class CategoryListRow extends StatelessWidget {
                 ],
               ),
             ),
-            const Text('→'),
+            const Text('→', style: TextStyle(color: AppColors.accent)),
           ],
         ),
       ),

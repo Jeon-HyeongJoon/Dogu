@@ -3,7 +3,7 @@
 import 'package:dogu_ui/dogu_ui.dart';
 import 'package:flutter/material.dart';
 
-/// 사례 하나 — [frame]은 골든을 찍는 틀의 크기, [dark]면 어두운 바탕 위에 그린다.
+/// 사례 하나 — [frame]은 골든을 찍는 틀의 크기, [dark]면 딜·뉴스레터 같은 가장 깊은 초록 띠 위에 그린다.
 class DoguUseCase {
   const DoguUseCase(this.name, this.build, {this.frame = const Size(360, 120), this.dark = false});
 
@@ -48,6 +48,11 @@ final doguComponentCases = <DoguComponentCases>[
     DoguUseCase('muted small', (_) => const MonoText('4.6 · 1237 reviews', size: 9.5, color: AppColors.ink4)),
   ]),
   DoguComponentCases('atoms', 'StrikeText', [DoguUseCase('default', (_) => const StrikeText('₩13,900'))]),
+  DoguComponentCases('atoms', 'PriceText', [
+    DoguUseCase('default', (_) => const PriceText('₩24,900')),
+    DoguUseCase('highlight', (_) => const PriceText('₩142,400', size: 22, color: AppColors.accentBright)),
+    DoguUseCase('discount', (_) => const PriceText('-29%', size: 12.5, color: AppColors.alertBright)),
+  ]),
   DoguComponentCases('atoms', 'Eyebrow', [
     DoguUseCase('default', (_) => const Eyebrow(index: '01', text: 'SHOP BY CATEGORY')),
     DoguUseCase('inverted', (_) => const Eyebrow(index: '02', text: 'TODAY ONLY', inverted: true), dark: true),
@@ -69,7 +74,7 @@ final doguComponentCases = <DoguComponentCases>[
   ]),
   DoguComponentCases('atoms', 'LoadingDots', [
     DoguUseCase('default', (_) => const LoadingDots()),
-    DoguUseCase('on dark', (_) => const LoadingDots(color: AppColors.heroInk3), dark: true),
+    DoguUseCase('on dark', (_) => const LoadingDots(), dark: true),
   ]),
   DoguComponentCases('atoms', 'SkeletonProductCard', [
     DoguUseCase('light', (_) => const SizedBox(width: 180, child: SkeletonProductCard()), frame: Size(220, 320)),

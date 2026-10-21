@@ -9,6 +9,7 @@ export 'src/tokens/tokens.dart';
 // atoms
 export 'src/components/atoms/mono_text.dart';
 export 'src/components/atoms/strike_text.dart';
+export 'src/components/atoms/price_text.dart';
 export 'src/components/atoms/eyebrow.dart';
 export 'src/components/atoms/tag.dart';
 export 'src/components/atoms/badge_pill.dart';
