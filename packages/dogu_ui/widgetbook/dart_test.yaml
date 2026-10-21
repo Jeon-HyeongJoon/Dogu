@@ -1,0 +1,6 @@
+tags:
+  golden:
+    description: >-
+      Component golden snapshots (one per catalog use case). Canonical PNGs are
+      rendered on CI (ubuntu); local macOS renders differ, so run locally with
+      --exclude-tags golden. Regenerate via the "Update goldens" workflow.

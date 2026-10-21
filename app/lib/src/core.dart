@@ -104,18 +104,7 @@ class _DoguAppState extends State<DoguApp> {
       child: MaterialApp.router(
         title: '욕망의장바구니',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          scaffoldBackgroundColor: AppColors.bg,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: AppColors.accent,
-            surface: AppColors.bg,
-          ),
-          fontFamily: doguFontFamily,
-          textTheme: const TextTheme(
-            bodyMedium: TextStyle(color: AppColors.ink, height: 1.5),
-          ),
-        ),
+        theme: buildDoguTheme(), // 디자인 시스템의 테마(카탈로그와 같다)
         routerConfig: _router,
         // 전역 장바구니 토스트 — 모든 라우트 위에 떠서 결제바 유무에 따라 위치가 움직인다.
         builder: (context, child) {

@@ -9,6 +9,11 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  exclude:
+    # 카탈로그(widgetbook/)는 자기 의존성을 가진 별도 앱 — CI 'Design catalog' 잡이 따로 분석한다.
+    - widgetbook/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`
