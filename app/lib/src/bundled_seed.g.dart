@@ -427,20 +427,14 @@ const String kBundledSeedJson = r'''
       "meta": "EST. 2024 · SEOUL · ED. Vol.23 — 2026.05"
     },
     "brands": [
-      "soft·studio",
-      "ATELIER 04",
-      "good machine",
-      "objet·han",
-      "NORM /",
-      "paperhouse",
-      "flat·flat",
-      "QUIET CO.",
-      "han·gul·works",
-      "monogram",
-      "slow craft",
-      "post script",
-      "edition·k",
-      "white room"
+      "스파클Mart",
+      "아모레퍼시픽몰 헤어바디",
+      "닥터바이",
+      "털보네 액상공장",
+      "미엘물티슈",
+      "헤븐센스",
+      "밴더마켓",
+      "슈퍼언더웨어"
     ],
     "collections": [
       {
@@ -535,20 +529,14 @@ const String kBundledSeedJson = r'''
     }
   ],
   "suggestions": [
-    "린넨 셔츠",
-    "스피커",
-    "머그컵",
-    "메리노 니트",
-    "디퓨저",
-    "soft·studio",
-    "무선 충전기",
-    "핸디 선풍기",
-    "노이즈캔슬링",
-    "요가 매트",
-    "LED 무드등",
-    "보온병",
-    "인체공학 의자",
-    "캠핑 랜턴"
+    "스파클Mart",
+    "아모레퍼시픽몰 헤어바디",
+    "닥터바이",
+    "털보네 액상공장",
+    "미엘물티슈",
+    "헤븐센스",
+    "밴더마켓",
+    "슈퍼언더웨어"
   ],
   "newsletter": {
     "eyebrow": "— 매주 수요일 발송",

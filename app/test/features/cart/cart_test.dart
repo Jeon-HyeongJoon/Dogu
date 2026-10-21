@@ -221,4 +221,18 @@ void main() {
     expect(store.wishlistIds, isEmpty);
     expect(store.findProduct('never-seen'), isNull, reason: '못 찾으면 기본 상품이 아니라 null');
   });
+
+  testWidgets('cart shows no developer notes to shoppers', (tester) async {
+    // 예전엔 장바구니 줄에 'local cart · persisted on this device', 합계 아래에 '// API에는 …' 같은 개발용 문구가 보였다.
+    final store = AppStore(repository: FakeRepository(results: const []));
+    store.catalogProducts = const [homeProduct];
+    store.cartQuantities = {homeProduct.id: 1};
+    await tester.pumpWidget(DoguApp(store: store, initializeStore: false, initialTabIndex: 4));
+    await tester.pump();
+
+    expect(find.text(homeProduct.name), findsOneWidget);
+    expect(find.textContaining('persisted'), findsNothing);
+    expect(find.textContaining('// '), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+  });
 }

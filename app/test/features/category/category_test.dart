@@ -161,4 +161,28 @@ void main() {
     expect(store.categoryBrowseProducts.map((p) => p.id), contains('furn-1'),
         reason: '서버에서 카테고리 상품을 받아 표시');
   });
+
+  testWidgets('SHOP BY BRAND lists the real brands and searches on tap', (tester) async {
+    // 세로로 길게 — 브랜드 태그가 하단 탭 바에 가리지 않게. 폭은 다른 앱 테스트처럼 넓게
+    // (테스트 폰트는 손글씨 타이틀을 정사각형으로 그려 390px 헤더가 넘친다 — 실제 폰트 골든은 정상).
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(800, 1700);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final store = AppStore(repository: FakeRepository(results: const [homeProduct]));
+    store.suggestions = const ['스파클Mart', '닥터바이'];
+    await tester.pumpWidget(DoguApp(store: store, initializeStore: false, initialTabIndex: 1));
+    await tester.pump();
+
+    final brands = find.ancestor(of: find.text('[ + ] SHOP BY BRAND'), matching: find.byType(TagSection));
+    expect(find.descendant(of: brands, matching: find.text('닥터바이')), findsOneWidget);
+    expect(find.text('soft·studio  42'), findsNothing, reason: '고정돼 있던 가짜 브랜드');
+    expect(find.text('전체 보기 →'), findsNothing, reason: '눌러도 아무 일 없던 링크');
+
+    await tester.tap(find.descendant(of: brands, matching: find.text('닥터바이')));
+    await tester.pumpAndSettle();
+    expect(store.lastSearchTerm, '닥터바이');
+    expect(find.byKey(const PageStorageKey('search-tab')), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
 }
