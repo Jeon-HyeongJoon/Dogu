@@ -27,17 +27,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/seed.json
-    # 폰트를 fonts:가 아닌 assets:로 등록 — 엔진 FontManifest 프리로드(웹 첫 페인트 차단/이중 로드)를 피하고
-    # 런타임 FontLoader로만 등록한다. (bootstrap이 첫 프레임 이후 비차단 로드)
-    # Dogu Sans = Pretendard 서브셋(굵기당 1.5MB → 350KB). 개명 사유와 재생성은
-    # assets/fonts/dogusans/NOTICE.md 와 scripts/build_fonts.sh 참조.
-    - assets/fonts/dogusans/DoguSans-Regular.otf
-    - assets/fonts/dogusans/DoguSans-SemiBold.otf
-    - assets/fonts/dogusans/DoguSans-Bold.otf
-    - assets/fonts/dogusans/DoguSans-ExtraBold.otf
-    # Dogu Hand = HSBombaram 3.0 서브셋 — 상단 브랜드 타이틀 전용(416KB → 14KB).
-    # 첫 페인트 전에 로드되는 서체라 크기가 곧 첫 화면 속도다. 개명 사유는 NOTICE.md.
-    - assets/fonts/doguhand/DoguHand-Thin.otf
-    # Gaegu Bold 서브셋 — 주문 결과 화면의 농담 한 줄 전용(디자인 시안과 같은 자형).
-    # 원본은 한글 2350자 2.9MB라 charset.txt의 글자만 남겼다(scripts/build_fonts.sh).
-    - assets/fonts/gaegu/Gaegu-Bold-subset.ttf
+    # 폰트·브랜드 로고는 디자인 시스템(packages/dogu_ui)이 담는다 — 여기 다시 등록하면 두 벌이 실린다.

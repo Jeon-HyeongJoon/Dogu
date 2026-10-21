@@ -141,7 +141,7 @@ def make_subset(src, out, text, rename=None):
 total_before = total_after = 0
 
 # ── 본문체: Pretendard -> Dogu Sans ───────────────────────────────────────
-dest = 'app/assets/fonts/dogusans'
+dest = 'packages/dogu_ui/assets/fonts/dogusans'
 os.makedirs(dest, exist_ok=True)
 body = clean(body_charset())
 write_charset(dest, body, 'Dogu Sans(본문) 커버 문자 — KS X 1001 + seed/소스 문자 + 기호')
@@ -163,7 +163,7 @@ for weight in ['Regular', 'SemiBold', 'Bold', 'ExtraBold']:
     print(f'  Pretendard-{weight:10} {before / 1024:7.0f}KB -> DoguSans-{weight:10} {after / 1024:7.1f}KB')
 
 # ── 타이틀 손글씨체: HSBombaram 3.0 -> Dogu Hand ──────────────────────────
-dest = 'app/assets/fonts/doguhand'
+dest = 'packages/dogu_ui/assets/fonts/doguhand'
 os.makedirs(dest, exist_ok=True)
 # 브랜드 타이틀 + (농담 줄의 폴백 역할) + ASCII.
 hand = clean(set(BRAND) | set(JOKE) | ASCII)
@@ -186,7 +186,7 @@ if bombaram_src:
     print(f'  HSBombaram-Thin       {before / 1024:7.0f}KB -> DoguHand-Thin        {after / 1024:7.1f}KB')
 
 # ── 농담 서체: Gaegu Bold(예약 이름 없음 — 이름 유지) ─────────────────────
-dest = 'app/assets/fonts/gaegu'
+dest = 'packages/dogu_ui/assets/fonts/gaegu'
 os.makedirs(dest, exist_ok=True)
 joke = clean(set(JOKE) | ASCII)
 write_charset(dest, joke, 'Gaegu(농담 한 줄) 커버 문자 — 농담 문구 + ASCII')
@@ -198,10 +198,10 @@ print(f'  Gaegu-Bold            {before / 1024:7.0f}KB -> Gaegu-Bold-subset    {
 print(f'total: {total_before / 1024 / 1024:.2f}MB -> {total_after / 1024 / 1024:.2f}MB')
 PY
 
-cp "$TMP/pretendard/LICENSE.txt" app/assets/fonts/dogusans/LICENSE.txt
-cp "$TMP/gaegu-OFL.txt" app/assets/fonts/gaegu/OFL.txt
+cp "$TMP/pretendard/LICENSE.txt" packages/dogu_ui/assets/fonts/dogusans/LICENSE.txt
+cp "$TMP/gaegu-OFL.txt" packages/dogu_ui/assets/fonts/gaegu/OFL.txt
 
-cat > app/assets/fonts/doguhand/NOTICE.md <<'NOTICE'
+cat > packages/dogu_ui/assets/fonts/doguhand/NOTICE.md <<'NOTICE'
 # Dogu Hand — HSBombaram 3.0 서브셋
 
 이 디렉터리의 `DoguHand-Thin.otf`는 **HSBombaram 3.0 Thin의 서브셋**이다.
@@ -227,4 +227,4 @@ NOTICE
 
 echo
 echo "fonts:"
-find app/assets/fonts -type f \( -name '*.otf' -o -name '*.ttf' \) -exec ls -l {} \; | awk '{printf "  %7.1f KB  %s\n", $5/1024, $9}'
+find packages/dogu_ui/assets/fonts -type f \( -name '*.otf' -o -name '*.ttf' \) -exec ls -l {} \; | awk '{printf "  %7.1f KB  %s\n", $5/1024, $9}'

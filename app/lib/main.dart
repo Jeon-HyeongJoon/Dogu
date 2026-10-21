@@ -30,34 +30,8 @@ part 'src/misc_widgets.dart';
 part 'src/order_flow.dart';
 part 'src/bundled_seed.g.dart';
 
-// 본문체(doguFontFamily, dogu_ui 토큰) — Pretendard 서브셋. 개명 사유는 assets/fonts/dogusans/NOTICE.md.
-const doguFontAssets = <String>[
-  'assets/fonts/dogusans/DoguSans-Regular.otf',
-  'assets/fonts/dogusans/DoguSans-SemiBold.otf',
-  'assets/fonts/dogusans/DoguSans-Bold.otf',
-  'assets/fonts/dogusans/DoguSans-ExtraBold.otf',
-];
-
-// 첫 페인트 전에 등록할 본문체 — 굵기 4개 전부. Regular가 없으면 첫 프레임 한글이 두부(⊠)로 찍히고,
-// 굵은 굵기를 나중에 받으면 굵은 제목이 얇게 그려졌다가 바뀐다(글자 폭이 달라져 줄바꿈도 바뀐다).
-// 대신 web/index.html이 같은 파일을 처음부터 미리 받아(preload as=fetch) 엔진과 나란히 내려받는다.
-const doguEssentialFontAssets = doguFontAssets;
-
-
-// 상단 브랜드 타이틀('욕망의 장바구니') 전용 손글씨체 — HSBombaram 3.0 서브셋.
-// 등록상표라 수정본은 원본 이름을 쓸 수 없어 'Dogu Hand'로 담는다(NOTICE.md).
-// 타이틀은 이 손글씨체가 primary라, 미등록 상태로 첫 페인트되면 CanvasKit이 폴백 대신
-// 두부(⊠)를 그린다. 그래서 타이틀 굵기(Thin)를 필수 폰트와 함께 첫 페인트 전에 로드한다.
-const doguTitleEssentialFontAssets = <String>[
-  'assets/fonts/doguhand/DoguHand-Thin.otf',
-];
-
-// 주문 결과 화면의 농담 한 줄 전용 손글씨체 — 디자인 시안이 쓴 Gaegu Bold와 같은 자형.
-// 장식용 한 줄이라 원본(한글 2350자, 2.9MB) 대신 필요한 글자만 남긴 서브셋(약 80KB)을
-// 쓴다. 첫 페인트 이후 비차단 로드하며, 로드 전/실패 시엔 폴백 서체로 그려진다.
-const doguJokeFontAssets = <String>[
-  'assets/fonts/gaegu/Gaegu-Bold-subset.ttf',
-];
+// 폰트 파일(서브셋)과 에셋 목록(doguFontAssets 등)은 디자인 시스템(packages/dogu_ui)이 담는다.
+// 앱은 부트스트랩에서 그 키로 런타임 등록(FontLoader)만 한다 — 아래 loadDoguEssentialFont/loadDoguFonts.
 
 typedef AppRunner = void Function(Widget app);
 

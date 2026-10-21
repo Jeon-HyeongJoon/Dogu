@@ -109,8 +109,8 @@ cd packages/dogu_ui
 flutter analyze && flutter test   # CI job: Design system (dogu_ui)
 ```
 
-Font files stay in the app (`app/assets/fonts`) and are registered at runtime under the
-family names the package defines; `scripts/build_fonts.sh` scans both `app/lib` and
+Font files (subsets) live in the package too (`packages/dogu_ui/assets/fonts`); the app
+registers them at runtime from the asset keys the package exports; `scripts/build_fonts.sh` scans both `app/lib` and
 `packages/dogu_ui/lib` for the characters to keep.
 
 ## Frontend tests (feature modules)

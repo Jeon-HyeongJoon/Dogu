@@ -1,7 +1,8 @@
 import 'package:flutter/painting.dart';
 
-// 글꼴 패밀리 이름. 폰트 파일(서브셋)은 앱이 담고 런타임에 이 이름으로 등록한다 — app/lib/main.dart,
-// app/assets/fonts/*/NOTICE.md. 디자인 시스템은 이름만 안다.
+// 글꼴 — 패밀리 이름과 폰트 파일(서브셋). 파일은 이 패키지의 assets/fonts/에 있고(출처·라이선스는 각
+// 디렉터리의 NOTICE.md·LICENSE), 앱이 부트스트랩에서 아래 에셋 키로 런타임 등록(FontLoader)한다.
+// 재생성: scripts/build_fonts.sh
 
 // 본문체 — Pretendard 서브셋(assets/fonts/dogusans). 원본은 한글 11,172자를 다 담아
 // 굵기당 1.5MB라, 앱이 실제로 그리는 글자만 남겨 굵기당 약 350KB로 줄였다.
@@ -20,3 +21,26 @@ const monoStyle = TextStyle(
   fontFamilyFallback: [doguFontFamily],
   letterSpacing: 0.1,
 );
+
+// 앱 번들에서의 에셋 키(웹 URL: assets/packages/dogu_ui/assets/fonts/…).
+const _fonts = 'packages/dogu_ui/assets/fonts';
+
+/// 본문체 굵기 4개(Regular · SemiBold · Bold · ExtraBold).
+const doguFontAssets = <String>[
+  '$_fonts/dogusans/DoguSans-Regular.otf',
+  '$_fonts/dogusans/DoguSans-SemiBold.otf',
+  '$_fonts/dogusans/DoguSans-Bold.otf',
+  '$_fonts/dogusans/DoguSans-ExtraBold.otf',
+];
+
+/// 첫 페인트 전에 등록할 본문체 — 굵기 4개 전부. Regular가 없으면 첫 프레임 한글이 두부(⊠)로 찍히고,
+/// 굵은 굵기를 나중에 받으면 굵은 제목이 얇게 그려졌다가 바뀐다(글자 폭이 달라져 줄바꿈도 바뀐다).
+/// 앱의 web/index.html이 같은 파일을 처음부터 미리 받는다(preload as=fetch).
+const doguEssentialFontAssets = doguFontAssets;
+
+/// 브랜드 타이틀 손글씨체(Thin) — 타이틀은 이 서체가 primary라 미등록 상태로 첫 페인트되면 CanvasKit이
+/// 폴백 대신 두부(⊠)를 그린다. 그래서 본문체와 함께 첫 페인트 전에 등록한다.
+const doguTitleEssentialFontAssets = <String>['$_fonts/doguhand/DoguHand-Thin.otf'];
+
+/// 주문 결과 화면의 농담 한 줄 손글씨체 — 장식용이라 첫 페인트 뒤에 비차단 등록한다.
+const doguJokeFontAssets = <String>['$_fonts/gaegu/Gaegu-Bold-subset.ttf'];

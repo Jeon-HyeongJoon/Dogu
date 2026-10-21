@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:dogu_mobile_shop/main.dart';
 
+import '../../support/assets.dart';
+
 // web/index.html은 첫 페인트 전에 등록하는 폰트를 엔진과 나란히 미리 받는다(preload).
 // 코드의 폰트 목록과 어긋나면 지운 파일을 계속 받거나(Task 56 뒤 Pretendard 4개를 받던 사고),
 // 필요한 폰트를 미리 못 받아 첫 화면이 늦어진다. 그 어긋남을 여기서 잡는다.
@@ -18,7 +20,7 @@ void main() {
     };
     expect(hrefs, expected);
     for (final asset in [...doguEssentialFontAssets, ...doguTitleEssentialFontAssets]) {
-      expect(File(asset).existsSync(), isTrue, reason: '$asset 가 없다');
+      expect(File(assetFile(asset)).existsSync(), isTrue, reason: '$asset 가 없다');
     }
   });
 

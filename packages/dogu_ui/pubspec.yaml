@@ -19,3 +19,14 @@ flutter:
   assets:
     # 브랜드 로고(항아리 엠블럼) — 정본은 design/assets/logo-square.png, 파생본은 scripts/sync_logo.sh가 만든다.
     - assets/logo-square.png
+    # 폰트를 fonts:가 아닌 assets:로 등록 — 엔진 FontManifest 프리로드(웹 첫 페인트 차단/이중 로드)를 피하고
+    # 앱이 런타임 FontLoader로만 등록한다(lib/src/tokens/typography.dart의 에셋 키).
+    # Dogu Sans = Pretendard 서브셋(굵기당 1.5MB → 350KB), 개명 사유는 assets/fonts/dogusans/NOTICE.md
+    - assets/fonts/dogusans/DoguSans-Regular.otf
+    - assets/fonts/dogusans/DoguSans-SemiBold.otf
+    - assets/fonts/dogusans/DoguSans-Bold.otf
+    - assets/fonts/dogusans/DoguSans-ExtraBold.otf
+    # Dogu Hand = HSBombaram 3.0 서브셋 — 브랜드 타이틀 전용(416KB → 14KB)
+    - assets/fonts/doguhand/DoguHand-Thin.otf
+    # Gaegu Bold 서브셋 — 주문 결과 화면의 농담 한 줄 전용
+    - assets/fonts/gaegu/Gaegu-Bold-subset.ttf
