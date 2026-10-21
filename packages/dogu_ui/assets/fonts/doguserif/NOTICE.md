@@ -1,8 +1,8 @@
 # Dogu Serif — Playfair Display 서브셋
 
-이 디렉터리의 `DoguSerif-Bold.ttf`는 **Playfair Display(가변 서체)의 Bold(700) 인스턴스를 서브셋**한 것이다.
-가격·큰 숫자·영문 디스플레이에만 쓰여 라틴 글자·숫자 기호(`charset.txt`)만 남겼다(약 49KB).
-첫 화면 가격이 이 서체라 본문체와 함께 첫 페인트 전에 받는다.
+이 디렉터리의 `DoguSerif-Bold.ttf`·`DoguSerif-BoldItalic.ttf`는 **Playfair Display(가변 서체, 바로·이탤릭)의
+Bold(700) 인스턴스를 서브셋**한 것이다. 가격·큰 숫자·영문 디스플레이(섹션 제목, 광고 워드마크와 태그라인)에만
+쓰여 라틴 글자·숫자 기호(`charset.txt`)만 남겼다(각 약 49KB). 첫 화면에 보여서 본문체와 함께 첫 페인트 전에 받는다.
 
 ## 바꾼 것
 

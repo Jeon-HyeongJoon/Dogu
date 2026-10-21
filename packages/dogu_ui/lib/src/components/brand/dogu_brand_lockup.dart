@@ -45,7 +45,7 @@ class DoguBrandLockup extends StatelessWidget {
             style: TextStyle(
               fontFamily: doguTitleFontFamily,
               fontFamilyFallback: [doguFontFamily],
-              color: AppColors.accentBright,
+              color: AppColors.ink,
               fontSize: 24,
               fontWeight: FontWeight.w100,
               height: 1.0,

@@ -28,7 +28,7 @@ class _QuickFilterRowState extends State<QuickFilterRow> {
     final activeIndex = widget.activeIndex ?? _activeIndex;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad, vertical: 16),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair))),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -50,7 +50,7 @@ class _QuickFilterRowState extends State<QuickFilterRow> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: i == activeIndex ? AppColors.accent : AppColors.bg,
-                    border: Border.all(color: i == activeIndex ? AppColors.accent : AppColors.line),
+                    border: Border.all(color: i == activeIndex ? AppColors.accent : AppColors.line, width: AppStroke.hair),
                   ),
                   child: Text(widget.items[i], style: TextStyle(fontSize: 12.5, color: i == activeIndex ? AppColors.invert : AppColors.ink2)),
                 ),

@@ -43,7 +43,7 @@ void main() {
     )));
     expect(tester.getSize(find.byType(DoguTabBar)).height, DoguTabBar.barHeight + 10);
     Color colorOf(String label) => tester.widget<Text>(find.text(label)).style!.color!;
-    expect(colorOf('카테고리'), AppColors.accentBright);
+    expect(colorOf('카테고리'), AppColors.ink, reason: '한글 라벨은 크림 — 금은 아이콘과 표시선');
     expect(colorOf('홈'), AppColors.ink4);
     expect(tester.widget<BadgePill>(find.widgetWithText(BadgePill, '5')).color, AppColors.alert);
     expect(find.text('2'), findsOneWidget);

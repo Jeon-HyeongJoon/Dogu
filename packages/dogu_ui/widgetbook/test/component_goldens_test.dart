@@ -42,8 +42,12 @@ void main() {
           theme: buildDoguTheme(),
           home: CatalogFrame(useCase: useCase),
         ));
-        // 로고는 PNG 에셋이라 디코딩을 강제해야 골든에 찍힌다.
-        await tester.runAsync(() => precacheImage(const AssetImage(DoguLogoMark.assetKey), tester.element(find.byType(CatalogFrame))));
+        // 로고·메달은 이미지 에셋이라 디코딩을 강제해야 골든에 찍힌다.
+        await tester.runAsync(() async {
+          final context = tester.element(find.byType(CatalogFrame));
+          await precacheImage(const AssetImage(DoguLogoMark.assetKey), context);
+          await precacheImage(const AssetImage(DoguMedal.assetKey), context);
+        });
         await tester.pump();
 
         await expectLater(

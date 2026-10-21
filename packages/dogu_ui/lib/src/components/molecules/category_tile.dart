@@ -19,7 +19,7 @@ class CategoryTile extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(border: Border.all(color: AppColors.line)),
+        decoration: BoxDecoration(border: Border.all(color: AppColors.line, width: AppStroke.hair)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,

@@ -61,10 +61,11 @@ Widget goldenMaterialApp(AppStore store, Widget home) {
   );
 }
 
-/// 헤더·푸터 로고는 PNG 에셋이라 디코딩을 강제해야 골든에 실제로 찍힌다.
+/// 헤더·푸터 로고와 광고 메달은 이미지 에셋이라 디코딩을 강제해야 골든에 실제로 찍힌다.
 Future<void> precacheLogo(WidgetTester tester, Finder context) async {
   await tester.runAsync(() async {
     await precacheImage(const AssetImage(DoguLogoMark.assetKey), tester.element(context));
+    await precacheImage(const AssetImage(DoguMedal.assetKey), tester.element(context));
   });
   await tester.pump();
 }

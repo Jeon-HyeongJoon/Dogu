@@ -97,7 +97,7 @@ class _OrderStatement extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 30, height: 1.05, letterSpacing: -1, fontWeight: FontWeight.w700, color: AppColors.accentBright),
+      style: const TextStyle(fontSize: 28, height: 1.15, letterSpacing: -0.8, fontWeight: FontWeight.w700, color: AppColors.ink),
     );
   }
 }
@@ -113,7 +113,7 @@ class _OrderLineRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair))),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -142,7 +142,7 @@ class _OrderLineRow extends StatelessWidget {
                   product.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: AppColors.accentBright),
+                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: AppColors.ink),
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -232,7 +232,7 @@ class OrderDeliveryPage extends StatelessWidget {
   Widget _arrivalBox() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.line)),
+      decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.line, width: AppStroke.hair)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -240,7 +240,7 @@ class OrderDeliveryPage extends StatelessWidget {
           const Spacer(),
           Text(
             _longDate(receipt.arrivalAt),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: -0.5, color: AppColors.accentBright),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.5, color: AppColors.ink),
           ),
         ],
       ),
@@ -257,7 +257,7 @@ class OrderDeliveryPage extends StatelessWidget {
     return Stack(
       children: [
         // 단계를 잇는 세로 괘선 — 첫/마지막 점 중심까지만 그린다.
-        Positioned(top: 9, bottom: 9, left: 4, width: 1, child: Container(color: AppColors.line)),
+        Positioned(top: 9, bottom: 9, left: 4, width: AppStroke.hair, child: Container(color: AppColors.line)),
         Column(
           children: [
             for (var i = 0; i < steps.length; i++)
@@ -296,7 +296,7 @@ class _TimelineRow extends StatelessWidget {
                 : isCurrent
                     ? AppColors.alert
                     : AppColors.ink,
-            border: isTodo ? Border.all(color: AppColors.line) : null,
+            border: isTodo ? Border.all(color: AppColors.line, width: AppStroke.hair) : null,
           ),
         ),
         const SizedBox(width: 14),
@@ -416,7 +416,7 @@ class OrderRevealPage extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: AppColors.bg, border: Border.all(color: AppColors.line)),
+          decoration: BoxDecoration(color: AppColors.bg, border: Border.all(color: AppColors.line, width: AppStroke.hair)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -431,7 +431,7 @@ class OrderRevealPage extends StatelessWidget {
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
-                child: Divider(height: 1, thickness: 1, color: AppColors.line),
+                child: Divider(height: 1, thickness: AppStroke.hair, color: AppColors.line),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -482,7 +482,7 @@ class OrderRevealPage extends StatelessWidget {
   Widget _savedBlock() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-      decoration: BoxDecoration(color: AppColors.deep, border: Border.all(color: AppColors.accentDeep)),
+      decoration: BoxDecoration(color: AppColors.deep, border: Border.all(color: AppColors.accentDeep, width: AppStroke.hair)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -526,7 +526,7 @@ class _OrderBottomBar extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.potDeep,
-        border: Border(top: BorderSide(color: AppColors.accentDeep)),
+        border: Border(top: BorderSide(color: AppColors.accentDeep, width: AppStroke.hair)),
       ),
       child: SafeArea(
         top: false,

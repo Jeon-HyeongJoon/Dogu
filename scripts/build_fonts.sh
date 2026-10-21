@@ -10,7 +10,7 @@
 #   Dogu Sans  (본문)  ← Pretendard        : KS X 1001 상용 한글 + seed/소스 문자 + 기호
 #   Dogu Hand  (타이틀) ← HSBombaram 3.0    : 브랜드 타이틀 + 농담 한 줄 + ASCII
 #   Gaegu      (농담)  ← Gaegu Bold        : 농담 한 줄 + ASCII
-#   Dogu Serif (가격)  ← Playfair Display  : Bold 700 인스턴스, ASCII + 숫자 기호 + 합성한 ₩
+#   Dogu Serif (가격)  ← Playfair Display  : Bold 700 인스턴스(바로·이탤릭), ASCII + 숫자 기호 + 합성한 ₩
 #
 # 이름을 바꾸는 이유(Dogu Sans / Dogu Hand): 원본이 각각 OFL 예약 폰트 이름과
 # 등록상표를 달고 있어, 수정본(서브셋)을 원본 이름으로 배포할 수 없다. 자형은 그대로고
@@ -27,6 +27,7 @@ PRETENDARD_URL="https://github.com/orioncactus/pretendard/releases/download/v${P
 GAEGU_URL="https://raw.githubusercontent.com/google/fonts/main/ofl/gaegu/Gaegu-Bold.ttf"
 GAEGU_OFL_URL="https://raw.githubusercontent.com/google/fonts/main/ofl/gaegu/OFL.txt"
 PLAYFAIR_URL="https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf"
+PLAYFAIR_ITALIC_URL="https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay-Italic%5Bwght%5D.ttf"
 PLAYFAIR_OFL_URL="https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/OFL.txt"
 # HSBombaram 원본은 배포처가 없어 디자인 원본 보관소(git-ignored)에서 가져온다.
 BOMBARAM_ZIP="design/assets/HSBomBaram3.0_OTF.zip"
@@ -46,6 +47,7 @@ curl -fsSL -o "$TMP/gaegu-OFL.txt" "$GAEGU_OFL_URL"
 
 echo "Downloading Playfair Display (variable)"
 curl -fsSL -o "$TMP/PlayfairDisplay.ttf" "$PLAYFAIR_URL"
+curl -fsSL -o "$TMP/PlayfairDisplay-Italic.ttf" "$PLAYFAIR_ITALIC_URL"
 curl -fsSL -o "$TMP/playfair-OFL.txt" "$PLAYFAIR_OFL_URL"
 
 if [ -f "$BOMBARAM_ZIP" ]; then
@@ -60,7 +62,7 @@ fi
 python3 -m venv "$TMP/venv" >/dev/null
 "$TMP/venv/bin/pip" -q install fonttools
 
-"$TMP/venv/bin/python" - "$TMP/pretendard" "$TMP/Gaegu-Bold.ttf" "$BOMBARAM_SRC" "$PRETENDARD_VERSION" "$TMP/PlayfairDisplay.ttf" <<'PY'
+"$TMP/venv/bin/python" - "$TMP/pretendard" "$TMP/Gaegu-Bold.ttf" "$BOMBARAM_SRC" "$PRETENDARD_VERSION" "$TMP/PlayfairDisplay.ttf" "$TMP/PlayfairDisplay-Italic.ttf" <<'PY'
 import glob
 import os
 import re
@@ -71,7 +73,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.varLib import instancer
 
-pretendard_dir, gaegu_src, bombaram_src, pretendard_version, playfair_src = sys.argv[1:6]
+pretendard_dir, gaegu_src, bombaram_src, pretendard_version, playfair_src, playfair_italic_src = sys.argv[1:7]
 
 
 def dart_const(path, name):
@@ -239,27 +241,31 @@ dest = 'packages/dogu_ui/assets/fonts/doguserif'
 os.makedirs(dest, exist_ok=True)
 serif = clean(ASCII | set('−·×'))
 write_charset(dest, serif + '₩', 'Dogu Serif(가격·숫자) 커버 문자 — ASCII + 숫자 기호 + 합성한 ₩')
-instance = os.path.join(os.path.dirname(playfair_src), 'PlayfairDisplay-Bold.ttf')
-instancer.instantiateVariableFont(TTFont(playfair_src), {'wght': 700}).save(instance)
-out = os.path.join(dest, 'DoguSerif-Bold.ttf')
-before, after = make_subset(
-    instance,
-    out,
-    serif,
-    rename={
-        1: 'Dogu Serif',
-        3: 'DoguSerif-Bold; subset of Playfair Display',
-        4: 'Dogu Serif Bold',
-        6: 'DoguSerif-Bold',
-        16: 'Dogu Serif',
-    },
-)
-add_won_sign(out)
-after = os.path.getsize(out)
-before = os.path.getsize(playfair_src)
-total_before += before
-total_after += after
-print(f'  PlayfairDisplay[wght] {before / 1024:7.0f}KB -> DoguSerif-Bold       {after / 1024:7.1f}KB')
+# 바로(가격·숫자)와 이탤릭(광고 워드마크의 'SI'·태그라인) — 굵기는 둘 다 700.
+for style, src in [('Bold', playfair_src), ('BoldItalic', playfair_italic_src)]:
+    instance = os.path.join(os.path.dirname(src), f'PlayfairDisplay-{style}.ttf')
+    instancer.instantiateVariableFont(TTFont(src), {'wght': 700}).save(instance)
+    out = os.path.join(dest, f'DoguSerif-{style}.ttf')
+    label = 'Bold Italic' if style == 'BoldItalic' else 'Bold'
+    make_subset(
+        instance,
+        out,
+        serif,
+        rename={
+            1: 'Dogu Serif',
+            2: label,
+            3: f'DoguSerif-{style}; subset of Playfair Display',
+            4: f'Dogu Serif {label}',
+            6: f'DoguSerif-{style}',
+            16: 'Dogu Serif',
+            17: label,
+        },
+    )
+    add_won_sign(out)
+    before, after = os.path.getsize(src), os.path.getsize(out)
+    total_before += before
+    total_after += after
+    print(f'  Playfair {style:13} {before / 1024:7.0f}KB -> DoguSerif-{style:11} {after / 1024:7.1f}KB')
 
 print(f'total: {total_before / 1024 / 1024:.2f}MB -> {total_after / 1024 / 1024:.2f}MB')
 PY
@@ -271,9 +277,9 @@ cp "$TMP/playfair-OFL.txt" packages/dogu_ui/assets/fonts/doguserif/OFL.txt
 cat > packages/dogu_ui/assets/fonts/doguserif/NOTICE.md <<'NOTICE'
 # Dogu Serif — Playfair Display 서브셋
 
-이 디렉터리의 `DoguSerif-Bold.ttf`는 **Playfair Display(가변 서체)의 Bold(700) 인스턴스를 서브셋**한 것이다.
-가격·큰 숫자·영문 디스플레이에만 쓰여 라틴 글자·숫자 기호(`charset.txt`)만 남겼다(약 49KB).
-첫 화면 가격이 이 서체라 본문체와 함께 첫 페인트 전에 받는다.
+이 디렉터리의 `DoguSerif-Bold.ttf`·`DoguSerif-BoldItalic.ttf`는 **Playfair Display(가변 서체, 바로·이탤릭)의
+Bold(700) 인스턴스를 서브셋**한 것이다. 가격·큰 숫자·영문 디스플레이(섹션 제목, 광고 워드마크와 태그라인)에만
+쓰여 라틴 글자·숫자 기호(`charset.txt`)만 남겼다(각 약 49KB). 첫 화면에 보여서 본문체와 함께 첫 페인트 전에 받는다.
 
 ## 바꾼 것
 

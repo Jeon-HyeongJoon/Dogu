@@ -34,7 +34,7 @@ class DoguTabBar extends StatelessWidget {
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
         color: AppColors.potDeep,
-        border: Border(top: BorderSide(color: AppColors.line)),
+        border: Border(top: BorderSide(color: AppColors.line, width: AppStroke.hair)),
       ),
       child: Row(
         children: [
@@ -53,7 +53,7 @@ class DoguTabBar extends StatelessWidget {
                         children: [
                           Icon(tabs[i].icon, size: 21, color: i == currentIndex ? AppColors.accentBright : AppColors.ink4),
                           const SizedBox(height: 4),
-                          Text(tabs[i].label, style: TextStyle(fontSize: 10.5, color: i == currentIndex ? AppColors.accentBright : AppColors.ink4, fontWeight: FontWeight.w500)),
+                          Text(tabs[i].label, style: TextStyle(fontSize: 10.5, color: i == currentIndex ? AppColors.ink : AppColors.ink4, fontWeight: FontWeight.w500)),
                         ],
                       ),
                     ),

@@ -2,8 +2,10 @@ import 'package:flutter/painting.dart';
 
 /// 색 토큰 — 앱 전체가 이 이름으로만 색을 쓴다.
 ///
-/// Gilded 테마(디자인 시안 `design_mockups/03-gilded-beast`): 짙은 항아리 초록 바탕에 금 테두리·금 제목,
-/// 크림색 글씨. 빨강(crave)은 '사고 싶게 만드는' 지점 — 할인·장바구니 수·결제·딜 마감·찜 — 에만 쓴다.
+/// Gilded 테마(디자인 시안 `design_mockups/03-gilded-beast`): 짙은 항아리 초록 바탕에 금 머리카락 선, 크림색 글씨.
+/// 금 글씨는 라틴 세리프(섹션 제목·가격·워드마크)와 작은 라벨에만 쓰고, 한글은 늘 크림 계열로 쓴다
+/// (금색 굵은 한글 제목은 무겁고 시안과도 달랐다).
+/// 빨강(crave)은 '사고 싶게 만드는' 지점 — 할인·장바구니 수·결제·딜 마감·찜 — 에만 쓴다.
 /// 빨강과 초록은 밝기가 비슷해 빨간 글씨는 초록 위에서 거의 안 보인다. 그래서 빨강은 면(배지·버튼)으로 쓰고,
 /// 글씨로 써야 하면 밝힌 [alertBright]를 쓴다.
 class AppColors {
@@ -31,10 +33,10 @@ class AppColors {
   /// 금·크림 면 위 글씨.
   static const invert = potDeep;
 
-  // ── 선 — 금빛이 비치는 올리브 ───────────────────────────────────────────
-  static const line = Color(0xff505d36); // 금 32%
-  static const lineSoft = Color(0xff334d30); // 금 16%
-  static const deepLine = Color(0xff3a4022); // [deep] 위의 금 25%
+  // ── 선 — 금빛이 비치는 올리브(머리카락 굵기 AppStroke.hair로 그린다) ────
+  static const line = Color(0xff5e6538); // 금 40%
+  static const lineSoft = Color(0xff3b5131); // 금 20%
+  static const deepLine = Color(0xff4d4d28); // [deep] 위의 금 35%
 
   // ── 포인트 ──────────────────────────────────────────────────────────────
   /// 주 버튼·활성 칩·제목 앞 번호 — 금.

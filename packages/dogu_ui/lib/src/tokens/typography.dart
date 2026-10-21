@@ -16,8 +16,8 @@ const doguTitleFontFamily = 'DoguHand';
 const doguJokeFontFamily = 'Gaegu';
 
 // 가격·숫자·영문 디스플레이 세리프 — Playfair Display Bold 서브셋('Dogu Serif', assets/fonts/doguserif).
-// 라틴 글자·숫자만 담는다(49KB). 원본에 없는 원화 기호(₩)는 W에 가로줄 두 개를 그어 합성했고,
-// 한글이 섞이면 본문체로 폴백한다.
+// 바로·이탤릭 두 벌, 라틴 글자·숫자만 담는다(각 49KB). 원본에 없는 원화 기호(₩)는 W에 가로줄 두 개를 그어
+// 합성했고, 한글이 섞이면 본문체로 폴백한다.
 const doguSerifFontFamily = 'DoguSerif';
 
 /// 마이크로 레이블(MonoText) 기본 스타일 — 본문체에 자간을 벌린 금박 라벨.
@@ -25,6 +25,15 @@ const doguSerifFontFamily = 'DoguSerif';
 const monoStyle = TextStyle(
   fontFamily: doguFontFamily,
   letterSpacing: 0.8,
+);
+
+/// 섹션 제목(SHOP BY CATEGORY 등) — 대문자 세리프에 자간을 넓게(시안의 POT OF DESIRE).
+const displayStyle = TextStyle(
+  fontFamily: doguSerifFontFamily,
+  fontFamilyFallback: [doguFontFamily],
+  fontWeight: FontWeight.w700,
+  letterSpacing: 2.4,
+  height: 1.15,
 );
 
 /// 가격·큰 숫자(PriceText·StatGrid) — 세리프, 숫자는 높이가 고른 라이닝 숫자.
@@ -55,8 +64,11 @@ const doguEssentialFontAssets = doguFontAssets;
 /// 폴백 대신 두부(⊠)를 그린다. 그래서 본문체와 함께 첫 페인트 전에 등록한다.
 const doguTitleEssentialFontAssets = <String>['$_fonts/doguhand/DoguHand-Thin.otf'];
 
-/// 가격·숫자 세리프 — 첫 화면 가격이 이 서체라 본문체와 함께 첫 페인트 전에 등록한다(49KB).
-const doguSerifFontAssets = <String>['$_fonts/doguserif/DoguSerif-Bold.ttf'];
+/// 가격·숫자·섹션 제목 세리프(바로·이탤릭) — 첫 화면에 보여서 본문체와 함께 첫 페인트 전에 등록한다(약 97KB).
+const doguSerifFontAssets = <String>[
+  '$_fonts/doguserif/DoguSerif-Bold.ttf',
+  '$_fonts/doguserif/DoguSerif-BoldItalic.ttf',
+];
 
 /// 주문 결과 화면의 농담 한 줄 손글씨체 — 장식용이라 첫 페인트 뒤에 비차단 등록한다.
 const doguJokeFontAssets = <String>['$_fonts/gaegu/Gaegu-Bold-subset.ttf'];

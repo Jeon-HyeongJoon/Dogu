@@ -20,7 +20,7 @@ class CategoryListRow extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad, vertical: 14),
-        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
+        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair))),
         child: Row(
           children: [
             SizedBox(

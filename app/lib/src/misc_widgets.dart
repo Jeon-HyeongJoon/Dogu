@@ -56,7 +56,7 @@ class _PaymentToastOverlayState extends State<PaymentToastOverlay> {
           margin: EdgeInsets.only(bottom: navBarHeight),
           decoration: BoxDecoration(
             color: AppColors.bg,
-            border: Border.all(color: AppColors.accentDeep),
+            border: Border.all(color: AppColors.accentDeep, width: AppStroke.hair),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: const [BoxShadow(color: Color(0x26000000), blurRadius: 24, offset: Offset(0, -2))],
           ),
@@ -66,7 +66,7 @@ class _PaymentToastOverlayState extends State<PaymentToastOverlay> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (_response == null) ...[
-                  const Text('결제 진행', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.accentBright)),
+                  const Text('결제 진행', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: AppColors.ink)),
                   const SizedBox(height: 6),
                   Text('선택 상품 $count개 · ${formatWon(total)}', style: const TextStyle(fontSize: 13, color: AppColors.ink3)),
                   if (items.isNotEmpty) ...[
@@ -88,7 +88,7 @@ class _PaymentToastOverlayState extends State<PaymentToastOverlay> {
                   else
                     AppButton(text: '결제하기', primary: true, large: true, onTap: _completePayment),
                 ] else ...[
-                  const Text('결제가 완료되었습니다.', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.accentBright)),
+                  const Text('결제가 완료되었습니다.', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: AppColors.ink)),
                   const SizedBox(height: 6),
                   Text('주문번호: ${_response!['order_id']}', style: const TextStyle(fontSize: 13, color: AppColors.ink3)),
                   const SizedBox(height: 10),
@@ -162,7 +162,7 @@ class _CartToastState extends State<CartToast> {
               child: Container(
                 decoration: BoxDecoration(
                   color: AppColors.potDeep,
-                  border: Border.all(color: AppColors.accent),
+                  border: Border.all(color: AppColors.accent, width: AppStroke.hair),
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 16, offset: Offset(0, 4))],
                 ),
@@ -200,7 +200,7 @@ class PatternBox extends StatelessWidget {
     return CustomPaint(
       painter: PatternPainter(pattern: pattern, dark: dark),
       child: Container(
-        decoration: BoxDecoration(border: Border.all(color: dark ? const Color(0xff1f1f1f) : AppColors.line)),
+        decoration: BoxDecoration(border: Border.all(color: dark ? const Color(0xff1f1f1f) : AppColors.line, width: AppStroke.hair)),
         child: child,
       ),
     );

@@ -32,7 +32,7 @@ class AppButton extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: bgColor,
-            border: Border.all(color: borderColor),
+            border: Border.all(color: borderColor, width: AppStroke.control),
           ),
           child: Text(text, style: TextStyle(fontSize: (large ? 13.5 : 13) + (onDark && primary ? 2 : 0), fontWeight: FontWeight.w700, letterSpacing: 0.6, color: textColor)),
         ),

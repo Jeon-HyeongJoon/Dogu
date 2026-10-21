@@ -16,7 +16,7 @@ class BadgePill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: compact ? 4 : 6, vertical: compact ? 2 : 4),
-      decoration: BoxDecoration(color: color, border: bordered ? Border.all(color: AppColors.accent) : null),
+      decoration: BoxDecoration(color: color, border: bordered ? Border.all(color: AppColors.accent, width: AppStroke.hair) : null),
       child: MonoText(text, size: compact ? 9 : 9.5, color: ink ?? (color.computeLuminance() > 0.3 ? AppColors.invert : AppColors.ink), weight: FontWeight.w700),
     );
   }

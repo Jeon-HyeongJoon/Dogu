@@ -18,10 +18,10 @@ class CornerMark extends StatelessWidget {
         margin: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           border: Border(
-            top: isTop ? const BorderSide(color: AppColors.accent) : BorderSide.none,
-            bottom: !isTop ? const BorderSide(color: AppColors.accent) : BorderSide.none,
-            left: isLeft ? const BorderSide(color: AppColors.accent) : BorderSide.none,
-            right: !isLeft ? const BorderSide(color: AppColors.accent) : BorderSide.none,
+            top: isTop ? const BorderSide(color: AppColors.accent, width: AppStroke.hair) : BorderSide.none,
+            bottom: !isTop ? const BorderSide(color: AppColors.accent, width: AppStroke.hair) : BorderSide.none,
+            left: isLeft ? const BorderSide(color: AppColors.accent, width: AppStroke.hair) : BorderSide.none,
+            right: !isLeft ? const BorderSide(color: AppColors.accent, width: AppStroke.hair) : BorderSide.none,
           ),
         ),
       ),

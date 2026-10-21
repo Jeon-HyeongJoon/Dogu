@@ -95,7 +95,7 @@ class Header extends StatelessWidget {
                 child: DecoratedBox(
                   position: DecorationPosition.foreground,
                   decoration: const BoxDecoration(
-                    border: Border(top: BorderSide(color: AppColors.line)),
+                    border: Border(top: BorderSide(color: AppColors.line, width: AppStroke.hair)),
                   ),
                   // 헤더 하단 라인에서부터 말려 내려오는 효과: 패널을 잘라낸 뒤 위에서 아래로 슬라이드
                   child: ClipRect(
@@ -107,7 +107,7 @@ class Header extends StatelessWidget {
                       // 상단 바와 일체화: 좌우/상단 여백 없이 풀폭, 하단 경계선만(바가 아래로 확장된 느낌)
                       decoration: const BoxDecoration(
                         color: AppColors.bg,
-                        border: Border(bottom: BorderSide(color: AppColors.line)),
+                        border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair)),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -125,7 +125,7 @@ class Header extends StatelessWidget {
                               onTap: () => choose(item.$3),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad, vertical: 16),
-                                decoration: const BoxDecoration(border: Border(top: BorderSide(color: AppColors.lineSoft))),
+                                decoration: const BoxDecoration(border: Border(top: BorderSide(color: AppColors.lineSoft, width: AppStroke.hair))),
                                 child: Row(
                                   children: [
                                     Icon(item.$1, size: 23, color: item.$3 == currentTab ? AppColors.accent : AppColors.ink3),
@@ -184,7 +184,7 @@ class SearchBarBlock extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             color: AppColors.bgAlt,
-            border: Border.all(color: AppColors.line),
+            border: Border.all(color: AppColors.line, width: AppStroke.hair),
           ),
           child: const Row(
             children: [
@@ -249,167 +249,204 @@ class HeroBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = AppStateScope.watch(context);
+    // 시안(03 gilded-beast)의 광고 무대 — 가운데 맞춤으로 'DESIRE' 워드마크, 그 아래를 덮는 항아리 메달,
+    // 태그라인, 그리고 백엔드 문구는 크림색 한글로 작게. 금 글씨는 라틴 세리프에만 쓴다.
     return SectionBorder(
       child: Container(
-        // 깊은 초록 위로 금빛이 위에서 번진다(시안의 광고 무대).
         decoration: const BoxDecoration(
           color: AppColors.heroBg,
           gradient: RadialGradient(
-            center: Alignment(0, -1.1),
-            radius: 1.3,
-            colors: [Color(0x26efd493), Color(0x00efd493)],
+            center: Alignment(0, -0.75),
+            radius: 1.1,
+            colors: [Color(0x1fefd493), Color(0x00efd493)],
           ),
         ),
-        padding: const EdgeInsets.fromLTRB(AppSpace.pad, 28, AppSpace.pad, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+        padding: const EdgeInsets.fromLTRB(AppSpace.pad, 24, AppSpace.pad, 24),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            final wordSize = DesireWordmark.sizeFor(width);
+            final medalWidth = (width * 0.66).clamp(210.0, 400.0);
+            final medalHeight = medalWidth / DoguMedal.aspect + 12; // 금테 두 겹
+            final overlap = wordSize * 0.2; // 메달이 워드마크 아랫단을 덮는다
+            return Column(
               children: [
-                Tag(text: store.heroEyebrow, dark: true),
-                if (store.heroDate.isNotEmpty) ...[
-                  const SizedBox(width: 10),
-                  MonoText(store.heroDate, size: 10.5, color: AppColors.heroInk3),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 10,
+                  runSpacing: 6,
+                  children: [
+                    Tag(text: store.heroEyebrow, dark: true),
+                    if (store.heroDate.isNotEmpty) MonoText(store.heroDate, size: 10.5, color: AppColors.heroInk3),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: wordSize * 0.95 + medalHeight - overlap,
+                  child: Stack(
+                    alignment: Alignment.topCenter,
+                    clipBehavior: Clip.none,
+                    children: [
+                      DesireWordmark(size: wordSize),
+                      Positioned(top: wordSize * 0.95 - overlap, child: DoguMedal(width: medalWidth)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const _HeroTagline(),
+                const SizedBox(height: 16),
+                Text(
+                  store.heroTitle.replaceFirst(', ', ',\n'),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontFamily: doguFontFamily, color: AppColors.ink, fontSize: 18, height: 1.45, fontWeight: FontWeight.w500, letterSpacing: -0.3),
+                ),
+                const SizedBox(height: 8),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 340),
+                  child: Text(store.heroSubtitle, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12.5, color: AppColors.heroInk3, height: 1.6)),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(minWidth: 200),
+                      child: AppButton(text: store.heroPrimaryAction, primary: true, large: true, onDark: true, onTap: () => AppNavigationScope.select(context, 1)),
+                    ),
+                    const SizedBox(width: 8),
+                    AppButton(text: store.heroSecondaryAction, large: true, onDark: true, onTap: () => AppNavigationScope.select(context, 2)),
+                  ],
+                ),
+                // 숫자는 백엔드가 DB에서 계산한다 — 응답 전엔 같은 틀의 로딩 자리, 없으면(오프라인) 숨김.
+                // 넓은 화면에서도 숫자 띠·추천 카드는 가운데 640폭 — 광고의 가운데 축을 지킨다.
+                if (store.catalogLoading || store.heroStats.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 640),
+                    child: StatGrid(stats: store.heroStats, dark: true, loading: store.catalogLoading),
+                  ),
+                ],
+                if (store.featuredProduct != null) ...[
+                  const SizedBox(height: 18),
+                  ConstrainedBox(constraints: const BoxConstraints(maxWidth: 640), child: const FeaturedCard()),
                 ],
               ],
-            ),
-            const SizedBox(height: 20),
-            Text(
-              store.heroTitle.replaceFirst(', ', ',\n'),
-              // 금박 글씨 — 아래로 한 겹 짙은 금 그림자를 깔아 도드라지게(시안의 DESIRE).
-              style: const TextStyle(
-                fontFamily: doguFontFamily,
-                color: AppColors.accentBright,
-                fontSize: 44,
-                height: 1.08,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -1.5,
-                shadows: [Shadow(color: AppColors.accentDeep, offset: Offset(0, 2))],
-              ),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              store.heroSubtitle,
-              style: const TextStyle(fontSize: 13.5, color: AppColors.heroInk2, height: 1.6),
-            ),
-            const SizedBox(height: 22),
-            Row(
-              children: [
-                Expanded(child: AppButton(text: store.heroPrimaryAction, primary: true, onDark: true, onTap: () => AppNavigationScope.select(context, 1))),
-                const SizedBox(width: 8),
-                AppButton(text: store.heroSecondaryAction, onDark: true, onTap: () => AppNavigationScope.select(context, 2)),
-              ],
-            ),
-            // 숫자는 백엔드가 DB에서 계산한다 — 응답 전엔 같은 틀의 로딩 자리, 없으면(오프라인) 숨김.
-            if (store.catalogLoading || store.heroStats.isNotEmpty) ...[
-              const SizedBox(height: 28),
-              StatGrid(stats: store.heroStats, dark: true, loading: store.catalogLoading),
-            ],
-            if (store.featuredProduct != null) ...[
-              const SizedBox(height: 22),
-              const FeaturedCard(),
-            ],
-          ],
+            );
+          },
         ),
       ),
     );
   }
 }
 
+/// 'Satisfying ✦ Every ✦ Craving' — 엠블럼에 새겨진 문구를 이탤릭 세리프로.
+class _HeroTagline extends StatelessWidget {
+  const _HeroTagline();
 
+  @override
+  Widget build(BuildContext context) {
+    const style = TextStyle(
+      fontFamily: doguSerifFontFamily,
+      fontStyle: FontStyle.italic,
+      fontWeight: FontWeight.w700,
+      fontSize: 19,
+      color: AppColors.ink,
+      letterSpacing: 0.4,
+    );
+    const words = ['Satisfying', 'Every', 'Craving'];
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 10,
+      children: [
+        for (var i = 0; i < words.length; i++) ...[
+          if (i > 0) const GoldSparkle(size: 11),
+          Text(words[i], style: style),
+        ],
+      ],
+    );
+  }
+}
+
+/// 광고 아래 추천 상품 한 줄 — 작은 사진 + 이름·가격(예전엔 화면 폭만 한 4:5 사진이었다).
 class FeaturedCard extends StatelessWidget {
   const FeaturedCard({super.key});
+
+  static const _thumb = 84.0;
 
   @override
   Widget build(BuildContext context) {
     final store = AppStateScope.watch(context);
     final featured = store.featuredProduct;
-    if (store.catalogLoading) {
-      // 백엔드 응답 전엔 seed 상품(이미지 없음) 대신 같은 틀의 로딩 자리 — 응답 뒤 크기가 거의 같다.
+    Widget frame({required Widget thumb, required Widget body}) {
       return Container(
-        decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.line)),
-        child: Column(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(color: AppColors.deep, border: Border.all(color: AppColors.accentDeep, width: AppStroke.hair)),
+        child: Row(
           children: [
-            const AspectRatio(aspectRatio: 4 / 5, child: NeutralImageSurface(child: Center(child: LoadingDots()))),
-            Container(height: 1, color: AppColors.line),
-            Padding(
-              padding: const EdgeInsets.all(14),
-              child: SizedBox(
-                height: 37,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(height: 13, width: 160, color: AppColors.line),
-                    const SizedBox(height: 6),
-                    Container(height: 10, width: 72, color: AppColors.line),
-                  ],
-                ),
-              ),
-            ),
+            SizedBox(width: _thumb, height: _thumb, child: thumb),
+            const SizedBox(width: 14),
+            Expanded(child: body),
+          ],
+        ),
+      );
+    }
+
+    if (store.catalogLoading) {
+      // 백엔드 응답 전엔 seed 상품(이미지 없음) 대신 같은 틀의 로딩 자리 — 응답 뒤 크기가 같다.
+      return frame(
+        thumb: const NeutralImageSurface(child: Center(child: LoadingDots())),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(height: 9, width: 72, color: AppColors.lineSoft),
+            const SizedBox(height: 8),
+            Container(height: 12, width: 150, color: AppColors.lineSoft),
+            const SizedBox(height: 8),
+            Container(height: 12, width: 90, color: AppColors.lineSoft),
           ],
         ),
       );
     }
     if (featured == null) {
-      return Container(
-        decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.line)),
-        child: const AspectRatio(
-          aspectRatio: 4 / 5,
-          child: NeutralImageSurface(),
-        ),
-      );
+      return frame(thumb: const NeutralImageSurface(), body: const SizedBox.shrink());
     }
-    return Container(
-      decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.accent)),
-      child: Column(
-        children: [
-          AspectRatio(
-            aspectRatio: 4 / 5,
-            child: ProductImageSurface(
-              pattern: featured.pattern,
-              imageUrl: featured.imageUrl,
-              artwork: featured.artwork,
-              thumbnailWidth: 640,
-              child: Stack(
-                children: [
-                  const Positioned(top: 12, left: 12, child: MonoText('001 / FEATURED', size: 9.5, color: AppColors.accent)),
-                  if (featured.badge != null) Positioned(top: 12, right: 12, child: BadgePill(text: featured.badge!, color: AppColors.accent)),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => openProductDetail(context, featured),
+      child: frame(
+        thumb: ProductImageSurface(
+          pattern: featured.pattern,
+          imageUrl: featured.imageUrl,
+          artwork: featured.artwork,
+          thumbnailWidth: 300,
+          child: featured.badge == null
+              ? null
+              : Positioned(top: 4, left: 4, child: BadgePill(text: featured.badge!, color: AppColors.accent, compact: true)),
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const MonoText('No.001 · FEATURED', size: 9, color: AppColors.accent, weight: FontWeight.w600),
+            const SizedBox(height: 5),
+            Text(featured.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13.5, height: 1.35, fontWeight: FontWeight.w500, color: AppColors.ink)),
+            const SizedBox(height: 2),
+            MonoText(featured.brand, size: 10, color: AppColors.ink4, maxLines: 1),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                PriceText(featured.price, size: 16, color: AppColors.accentBright),
+                if (featured.hasDiscount) ...[
+                  PriceText(featured.discount, size: 11, color: AppColors.alertBright),
+                  StrikeText(featured.oldPrice, size: 10),
                 ],
-              ),
+              ],
             ),
-          ),
-          Container(height: 1, color: AppColors.accent),
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => openProductDetail(context, featured),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(featured.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.accentBright)),
-                        const SizedBox(height: 2),
-                        MonoText(featured.brand, size: 11, color: AppColors.ink3),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      if (featured.hasDiscount) StrikeText(featured.oldPrice),
-                      PriceText(featured.price, size: 17, color: AppColors.accentBright),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -462,7 +499,7 @@ class _TickerStripState extends State<TickerStrip> {
       padding: const EdgeInsets.symmetric(vertical: 11),
       decoration: const BoxDecoration(
         color: AppColors.deep,
-        border: Border(bottom: BorderSide(color: AppColors.accentDeep)),
+        border: Border(bottom: BorderSide(color: AppColors.accentDeep, width: AppStroke.hair)),
       ),
       child: SingleChildScrollView(
         controller: _sc,
@@ -504,7 +541,7 @@ const homeCategorySlots = 9;
 
 const _categoryGridDelegate = SliverGridDelegateWithMaxCrossAxisExtent(
   maxCrossAxisExtent: 160,
-  mainAxisExtent: 72,
+  mainAxisExtent: 58,
   mainAxisSpacing: 8,
   crossAxisSpacing: 8,
 );
@@ -598,57 +635,42 @@ class DealSection extends StatelessWidget {
 
   static const int _initialCountdownSeconds = (7 * 60 * 60) + (42 * 60) + 18;
 
+  /// 딜 카드 폭 — 격자 카드와 같은 크기라 휴대폰에서 2장 반이 보여 옆으로 넘길 수 있음을 알린다.
+  static const cardWidth = 132.0;
+
   @override
   Widget build(BuildContext context) {
     final store = AppStateScope.watch(context);
     final items = store.dealProducts;
     if (items.isEmpty && !store.catalogLoading) return const SizedBox.shrink();
     return Container(
-      margin: const EdgeInsets.only(top: 36),
-      padding: const EdgeInsets.symmetric(vertical: 32),
+      margin: const EdgeInsets.only(top: 32),
+      padding: const EdgeInsets.symmetric(vertical: 28),
       decoration: const BoxDecoration(
         color: AppColors.deep,
-        border: Border(top: BorderSide(color: AppColors.accentDeep), bottom: BorderSide(color: AppColors.accentDeep)),
+        border: Border(top: BorderSide(color: AppColors.accentDeep, width: AppStroke.hair), bottom: BorderSide(color: AppColors.accentDeep, width: AppStroke.hair)),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // 좁은 폭에선 제목 쪽이 줄어든다 — 마감 시계(빨간 면)는 줄지 않는다.
-                const Flexible(
-                  child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Eyebrow(index: '02', text: 'TODAY ONLY', inverted: true),
-                    Text('오늘의 딜', style: TextStyle(fontSize: 34, height: 1, color: AppColors.accentBright, fontWeight: FontWeight.w800, letterSpacing: -1.2)),
-                  ],
-                ),
-                ),
-                const SizedBox(width: 12),
-                const CountdownTimer(initialSeconds: _initialCountdownSeconds),
-              ],
-            ),
-          ),
-          const SizedBox(height: 18),
+          // 마감 시계(빨간 면)는 줄지 않고, 좁은 폭에선 제목 쪽이 줄어든다.
+          const SectionHead(index: '02', eyebrow: 'TODAY ONLY', title: '오늘의 딜', trailing: CountdownTimer(initialSeconds: _initialCountdownSeconds)),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 백엔드 응답 전엔 seed 상품 대신 스켈레톤 — 빠르게 넘기다 곧 바뀔 카드를 누르지 않게.
                 if (store.catalogLoading)
                   for (var i = 0; i < 3; i++) ...[
-                    const SizedBox(width: 200, child: SkeletonProductCard(dark: true)),
-                    const SizedBox(width: 12),
+                    if (i > 0) const SizedBox(width: AppSpace.gutter),
+                    const SizedBox(width: cardWidth, child: SkeletonProductCard(dark: true)),
                   ]
                 else
-                  for (final product in items) ...[
-                    SizedBox(width: 200, child: ProductCard(product: product, dark: true)),
-                    const SizedBox(width: 12),
+                  for (var i = 0; i < items.length; i++) ...[
+                    if (i > 0) const SizedBox(width: AppSpace.gutter),
+                    SizedBox(width: cardWidth, child: ProductCard(product: items[i], dark: true)),
                   ],
               ],
             ),
@@ -662,8 +684,9 @@ class DealSection extends StatelessWidget {
 class ProductSection extends StatelessWidget {
   const ProductSection({super.key});
 
-  static const initialVisibleCount = 8;
-  static const loadMoreCount = 8;
+  /// 처음 보이는 수 — 3열(휴대폰)·4열(넓은 화면) 어느 쪽에서도 줄이 꽉 차는 12.
+  static const initialVisibleCount = 12;
+  static const loadMoreCount = 12;
 
   @override
   Widget build(BuildContext context) {
@@ -690,6 +713,7 @@ class _ProductSectionContentState extends State<ProductSectionContent> {
   @override
   Widget build(BuildContext context) {
     final store = AppStateScope.watch(context);
+    const head = SectionHead(index: '03', eyebrow: 'NEW ARRIVALS', title: '이번 주 신상품');
 
     // 번들 seed를 읽기 전, 그리고 백엔드 응답 전 — seed 상품 대신 스켈레톤.
     if (store.usingFallback || store.catalogLoading) {
@@ -697,22 +721,10 @@ class _ProductSectionContentState extends State<ProductSectionContent> {
         padding: const EdgeInsets.only(top: 36),
         child: Column(
           children: [
-            const SectionHead(index: '03', eyebrow: 'NEW ARRIVALS', title: '이번 주 신상품'),
+            head,
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad),
-              child: GridView.builder(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.58,
-                  mainAxisSpacing: 24,
-                  crossAxisSpacing: 12,
-                ),
-                itemCount: ProductSection.initialVisibleCount,
-                itemBuilder: (_, __) => const SkeletonProductCard(),
-              ),
+              child: CardGrid(children: [for (var i = 0; i < ProductSection.initialVisibleCount; i++) const SkeletonProductCard()]),
             ),
           ],
         ),
@@ -731,41 +743,15 @@ class _ProductSectionContentState extends State<ProductSectionContent> {
         children: [
           // 카테고리 필터 칩(의류·홈·테크·뷰티)은 뺐다 — 백엔드에 없는 옛 키라 실제 상품에선 항상 비었고,
           // 신상품 태그가 DB 전체에 6개뿐이라 카테고리별 신상품으로 바꿀 수도 없다.
-          const SectionHead(index: '03', eyebrow: 'NEW ARRIVALS', title: '이번 주 신상품'),
+          head,
           Padding(
-            // 좌우 AppSpace.pad만큼 들여쓰기 → 상품 이미지와 동일한 인셋
             padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad),
-            child: Column(
-              children: [
-                for (var row = 0; row * 2 < visibleItems.length; row++) ...[
-                  if (row > 0)
-                    // 줄 구분 가로선: 상품 이미지가 양 끝에서 떨어진 만큼(좌우 패딩)만 차지
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Divider(height: 1, thickness: 1, color: AppColors.line),
-                    ),
-                  IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(child: ProductCard(product: visibleItems[row * 2])),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: row * 2 + 1 < visibleItems.length
-                              ? ProductCard(product: visibleItems[row * 2 + 1])
-                              : const SizedBox.shrink(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ],
-            ),
+            child: CardGrid(children: [for (final product in visibleItems) ProductCard(product: product)]),
           ),
           if (hasMore)
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpace.pad, 28, AppSpace.pad, 0),
-              child: AppButton(text: '더 보기  +8', large: true, onTap: () => _showMore(items.length)),
+              padding: const EdgeInsets.fromLTRB(AppSpace.pad, 26, AppSpace.pad, 0),
+              child: AppButton(text: '더 보기  +${ProductSection.loadMoreCount}', large: true, onTap: () => _showMore(items.length)),
             ),
         ],
       ),
@@ -807,7 +793,7 @@ class RemoteNeutralImageSurface extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.bg,
-        border: Border.all(color: AppColors.line),
+        border: Border.all(color: AppColors.line, width: AppStroke.hair),
       ),
       child: Stack(
         fit: StackFit.expand,

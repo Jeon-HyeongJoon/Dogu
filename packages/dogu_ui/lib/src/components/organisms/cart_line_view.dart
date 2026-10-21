@@ -56,11 +56,11 @@ class CartLineView extends StatelessWidget {
       onTap: onToggle,
       child: Container(
         padding: const EdgeInsets.all(AppSpace.pad - 2),
-        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
+        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair))),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(children: [SizedBox(width: 96, height: 96, child: ProductImage(url: imageUrl, child: Padding(padding: const EdgeInsets.all(6), child: MonoText(index.toString().padLeft(3, '0'), size: 9, color: AppColors.ink4)))), Positioned(top: -2, left: -2, child: Container(width: 18, height: 18, alignment: Alignment.center, decoration: BoxDecoration(color: selected ? AppColors.accent : AppColors.bg, border: Border.all(color: selected ? AppColors.accent : AppColors.line)), child: Text(selected ? '✓' : '', style: const TextStyle(color: AppColors.invert, fontSize: 11))))]),
+            Stack(children: [SizedBox(width: 96, height: 96, child: ProductImage(url: imageUrl, child: Padding(padding: const EdgeInsets.all(6), child: MonoText(index.toString().padLeft(3, '0'), size: 9, color: AppColors.ink4)))), Positioned(top: -2, left: -2, child: Container(width: 18, height: 18, alignment: Alignment.center, decoration: BoxDecoration(color: selected ? AppColors.accent : AppColors.bg, border: Border.all(color: selected ? AppColors.accent : AppColors.line, width: AppStroke.hair)), child: Text(selected ? '✓' : '', style: const TextStyle(color: AppColors.invert, fontSize: 11))))]),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -68,7 +68,7 @@ class CartLineView extends StatelessWidget {
                 children: [
                   MonoText(brand, size: 10, color: AppColors.ink4),
                   const SizedBox(height: 4),
-                  Text(name, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: AppColors.accentBright)),
+                  Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.ink)),
                   if (note != null) ...[
                     const SizedBox(height: 4),
                     MonoText(note!, size: 10.5, color: AppColors.ink3),

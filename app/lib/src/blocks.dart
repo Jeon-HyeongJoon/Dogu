@@ -19,20 +19,25 @@ class CategoryListBlock extends StatelessWidget {
     final visibleRows = selectedCategoryKey == null
         ? rows
         : rows.where((row) => _normalizeCategoryKey(row.id.isEmpty ? row.name : row.id) == selectedCategoryKey).toList();
-    return Column(
-      children: [
-        for (var i = 0; i < visibleRows.length; i++)
-          // 그리기는 디자인 시스템(CategoryListRow). 상품 수는 그리지 않는다(메인 카드와 같은 이유).
-          CategoryListRow(
-            index: i + 1,
-            name: visibleRows[i].name,
-            description: visibleRows[i].description.isEmpty ? '큐레이션 · 베스트 · 신상품 · 한정판' : visibleRows[i].description,
-            onTap: () {
-              AppStateScope.read(context).setCategoryQuickFilter('all');
-              AppStateScope.read(context).selectCategoryBrowse(_normalizeCategoryKey(visibleRows[i].id.isEmpty ? visibleRows[i].name : visibleRows[i].id));
-            },
-          ),
-      ],
+    // 메인 화면과 같은 칸 격자(휴대폰 3열) — 예전엔 한 줄에 하나씩, 모든 줄이 같은 채우기 설명을 반복했다.
+    // 그리기는 디자인 시스템(CategoryTile). 상품 수는 그리지 않는다(메인 카드와 같은 이유).
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpace.pad, 16, AppSpace.pad, 4),
+      child: GridView.builder(
+        padding: EdgeInsets.zero,
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: visibleRows.length,
+        gridDelegate: _categoryGridDelegate,
+        itemBuilder: (context, i) => CategoryTile(
+          index: i + 1,
+          name: visibleRows[i].name,
+          onTap: () {
+            AppStateScope.read(context).setCategoryQuickFilter('all');
+            AppStateScope.read(context).selectCategoryBrowse(_normalizeCategoryKey(visibleRows[i].id.isEmpty ? visibleRows[i].name : visibleRows[i].id));
+          },
+        ),
+      ),
     );
   }
 }
@@ -49,19 +54,7 @@ class CategoryProductsBlock extends StatelessWidget {
     if (loading) {
       return Padding(
         padding: const EdgeInsets.all(AppSpace.pad),
-        child: GridView.builder(
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: 4,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.58,
-            mainAxisSpacing: 24,
-            crossAxisSpacing: 12,
-          ),
-          itemBuilder: (_, __) => const SkeletonProductCard(),
-        ),
+        child: CardGrid(children: [for (var i = 0; i < 6; i++) const SkeletonProductCard()]),
       );
     }
     if (products.isEmpty) {
@@ -73,19 +66,7 @@ class CategoryProductsBlock extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(AppSpace.pad),
-      child: GridView.builder(
-        padding: EdgeInsets.zero,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: products.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.58,
-          mainAxisSpacing: 24,
-          crossAxisSpacing: 12,
-        ),
-        itemBuilder: (context, index) => ProductCard(product: products[index]),
-      ),
+      child: CardGrid(children: [for (final product in products) ProductCard(product: product)]),
     );
   }
 }
@@ -159,7 +140,7 @@ class _BigSearchBoxState extends State<BigSearchBox> {
       height: 48,
       margin: const EdgeInsets.all(AppSpace.pad - 4),
       padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(border: Border.all(color: AppColors.accent), color: AppColors.bgAlt),
+      decoration: BoxDecoration(border: Border.all(color: AppColors.accent, width: AppStroke.control), color: AppColors.bgAlt),
       child: Row(
         children: [
           GestureDetector(
@@ -209,7 +190,7 @@ class TrendingBlock extends StatelessWidget {
                 onTap: () => AppStateScope.read(context).performSearch(rows[i].term),
                 child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.lineSoft))),
+                decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.lineSoft, width: AppStroke.hair))),
                 child: Row(
                   children: [
                     SizedBox(width: 28, child: MonoText((i + 1).toString().padLeft(2, '0'), size: 14, color: i < 3 ? AppColors.accent : AppColors.ink, weight: FontWeight.w700)),
@@ -238,7 +219,7 @@ class WishSummary extends StatelessWidget {
     final total = store.wishlistProducts.fold<int>(0, (sum, product) => sum + product.numericPrice);
     return Container(
       padding: const EdgeInsets.all(AppSpace.pad - 4),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair))),
       child: Row(
         children: [
           Expanded(child: Text('${store.wishlistProducts.length} items · 총 ${formatWon(total)} 상당', style: const TextStyle(fontSize: 12.5, color: AppColors.ink3))),
@@ -277,18 +258,38 @@ class WishGridBlock extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(AppSpace.pad),
-      child: GridView.builder(
-        padding: EdgeInsets.zero,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: items.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.58, mainAxisSpacing: 24, crossAxisSpacing: 12),
-        itemBuilder: (context, index) => Stack(
-          children: [
-            ProductCard(product: items[index]),
-            Positioned(top: 8, right: 8, child: GestureDetector(onTap: () => AppStateScope.read(context).toggleWishlist(items[index]), child: Container(width: 26, height: 26, alignment: Alignment.center, decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.alertBright)), child: const Text('♥', style: TextStyle(color: AppColors.alertBright))))),
-          ],
-        ),
+      child: CardGrid(
+        children: [
+          for (final item in items)
+            Stack(
+              children: [
+                ProductCard(product: item),
+                // 찜 빼기 — 사진 오른쪽 아래(왼쪽 위는 할인, 오른쪽 위는 BEST·NEW 자리)
+                Positioned.fill(
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: GestureDetector(
+                          onTap: () => AppStateScope.read(context).toggleWishlist(item),
+                          child: Container(
+                            width: 22,
+                            height: 22,
+                            margin: const EdgeInsets.all(5),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.alertBright, width: AppStroke.hair)),
+                            child: const Text('♥', style: TextStyle(color: AppColors.alertBright, fontSize: 11)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+        ],
       ),
     );
   }
@@ -302,7 +303,7 @@ class CartStatusBlock extends StatelessWidget {
     final store = AppStateScope.watch(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad, vertical: 14),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -327,7 +328,7 @@ class CartBannerBlock extends StatelessWidget {
     final remaining = (28000 - store.selectedCartTotal).clamp(0, 28000);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad, vertical: 12),
-      decoration: const BoxDecoration(color: AppColors.bgSoft, border: Border(bottom: BorderSide(color: AppColors.line))),
+      decoration: const BoxDecoration(color: AppColors.bgSoft, border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair))),
       child: Row(children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle)), const SizedBox(width: 10), Expanded(child: Text(remaining == 0 ? '무료 배송 조건이 충족됐어요' : '${formatWon(remaining)} 더 담으면 무료 배송 조건이 충족돼요', style: const TextStyle(fontSize: 12, color: AppColors.ink2)))]),
     );
   }
@@ -395,7 +396,7 @@ class CartSummaryBlock extends StatelessWidget {
           SummaryLine(label: '상품 금액', value: formatWon(store.selectedCartOldTotal)),
           SummaryLine(label: '할인', value: '−${formatWon(store.selectedCartDiscount)}', accent: true),
           const SummaryLine(label: '배송비', value: '무료'),
-          const Divider(color: AppColors.line),
+          const Divider(color: AppColors.line, thickness: AppStroke.hair),
           SummaryLine(label: '결제 예정 금액', value: formatWon(store.selectedCartTotal), total: true),
         ],
       ),
@@ -417,16 +418,16 @@ class RecommendedCartBlock extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const MonoText('[ → ] 함께 담으면 좋은', size: 10, weight: FontWeight.w700),
+          const Eyebrow(index: '→', text: '함께 담으면 좋은'),
           const SizedBox(height: 12),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: Row(children: [
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               // 백엔드 응답 전엔 seed 상품 대신 스켈레톤.
               if (store.catalogLoading)
-                for (var i = 0; i < 2; i++) const Padding(padding: EdgeInsets.only(right: 12), child: SizedBox(width: 160, child: SkeletonProductCard()))
+                for (var i = 0; i < 3; i++) const Padding(padding: EdgeInsets.only(right: AppSpace.gutter), child: SizedBox(width: DealSection.cardWidth, child: SkeletonProductCard()))
               else
-                for (final item in recos) Padding(padding: const EdgeInsets.only(right: 12), child: SizedBox(width: 160, child: ProductCard(product: item))),
+                for (final item in recos) Padding(padding: const EdgeInsets.only(right: AppSpace.gutter), child: SizedBox(width: DealSection.cardWidth, child: ProductCard(product: item))),
             ]),
           ),
         ],

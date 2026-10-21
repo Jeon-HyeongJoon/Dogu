@@ -21,7 +21,7 @@ class Tag extends StatelessWidget {
     final label = MonoText(live ? text.substring(_liveMark.length) : text, size: compact ? 9.5 : 10, weight: FontWeight.w600, color: color);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: compact ? 6 : 7, vertical: compact ? 4 : 5),
-      decoration: BoxDecoration(border: Border.all(color: dark ? AppColors.heroChip : AppColors.line)),
+      decoration: BoxDecoration(border: Border.all(color: dark ? AppColors.heroChip : AppColors.line, width: AppStroke.hair)),
       child: live
           ? Row(
               mainAxisSize: MainAxisSize.min,

@@ -13,7 +13,7 @@ class NeutralImageSurface extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.bgAlt,
-        border: Border.all(color: AppColors.line),
+        border: Border.all(color: AppColors.line, width: AppStroke.hair),
       ),
       child: Stack(
         fit: StackFit.expand,

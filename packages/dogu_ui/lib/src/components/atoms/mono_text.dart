@@ -3,18 +3,22 @@ import 'package:flutter/material.dart';
 import '../../tokens/tokens.dart';
 
 class MonoText extends StatelessWidget {
-  const MonoText(this.text, {this.size = 12, this.color = AppColors.ink, this.weight = FontWeight.w400, this.align, super.key});
+  const MonoText(this.text, {this.size = 12, this.color = AppColors.ink, this.weight = FontWeight.w400, this.align, this.maxLines, super.key});
   final String text;
   final double size;
   final Color color;
   final FontWeight weight;
   final TextAlign? align;
+  /// 넘치면 말줄임(…) — 좁은 카드의 브랜드·메타 줄.
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
       textAlign: align,
+      maxLines: maxLines,
+      overflow: maxLines == null ? null : TextOverflow.ellipsis,
       style: monoStyle.copyWith(fontSize: size, color: color, fontWeight: weight),
     );
   }

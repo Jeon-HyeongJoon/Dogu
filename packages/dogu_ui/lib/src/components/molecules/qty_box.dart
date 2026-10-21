@@ -14,8 +14,8 @@ class QtyBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(border: Border.all(color: AppColors.line)),
-      child: Row(children: [GestureDetector(behavior: HitTestBehavior.opaque, onTap: onMinus, child: SizedBox(width: buttonExtent, height: buttonExtent, child: const Center(child: MonoText('−', size: 16)))), Container(width: valueExtent, height: buttonExtent, alignment: Alignment.center, decoration: const BoxDecoration(border: Border(left: BorderSide(color: AppColors.line), right: BorderSide(color: AppColors.line))), child: MonoText(value, size: 13, weight: FontWeight.w700)), GestureDetector(behavior: HitTestBehavior.opaque, onTap: onPlus, child: SizedBox(width: buttonExtent, height: buttonExtent, child: const Center(child: MonoText('+', size: 16))))]),
+      decoration: BoxDecoration(border: Border.all(color: AppColors.line, width: AppStroke.hair)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [GestureDetector(behavior: HitTestBehavior.opaque, onTap: onMinus, child: SizedBox(width: buttonExtent, height: buttonExtent, child: const Center(child: MonoText('−', size: 16)))), Container(width: valueExtent, height: buttonExtent, alignment: Alignment.center, decoration: const BoxDecoration(border: Border(left: BorderSide(color: AppColors.line, width: AppStroke.hair), right: BorderSide(color: AppColors.line, width: AppStroke.hair))), child: MonoText(value, size: 13, weight: FontWeight.w700)), GestureDetector(behavior: HitTestBehavior.opaque, onTap: onPlus, child: SizedBox(width: buttonExtent, height: buttonExtent, child: const Center(child: MonoText('+', size: 16))))]),
     );
   }
 }

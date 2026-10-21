@@ -23,7 +23,7 @@ class PreparingImageSurface extends StatelessWidget {
           radius: 0.75,
           colors: [sheen, base],
         ),
-        border: Border.all(color: dark ? AppColors.deepLine : AppColors.line),
+        border: Border.all(color: dark ? AppColors.deepLine : AppColors.line, width: AppStroke.hair),
       ),
       child: Stack(
         fit: StackFit.expand,

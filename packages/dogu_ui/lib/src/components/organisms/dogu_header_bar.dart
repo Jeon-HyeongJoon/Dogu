@@ -47,7 +47,7 @@ class DoguHeaderBar extends StatelessWidget {
           ),
         ),
         Container(
-          height: 1,
+          height: AppStroke.hair,
           decoration: const BoxDecoration(
             gradient: LinearGradient(colors: [AppColors.line, AppColors.accent, AppColors.line]),
           ),

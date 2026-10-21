@@ -14,7 +14,7 @@ class SkeletonProductCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AspectRatio(aspectRatio: 1, child: ColoredBox(color: fill)),
-        Container(height: 1, color: dark ? AppColors.deepLine : AppColors.line),
+        Container(height: AppStroke.hair, color: dark ? AppColors.deepLine : AppColors.line),
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 10, 4, 4),
           child: Column(

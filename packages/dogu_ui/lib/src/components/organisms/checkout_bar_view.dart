@@ -22,7 +22,7 @@ class CheckoutBarView extends StatelessWidget {
     return Container(
       height: barHeight,
       padding: const EdgeInsets.fromLTRB(AppSpace.pad, 16, AppSpace.pad, 18),
-      decoration: const BoxDecoration(color: AppColors.deep, border: Border(top: BorderSide(color: AppColors.accentDeep))),
+      decoration: const BoxDecoration(color: AppColors.deep, border: Border(top: BorderSide(color: AppColors.accentDeep, width: AppStroke.hair))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
