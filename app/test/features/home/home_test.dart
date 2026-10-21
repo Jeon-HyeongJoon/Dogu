@@ -746,4 +746,22 @@ void main() {
     await tester.pump(const Duration(seconds: 5));
     expect(find.text('00:00:04'), findsOneWidget);
   });
+
+  testWidgets('participating brands show the real brands, loading keeps the same height', (tester) async {
+    final store = AppStore(repository: FakeRepository(results: const []));
+    store.suggestions = const ['스파클Mart', '닥터바이', '헤븐센스', '밴더마켓'];
+    Widget section() => AppStateScope(store: store, child: const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: BrandSection()))));
+
+    await tester.pumpWidget(section());
+    expect(find.text('헤븐센스'), findsWidgets);
+    expect(find.text('soft·studio'), findsNothing, reason: '고정돼 있던 가짜 브랜드');
+    final loadedHeight = tester.getSize(find.byType(BrandSection)).height;
+
+    store.catalogLoading = true;
+    store.notifyListeners();
+    await tester.pump();
+    expect(find.byType(LoadingDots), findsOneWidget);
+    expect(find.text('헤븐센스').hitTestable(), findsNothing);
+    expect(tester.getSize(find.byType(BrandSection)).height, loadedHeight, reason: '브랜드가 나타날 때 밀리지 않는다');
+  });
 }

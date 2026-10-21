@@ -91,15 +91,24 @@ class CategoryProductsBlock extends StatelessWidget {
 }
 
 
+/// 실제 브랜드(검색 탭 '추천 브랜드'와 같은 목록) — 누르면 그 브랜드로 검색한다.
+/// 예전엔 가짜 브랜드 8개('soft·studio  42' 등)가 고정돼 있었고 '전체 보기'는 눌러도 아무 일도 없었다.
 class BrandTagBlock extends StatelessWidget {
-  const BrandTagBlock({required this.title, this.action, super.key});
+  const BrandTagBlock({required this.title, super.key});
   final String title;
-  final String? action;
 
   @override
   Widget build(BuildContext context) {
-    const brands = ['soft·studio  42', 'good machine  18', 'objet·han  36', 'NORM /  24', 'QUIET CO.  19', 'paperhouse  12', 'flat·flat  28', 'ATELIER 04  31'];
-    return TagSection(title: title, action: action, tags: brands);
+    final store = AppStateScope.watch(context);
+    return TagSection(
+      title: title,
+      tags: store.suggestions,
+      loading: store.catalogLoading,
+      onTagTap: (brand) {
+        AppStateScope.read(context).performSearch(brand);
+        AppNavigationScope.select(context, 2);
+      },
+    );
   }
 }
 
@@ -285,43 +294,6 @@ class WishGridBlock extends StatelessWidget {
   }
 }
 
-class PriceDropBlock extends StatelessWidget {
-  const PriceDropBlock({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    const drops = [
-      ('Graphite Linen Overshirt', 'soft·studio', '₩189,000', '₩118,000'),
-      ('Aluminum Desk Lamp', 'good machine', '₩198,000', '₩148,000'),
-      ('Cedar Wood Diffuser', 'slow craft', '₩62,000', '₩46,000'),
-    ];
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpace.pad, 24, AppSpace.pad, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const MonoText('[ ↓ ] 가격 인하 알림', size: 10, weight: FontWeight.w700),
-          const SizedBox(height: 12),
-          const Text('관심상품 중 가격이 내려간 3개 항목이 있어요.', style: TextStyle(fontSize: 12.5, color: AppColors.ink3, height: 1.6)),
-          const SizedBox(height: 14),
-          for (final item in drops)
-            Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(border: Border.all(color: AppColors.line)),
-              child: Row(
-                children: [
-                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(item.$1, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500)), MonoText(item.$2, size: 10.5, color: AppColors.ink4)])),
-                  Column(crossAxisAlignment: CrossAxisAlignment.end, children: [StrikeText(item.$3), MonoText(item.$4, size: 14, color: AppColors.accent, weight: FontWeight.w700)]),
-                ],
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
 class CartStatusBlock extends StatelessWidget {
   const CartStatusBlock({super.key});
 
@@ -392,8 +364,6 @@ class CartItemRow extends StatelessWidget {
       index: index,
       brand: product.brand,
       name: product.name,
-      // TODO(문구): 개발용 안내가 사용자에게 보인다 — 화면을 바꾸지 않는 리팩터링이라 그대로 옮겼다.
-      note: 'local cart · persisted on this device',
       price: product.price,
       oldPrice: product.oldPrice,
       discount: product.discount,
@@ -427,8 +397,6 @@ class CartSummaryBlock extends StatelessWidget {
           const SummaryLine(label: '배송비', value: '무료'),
           const Divider(color: AppColors.line),
           SummaryLine(label: '결제 예정 금액', value: formatWon(store.selectedCartTotal), total: true),
-          const SizedBox(height: 14),
-          Align(alignment: Alignment.centerLeft, child: MonoText('// 장바구니는 이 기기에 로컬 저장됩니다\n// API에는 결제·쿠폰 데이터를 전송하지 않음', size: 10.5, color: AppColors.ink4)),
         ],
       ),
     );

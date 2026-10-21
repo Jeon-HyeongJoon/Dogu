@@ -282,17 +282,32 @@ class BrandSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const row1 = ['soft·studio', 'ATELIER 04', 'good machine', 'objet·han', 'NORM /', 'paperhouse', 'flat·flat'];
-    const row2 = ['QUIET CO.', 'han·gul·works', 'monogram', 'slow craft', 'post script', 'edition·k', 'white room'];
+    // 실제 브랜드(백엔드가 메인 카테고리별 대표 브랜드로 고른 것) — 예전엔 가짜 브랜드 14개가 고정돼 있었다.
+    final store = AppStateScope.watch(context);
+    final brands = store.suggestions;
+    final half = (brands.length / 2).ceil();
+    final rows = [
+      BrandRow(items: store.catalogLoading ? const ['·'] : brands.take(half).toList()),
+      BrandRow(items: store.catalogLoading ? const ['·'] : brands.skip(half).toList(), noTop: true),
+    ];
     return Padding(
       padding: const EdgeInsets.only(top: 40, bottom: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Padding(padding: EdgeInsets.symmetric(horizontal: AppSpace.pad), child: Eyebrow(index: '04', text: "THIS WEEK'S BRANDS")),
-          Padding(padding: EdgeInsets.fromLTRB(AppSpace.pad, 8, AppSpace.pad, 20), child: Text('참여 브랜드', style: TextStyle(fontSize: 34, height: 1, fontWeight: FontWeight.w800, letterSpacing: -1.2))),
-          BrandRow(items: row1),
-          BrandRow(items: row2, noTop: true),
+        children: [
+          const Padding(padding: EdgeInsets.symmetric(horizontal: AppSpace.pad), child: Eyebrow(index: '04', text: "THIS WEEK'S BRANDS")),
+          const Padding(padding: EdgeInsets.fromLTRB(AppSpace.pad, 8, AppSpace.pad, 20), child: Text('참여 브랜드', style: TextStyle(fontSize: 34, height: 1, fontWeight: FontWeight.w800, letterSpacing: -1.2))),
+          // 응답 전엔 두 줄의 자리를 그대로 두고(보이지 않게) 로딩 점 — 브랜드가 나타날 때 밀리지 않게.
+          if (store.catalogLoading)
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Visibility(visible: false, maintainSize: true, maintainAnimation: true, maintainState: true, child: Column(children: rows)),
+                const LoadingDots(),
+              ],
+            )
+          else
+            ...rows,
         ],
       ),
     );
@@ -552,7 +567,7 @@ class CategoryTabPage extends StatelessWidget {
             // 카테고리 미선택(퀵필터만)이면 전체 상품 = 백엔드 카탈로그를, 선택했으면 그 카테고리 결과를 기다린다.
             loading: store.selectedCategoryKey == null ? store.catalogLoading : store.categoryProductsLoading,
           ),
-        const SoftDividerBlock(child: BrandTagBlock(title: '[ + ] SHOP BY BRAND', action: '전체 보기 →')),
+        const SoftDividerBlock(child: BrandTagBlock(title: '[ + ] SHOP BY BRAND')),
       ],
     );
   }
