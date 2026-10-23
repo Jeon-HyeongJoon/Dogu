@@ -3,7 +3,7 @@
 import 'package:dogu_ui/dogu_ui.dart';
 import 'package:flutter/material.dart';
 
-/// 사례 하나 — [frame]은 골든을 찍는 틀의 크기, [dark]면 어두운 바탕 위에 그린다.
+/// 사례 하나 — [frame]은 골든을 찍는 틀의 크기, [dark]면 딜·뉴스레터 같은 가장 깊은 초록 띠 위에 그린다.
 class DoguUseCase {
   const DoguUseCase(this.name, this.build, {this.frame = const Size(360, 120), this.dark = false});
 
@@ -48,6 +48,11 @@ final doguComponentCases = <DoguComponentCases>[
     DoguUseCase('muted small', (_) => const MonoText('4.6 · 1237 reviews', size: 9.5, color: AppColors.ink4)),
   ]),
   DoguComponentCases('atoms', 'StrikeText', [DoguUseCase('default', (_) => const StrikeText('₩13,900'))]),
+  DoguComponentCases('atoms', 'PriceText', [
+    DoguUseCase('default', (_) => const PriceText('₩24,900')),
+    DoguUseCase('highlight', (_) => const PriceText('₩142,400', size: 22, color: AppColors.accentBright)),
+    DoguUseCase('discount', (_) => const PriceText('-29%', size: 12.5, color: AppColors.alertBright)),
+  ]),
   DoguComponentCases('atoms', 'Eyebrow', [
     DoguUseCase('default', (_) => const Eyebrow(index: '01', text: 'SHOP BY CATEGORY')),
     DoguUseCase('inverted', (_) => const Eyebrow(index: '02', text: 'TODAY ONLY', inverted: true), dark: true),
@@ -69,7 +74,7 @@ final doguComponentCases = <DoguComponentCases>[
   ]),
   DoguComponentCases('atoms', 'LoadingDots', [
     DoguUseCase('default', (_) => const LoadingDots()),
-    DoguUseCase('on dark', (_) => const LoadingDots(color: AppColors.heroInk3), dark: true),
+    DoguUseCase('on dark', (_) => const LoadingDots(), dark: true),
   ]),
   DoguComponentCases('atoms', 'SkeletonProductCard', [
     DoguUseCase('light', (_) => const SizedBox(width: 180, child: SkeletonProductCard()), frame: Size(220, 320)),
@@ -88,6 +93,9 @@ final doguComponentCases = <DoguComponentCases>[
     DoguUseCase('default', (_) => const IconBox(icon: Icons.search, label: '검색', onTap: _noop)),
     DoguUseCase('inverted with count', (_) => const IconBox(icon: Icons.shopping_cart_outlined, label: '장바구니', inverted: true, count: '3', onTap: _noop)),
   ]),
+  DoguComponentCases('atoms', 'GoldSparkle', [
+    DoguUseCase('default', (_) => const GoldSparkle(size: 14), frame: Size(80, 60)),
+  ]),
   DoguComponentCases('atoms', 'CornerMark', [
     DoguUseCase('four corners', (_) => const SizedBox(
           width: 80,
@@ -105,6 +113,7 @@ final doguComponentCases = <DoguComponentCases>[
   DoguComponentCases('molecules', 'SectionHead', [
     DoguUseCase('with link', (_) => const SectionHead(index: '01', eyebrow: 'SHOP BY CATEGORY', title: '카테고리', link: '전체 →', onLinkTap: _noop), frame: Size(390, 110)),
     DoguUseCase('title only', (_) => const SectionHead(index: '03', eyebrow: 'NEW ARRIVALS', title: '이번 주 신상품'), frame: Size(390, 110)),
+    DoguUseCase('with trailing', (_) => const SectionHead(index: '02', eyebrow: 'TODAY ONLY', title: '오늘의 딜', trailing: CountdownTimer(initialSeconds: 7 * 3600 + 42 * 60 + 18)), frame: Size(390, 110), dark: true),
   ]),
   DoguComponentCases('molecules', 'SectionBorder', [
     DoguUseCase('default', (_) => const SectionBorder(child: Padding(padding: EdgeInsets.all(20), child: Text('섹션 내용'))), frame: Size(390, 120)),
@@ -148,12 +157,16 @@ final doguComponentCases = <DoguComponentCases>[
     DoguUseCase('without url', (_) => const SizedBox(width: 160, height: 160, child: ProductImage(child: Padding(padding: EdgeInsets.all(8), child: BadgePill(text: '-29%', color: AppColors.ink)))), frame: Size(200, 200)),
   ]),
   DoguComponentCases('molecules', 'ProductCardView', [
-    DoguUseCase('discount + badge', (_) => const SizedBox(width: 180, child: ProductCardView(data: _product, onTap: _noop, onWishTap: _noop)), frame: Size(220, 340)),
-    DoguUseCase('plain, wished', (_) => const SizedBox(width: 180, child: ProductCardView(data: _plainProduct, wished: true, onTap: _noop, onWishTap: _noop)), frame: Size(220, 340)),
-    DoguUseCase('dark', (_) => const SizedBox(width: 200, child: ProductCardView(data: _product, dark: true, onTap: _noop, onWishTap: _noop)), frame: Size(240, 360), dark: true),
+    DoguUseCase('discount + badge', (_) => const SizedBox(width: 132, child: ProductCardView(data: _product, onTap: _noop, onWishTap: _noop)), frame: Size(170, 280)),
+    DoguUseCase('plain, wished', (_) => const SizedBox(width: 132, child: ProductCardView(data: _plainProduct, wished: true, onTap: _noop, onWishTap: _noop)), frame: Size(170, 280)),
+    DoguUseCase('dark', (_) => const SizedBox(width: 132, child: ProductCardView(data: _product, dark: true, onTap: _noop, onWishTap: _noop)), frame: Size(170, 280), dark: true),
   ]),
   DoguComponentCases('molecules', 'CategoryTile', [
     DoguUseCase('default', (_) => const SizedBox(width: 112, height: 72, child: CategoryTile(index: 1, name: '식품', onTap: _noop)), frame: Size(160, 110)),
+  ]),
+  DoguComponentCases('molecules', 'CardGrid', [
+    DoguUseCase('phone (3 columns)', (_) => Padding(padding: const EdgeInsets.all(20), child: CardGrid(children: [for (var i = 0; i < 6; i++) const ProductCardView(data: _product, onTap: _noop, onWishTap: _noop)])), frame: const Size(390, 560)),
+    DoguUseCase('wide (4 columns)', (_) => Padding(padding: const EdgeInsets.all(20), child: CardGrid(children: [for (var i = 0; i < 4; i++) const ProductCardView(data: _plainProduct, onTap: _noop, onWishTap: _noop)])), frame: const Size(720, 360)),
   ]),
   DoguComponentCases('molecules', 'CategoryListRow', [
     DoguUseCase('default', (_) => const CategoryListRow(index: 7, name: '조명/인테리어', description: '큐레이션 · 베스트 · 신상품 · 한정판', onTap: _noop), frame: Size(390, 100)),
@@ -210,4 +223,6 @@ final doguComponentCases = <DoguComponentCases>[
   DoguComponentCases('brand', 'DoguBrandMark', [DoguUseCase('48', (_) => const DoguBrandMark(size: 48), frame: Size(120, 120))]),
   DoguComponentCases('brand', 'DoguLogoMark', [DoguUseCase('48', (_) => const DoguLogoMark(size: 48), frame: Size(120, 120))]),
   DoguComponentCases('brand', 'DoguBrandLockup', [DoguUseCase('default', (_) => const DoguBrandLockup(), frame: Size(300, 80))]),
+  DoguComponentCases('brand', 'DoguMedal', [DoguUseCase('default', (_) => const DoguMedal(width: 240), frame: Size(390, 200))]),
+  DoguComponentCases('brand', 'DesireWordmark', [DoguUseCase('phone', (_) => const DesireWordmark(size: 100), frame: Size(390, 150))]),
 ];

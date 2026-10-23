@@ -40,7 +40,7 @@ class IconBox extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: inverted ? AppColors.accent : AppColors.bg,
-                  border: Border.all(color: inverted ? AppColors.accent : AppColors.line),
+                  border: Border.all(color: inverted ? AppColors.accent : AppColors.line, width: AppStroke.control),
                 ),
                 child: Icon(icon, size: 18, color: inverted ? AppColors.invert : AppColors.ink),
               ),

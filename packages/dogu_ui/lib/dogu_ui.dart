@@ -9,6 +9,7 @@ export 'src/tokens/tokens.dart';
 // atoms
 export 'src/components/atoms/mono_text.dart';
 export 'src/components/atoms/strike_text.dart';
+export 'src/components/atoms/price_text.dart';
 export 'src/components/atoms/eyebrow.dart';
 export 'src/components/atoms/tag.dart';
 export 'src/components/atoms/badge_pill.dart';
@@ -19,6 +20,7 @@ export 'src/components/atoms/small_chip.dart';
 export 'src/components/atoms/nav_label.dart';
 export 'src/components/atoms/icon_box.dart';
 export 'src/components/atoms/corner_mark.dart';
+export 'src/components/atoms/gold_sparkle.dart';
 
 // molecules
 export 'src/components/molecules/section_head.dart';
@@ -37,6 +39,7 @@ export 'src/components/molecules/product_image.dart';
 export 'src/components/molecules/product_card_view.dart';
 export 'src/components/molecules/category_tile.dart';
 export 'src/components/molecules/category_list_row.dart';
+export 'src/components/molecules/card_grid.dart';
 
 // organisms
 export 'src/components/organisms/dogu_header_bar.dart';
@@ -50,3 +53,5 @@ export 'src/components/organisms/checkout_bar_view.dart';
 export 'src/components/brand/dogu_brand_mark.dart';
 export 'src/components/brand/dogu_logo_mark.dart';
 export 'src/components/brand/dogu_brand_lockup.dart';
+export 'src/components/brand/dogu_medal.dart';
+export 'src/components/brand/desire_wordmark.dart';

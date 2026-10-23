@@ -19,12 +19,12 @@ class CategoryTile extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(border: Border.all(color: AppColors.line)),
+        decoration: BoxDecoration(border: Border.all(color: AppColors.line, width: AppStroke.hair)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            MonoText(index.toString().padLeft(2, '0'), size: 8.5, color: AppColors.ink4),
+            MonoText(index.toString().padLeft(2, '0'), size: 8.5, color: AppColors.accent),
             const SizedBox(height: 5),
             Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: -0.3, height: 1.1), maxLines: 1, overflow: TextOverflow.ellipsis),
           ],

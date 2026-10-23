@@ -13,7 +13,7 @@ class RecentSearchTag extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(border: Border.all(color: AppColors.line), color: AppColors.bg),
+      decoration: BoxDecoration(border: Border.all(color: AppColors.line, width: AppStroke.hair), color: AppColors.bg),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

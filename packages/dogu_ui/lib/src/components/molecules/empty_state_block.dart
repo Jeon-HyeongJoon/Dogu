@@ -14,11 +14,11 @@ class EmptyStateBlock extends StatelessWidget {
       width: double.infinity,
       margin: const EdgeInsets.all(AppSpace.pad),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
-      decoration: BoxDecoration(color: AppColors.bgSoft, border: Border.all(color: AppColors.line)),
+      decoration: BoxDecoration(color: AppColors.bgSoft, border: Border.all(color: AppColors.line, width: AppStroke.hair)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.4)),
+          Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -0.3, color: AppColors.ink)),
           const SizedBox(height: 6),
           Text(body, style: const TextStyle(fontSize: 12.5, height: 1.6, color: AppColors.ink3)),
         ],

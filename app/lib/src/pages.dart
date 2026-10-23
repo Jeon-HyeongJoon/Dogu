@@ -44,9 +44,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   String _tagLabel(String tag) {
     switch (tag) {
-      case 'today_deal': return '오늘의 딜';
-      case 'new_arrival': return '신상품';
-      default: return tag;
+      case 'today_deal':
+        return '오늘의 딜';
+      case 'new_arrival':
+        return '신상품';
+      default:
+        return tag;
     }
   }
 
@@ -85,131 +88,141 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       // 상품 주소로 바로 들어와 아직 정보가 없으면 로딩 → 실패 시 안내(엉뚱한 상품 대신).
       body: _product.isPending
           ? Center(
-              child: _loading
-                  ? const LoadingDots()
-                  : const Text('상품 정보를 불러오지 못했어요', style: TextStyle(fontSize: 14, color: AppColors.ink3)),
+              child: _loading ? const LoadingDots() : const Text('상품 정보를 불러오지 못했어요', style: TextStyle(fontSize: 14, color: AppColors.ink3)),
             )
           : Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-              AspectRatio(
-                aspectRatio: 1,
-            child: ProductImageSurface(
-              pattern: _product.pattern,
-              imageUrl: _product.imageUrl,
-              artwork: _product.artwork,
-              child: Stack(
-                    children: [
-                      if (_loading)
-                        const Positioned(
-                          top: 16,
-                          right: 16,
-                          child: SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+              children: [
+                Expanded(
+                  // 넓은 화면(720 이상)에선 사진과 정보를 좌우로 — 예전엔 화면 폭만 한 정사각 사진 아래로 정보가 밀렸다.
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final image = AspectRatio(
+                        aspectRatio: 1,
+                        child: ProductImageSurface(
+                          pattern: _product.pattern,
+                          imageUrl: _product.imageUrl,
+                          artwork: _product.artwork,
+                          child: Stack(
+                            children: [
+                              if (_loading)
+                                const Positioned(
+                                  top: 16,
+                                  right: 16,
+                                  child: SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                    ],
+                      );
+                      final info = Padding(
+                        padding: const EdgeInsets.fromLTRB(AppSpace.pad, 24, AppSpace.pad, 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            MonoText(_product.brand, size: 10.5, color: AppColors.ink4),
+                            const SizedBox(height: 10),
+                            Text(_product.name, style: const TextStyle(fontSize: 22, height: 1.3, letterSpacing: -0.4, fontWeight: FontWeight.w600, color: AppColors.ink)),
+                            if (_product.subtitle.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Text(_product.subtitle, style: const TextStyle(fontSize: 13.5, color: AppColors.ink3, height: 1.5)),
+                            ],
+                            const SizedBox(height: 10),
+                            Text('${_product.rating.toStringAsFixed(1)} · ${_product.reviews} reviews', style: const TextStyle(fontSize: 12.5, color: AppColors.ink3, height: 1.6)),
+                            const SizedBox(height: 18),
+                            Wrap(
+                              spacing: 8,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                if (_product.hasDiscount) PriceText(_product.discount, size: 17, color: AppColors.alertBright),
+                                PriceText(_product.price, size: 26, color: AppColors.accentBright),
+                                if (_product.hasDiscount) StrikeText(_product.oldPrice),
+                              ],
+                            ),
+                            if (_product.blurb.isNotEmpty) ...[
+                              const SizedBox(height: 18),
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(color: AppColors.bgSoft, border: Border.all(color: AppColors.line, width: AppStroke.hair)),
+                                child: Text(_product.blurb, style: const TextStyle(fontSize: 13.5, color: AppColors.ink2, height: 1.65)),
+                              ),
+                            ],
+                            if (_product.tags.isNotEmpty) ...[
+                              const SizedBox(height: 16),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: [
+                                  for (final tag in _product.tags)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      decoration: BoxDecoration(border: Border.all(color: AppColors.line, width: AppStroke.hair)),
+                                      child: MonoText(_tagLabel(tag), size: 10, color: AppColors.ink3),
+                                    ),
+                                ],
+                              ),
+                            ],
+                            const SizedBox(height: 20),
+                            const MonoText('QUANTITY', size: 10, color: AppColors.ink4, weight: FontWeight.w700),
+                            const SizedBox(height: 10),
+                            QtyBox(value: _quantity.toString(), onMinus: () => _changeQuantity(-1), onPlus: () => _changeQuantity(1), buttonExtent: 56, valueExtent: 48),
+                          ],
+                        ),
+                      );
+                      if (constraints.maxWidth < 720) {
+                        return SingleChildScrollView(
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [image, info]),
+                        );
+                      }
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(AppSpace.pad, AppSpace.pad, 0, 0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(width: (constraints.maxWidth * 0.46).clamp(320.0, 520.0), child: image),
+                            Expanded(child: info),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpace.pad, 24, AppSpace.pad, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    MonoText(_product.brand, size: 10.5, color: AppColors.ink4),
-                    const SizedBox(height: 10),
-                    Text(_product.name, style: const TextStyle(fontSize: 28, height: 1.08, letterSpacing: -0.8, fontWeight: FontWeight.w700)),
-                    if (_product.subtitle.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Text(_product.subtitle, style: const TextStyle(fontSize: 13.5, color: AppColors.ink3, height: 1.5)),
-                    ],
-                    const SizedBox(height: 10),
-                    Text('${_product.rating.toStringAsFixed(1)} · ${_product.reviews} reviews', style: const TextStyle(fontSize: 12.5, color: AppColors.ink3, height: 1.6)),
-                    const SizedBox(height: 18),
-                    Wrap(
-                      spacing: 8,
-                      crossAxisAlignment: WrapCrossAlignment.center,
+                SafeArea(
+                  top: false,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(AppSpace.pad, 12, AppSpace.pad, 16),
+                    decoration: const BoxDecoration(color: AppColors.potDeep, border: Border(top: BorderSide(color: AppColors.accentDeep, width: AppStroke.hair))),
+                    child: Row(
                       children: [
-                        if (_product.hasDiscount)
-                          MonoText(_product.discount, size: 16, color: AppColors.accent, weight: FontWeight.w700),
-                        MonoText(_product.price, size: 20, weight: FontWeight.w800),
-                        if (_product.hasDiscount) StrikeText(_product.oldPrice),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => AppStateScope.read(context).toggleWishlist(_product),
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(border: Border.all(color: wished ? AppColors.alertBright : AppColors.accent, width: AppStroke.control)),
+                            child: Text(wished ? '♥' : '♡', style: TextStyle(color: wished ? AppColors.alertBright : AppColors.accent, fontSize: 18)),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: AppButton(
+                            text: _addedToCart ? '장바구니로 이동' : '장바구니 담기',
+                            primary: !_addedToCart,
+                            large: true,
+                            onTap: _addedToCart ? _goToCart : _addToCart,
+                          ),
+                        ),
                       ],
                     ),
-                    if (_product.blurb.isNotEmpty) ...[
-                      const SizedBox(height: 18),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(color: AppColors.bgSoft, border: Border.all(color: AppColors.line)),
-                        child: Text(_product.blurb, style: const TextStyle(fontSize: 13.5, color: AppColors.ink2, height: 1.65)),
-                      ),
-                    ],
-                    if (_product.tags.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: [
-                          for (final tag in _product.tags)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(border: Border.all(color: AppColors.line)),
-                              child: MonoText(_tagLabel(tag), size: 10, color: AppColors.ink3),
-                            ),
-                        ],
-                      ),
-                    ],
-                    const SizedBox(height: 20),
-                    const MonoText('QUANTITY', size: 10, color: AppColors.ink4, weight: FontWeight.w700),
-                    const SizedBox(height: 10),
-                    QtyBox(value: _quantity.toString(), onMinus: () => _changeQuantity(-1), onPlus: () => _changeQuantity(1), buttonExtent: 56, valueExtent: 48),
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-          ),
-          SafeArea(
-            top: false,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(AppSpace.pad, 12, AppSpace.pad, 16),
-              decoration: const BoxDecoration(color: AppColors.bg, border: Border(top: BorderSide(color: AppColors.line))),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => AppStateScope.read(context).toggleWishlist(_product),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(color: AppColors.bg, border: Border.all(color: AppColors.line)),
-                      child: Text(wished ? '♥' : '♡', style: TextStyle(color: wished ? AppColors.accent : AppColors.ink3, fontSize: 18)),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: AppButton(
-                      text: _addedToCart ? '장바구니로 이동' : '장바구니 담기',
-                      primary: !_addedToCart,
-                      large: true,
-                      onTap: _addedToCart ? _goToCart : _addToCart,
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -230,7 +243,7 @@ class _EditorialSectionState extends State<EditorialSection> {
       margin: const EdgeInsets.only(top: 48),
       decoration: const BoxDecoration(
         color: AppColors.bgSoft,
-        border: Border(top: BorderSide(color: AppColors.line), bottom: BorderSide(color: AppColors.line)),
+        border: Border(top: BorderSide(color: AppColors.line, width: AppStroke.hair), bottom: BorderSide(color: AppColors.line, width: AppStroke.hair)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,14 +266,14 @@ class _EditorialSectionState extends State<EditorialSection> {
                   const SizedBox(height: 14),
                   Container(
                     padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(color: AppColors.bg, border: Border.all(color: AppColors.line)),
+                    decoration: BoxDecoration(color: AppColors.bg, border: Border.all(color: AppColors.line, width: AppStroke.hair)),
                     child: const Text('이번 노트는 외부 페이지로 이동하지 않고, 로컬 큐레이션 메모만 펼쳐 보여줍니다. 상품보다 오래 남는 감각을 기준으로 고른 기록입니다.', style: TextStyle(fontSize: 12.5, height: 1.65, color: AppColors.ink2)),
                   ),
                 ],
                 const SizedBox(height: 20),
                 AppButton(text: _showNote ? '큐레이션 노트 닫기' : '큐레이션 노트 보기', primary: true, onTap: () => setState(() => _showNote = !_showNote)),
                 const SizedBox(height: 24),
-                const Divider(color: AppColors.line),
+                const Divider(color: AppColors.line, thickness: AppStroke.hair),
                 const SizedBox(height: 16),
                 const Row(
                   children: [
@@ -295,8 +308,7 @@ class BrandSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(padding: EdgeInsets.symmetric(horizontal: AppSpace.pad), child: Eyebrow(index: '04', text: "THIS WEEK'S BRANDS")),
-          const Padding(padding: EdgeInsets.fromLTRB(AppSpace.pad, 8, AppSpace.pad, 20), child: Text('참여 브랜드', style: TextStyle(fontSize: 34, height: 1, fontWeight: FontWeight.w800, letterSpacing: -1.2))),
+          const SectionHead(index: '04', eyebrow: "THIS WEEK'S BRANDS", title: '참여 브랜드'),
           // 응답 전엔 두 줄의 자리를 그대로 두고(보이지 않게) 로딩 점 — 브랜드가 나타날 때 밀리지 않게.
           if (store.catalogLoading)
             Stack(
@@ -324,11 +336,11 @@ class BrandRow extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          top: noTop ? BorderSide.none : const BorderSide(color: AppColors.line),
-          bottom: const BorderSide(color: AppColors.line),
+          top: noTop ? BorderSide.none : const BorderSide(color: AppColors.line, width: AppStroke.hair),
+          bottom: const BorderSide(color: AppColors.line, width: AppStroke.hair),
         ),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 13),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -337,7 +349,7 @@ class BrandRow extends StatelessWidget {
             for (final item in [...items, ...items])
               Padding(
                 padding: const EdgeInsets.only(right: 28),
-                child: Text(item, style: const TextStyle(fontSize: 20, color: AppColors.ink3, fontWeight: FontWeight.w600, letterSpacing: -0.5)),
+                child: Text(item, style: const TextStyle(fontSize: 15, color: AppColors.ink2, fontWeight: FontWeight.w500, letterSpacing: 0.2)),
               ),
           ],
         ),
@@ -378,28 +390,32 @@ class _NewsletterSectionState extends State<NewsletterSection> {
   Widget build(BuildContext context) {
     final data = AppStateScope.watch(context).newsletter;
     return Container(
-      color: AppColors.ink,
+      decoration: const BoxDecoration(
+        color: AppColors.deep,
+        border: Border(top: BorderSide(color: AppColors.accentDeep, width: AppStroke.hair)),
+      ),
       padding: const EdgeInsets.fromLTRB(AppSpace.pad, 44, AppSpace.pad, 36),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MonoText(data['eyebrow'] ?? '— 매주 수요일 발송', size: 10.5, color: AppColors.ink4),
+          MonoText(data['eyebrow'] ?? '— 매주 수요일 발송', size: 10.5, color: AppColors.accent),
           const SizedBox(height: 14),
-          Text(data['title'] ?? '조용한 신상품을\n가장 먼저.', style: const TextStyle(fontSize: 36, height: 1, color: AppColors.invert, fontWeight: FontWeight.w700, letterSpacing: -1.4)),
+          Text(data['title'] ?? '조용한 신상품을\n가장 먼저.', style: const TextStyle(fontSize: 26, height: 1.2, color: AppColors.ink, fontWeight: FontWeight.w600, letterSpacing: -0.6)),
           const SizedBox(height: 28),
           Container(
-            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.ink2))),
+            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.accent, width: AppStroke.hair))),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _controller,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration.collapsed(hintText: 'you@email.com', hintStyle: TextStyle(fontSize: 13, color: Color(0xff555555), fontFamily: 'monospace')),
-                    style: const TextStyle(fontSize: 13, color: AppColors.invert, fontFamily: 'monospace'),
+                    decoration: const InputDecoration.collapsed(hintText: 'you@email.com', hintStyle: TextStyle(fontSize: 13, color: AppColors.ink4, letterSpacing: 0.8)),
+                    style: const TextStyle(fontSize: 13, color: AppColors.ink, letterSpacing: 0.8),
                   ),
                 ),
-                GestureDetector(onTap: _subscribe, child: const Padding(padding: EdgeInsets.symmetric(vertical: 14), child: Text('구독', style: TextStyle(color: AppColors.invert, fontWeight: FontWeight.w600)))),
+                GestureDetector(
+                    onTap: _subscribe, child: const Padding(padding: EdgeInsets.symmetric(vertical: 14), child: Text('구독', style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w700)))),
               ],
             ),
           ),
@@ -424,7 +440,7 @@ class FooterSection extends StatelessWidget {
     };
     return Container(
       padding: const EdgeInsets.fromLTRB(AppSpace.pad, 32, AppSpace.pad, 28),
-      decoration: const BoxDecoration(border: Border(top: BorderSide(color: AppColors.line))),
+      decoration: const BoxDecoration(color: AppColors.potDeep, border: Border(top: BorderSide(color: AppColors.accentDeep, width: AppStroke.hair))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -465,7 +481,7 @@ class _FooterGroupState extends State<FooterGroup> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair))),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => setState(() => _expanded = !_expanded),
@@ -475,7 +491,7 @@ class _FooterGroupState extends State<FooterGroup> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                MonoText(widget.title, size: 11, weight: FontWeight.w700),
+                MonoText(widget.title, size: 11, weight: FontWeight.w700, color: AppColors.accent),
                 Text(_expanded ? '−' : '+', style: const TextStyle(color: AppColors.ink3)),
               ],
             ),
@@ -629,7 +645,7 @@ class SearchResultsBlock extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(AppSpace.pad, 8, AppSpace.pad, 20),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.line)),
+        border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -658,11 +674,7 @@ class SearchResultsBlock extends StatelessWidget {
           ),
           if (results.isNotEmpty) ...[
             const SizedBox(height: 16),
-            for (final product in results)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: ProductCard(product: product),
-              ),
+            CardGrid(children: [for (final product in results) ProductCard(product: product)]),
           ],
         ],
       ),
@@ -728,5 +740,3 @@ class CartTabPage extends StatelessWidget {
     );
   }
 }
-
-

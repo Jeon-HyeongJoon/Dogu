@@ -97,7 +97,7 @@ class _OrderStatement extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(fontSize: 30, height: 1.05, letterSpacing: -1, fontWeight: FontWeight.w700),
+      style: const TextStyle(fontSize: 28, height: 1.15, letterSpacing: -0.8, fontWeight: FontWeight.w700, color: AppColors.ink),
     );
   }
 }
@@ -113,7 +113,7 @@ class _OrderLineRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair))),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -142,12 +142,12 @@ class _OrderLineRow extends StatelessWidget {
                   product.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500),
+                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: AppColors.ink),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    MonoText(formatWon(product.numericPrice * quantity), size: 14, weight: FontWeight.w700),
+                    PriceText(formatWon(product.numericPrice * quantity), size: 15),
                     const SizedBox(width: 8),
                     MonoText('× $quantity', size: 11, color: AppColors.ink3),
                   ],
@@ -232,7 +232,7 @@ class OrderDeliveryPage extends StatelessWidget {
   Widget _arrivalBox() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.line)),
+      decoration: BoxDecoration(color: AppColors.bgAlt, border: Border.all(color: AppColors.line, width: AppStroke.hair)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -240,7 +240,7 @@ class OrderDeliveryPage extends StatelessWidget {
           const Spacer(),
           Text(
             _longDate(receipt.arrivalAt),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: -0.5),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.5, color: AppColors.ink),
           ),
         ],
       ),
@@ -257,7 +257,7 @@ class OrderDeliveryPage extends StatelessWidget {
     return Stack(
       children: [
         // 단계를 잇는 세로 괘선 — 첫/마지막 점 중심까지만 그린다.
-        Positioned(top: 9, bottom: 9, left: 4, width: 1, child: Container(color: AppColors.line)),
+        Positioned(top: 9, bottom: 9, left: 4, width: AppStroke.hair, child: Container(color: AppColors.line)),
         Column(
           children: [
             for (var i = 0; i < steps.length; i++)
@@ -296,7 +296,7 @@ class _TimelineRow extends StatelessWidget {
                 : isCurrent
                     ? AppColors.alert
                     : AppColors.ink,
-            border: isTodo ? Border.all(color: AppColors.line) : null,
+            border: isTodo ? Border.all(color: AppColors.line, width: AppStroke.hair) : null,
           ),
         ),
         const SizedBox(width: 14),
@@ -315,7 +315,7 @@ class _TimelineRow extends StatelessWidget {
           size: isCurrent ? 10 : 11,
           weight: isCurrent ? FontWeight.w700 : FontWeight.w400,
           color: isCurrent
-              ? AppColors.alert
+              ? AppColors.alertBright
               : isTodo
                   ? AppColors.ink4
                   : AppColors.ink3,
@@ -351,7 +351,7 @@ class OrderRevealPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const MonoText('ORDER RESULT', size: 10, color: AppColors.alert, weight: FontWeight.w700),
+                    const MonoText('ORDER RESULT', size: 10, color: AppColors.alertBright, weight: FontWeight.w700),
                     const SizedBox(height: 14),
                     const _OrderStatement('사실은요,\n안 보냈습니다'),
                     const SizedBox(height: 12),
@@ -372,7 +372,7 @@ class OrderRevealPage extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                           fontSize: 30,
                           height: 1.25,
-                          color: AppColors.alert,
+                          color: AppColors.alertBright,
                         ),
                       ),
                     ),
@@ -416,7 +416,7 @@ class OrderRevealPage extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: AppColors.bg, border: Border.all(color: AppColors.line)),
+          decoration: BoxDecoration(color: AppColors.bg, border: Border.all(color: AppColors.line, width: AppStroke.hair)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -431,13 +431,13 @@ class OrderRevealPage extends StatelessWidget {
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
-                child: Divider(height: 1, thickness: 1, color: AppColors.line),
+                child: Divider(height: 1, thickness: AppStroke.hair, color: AppColors.line),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('실제로 나간 돈', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                  const MonoText('₩0', size: 22, weight: FontWeight.w800, color: AppColors.accent),
+                  const PriceText('₩0', size: 24, color: AppColors.accentBright),
                 ],
               ),
             ],
@@ -450,8 +450,9 @@ class OrderRevealPage extends StatelessWidget {
             angle: -11 * pi / 180,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              // 크림 종이에 찍힌 빨간 도장 — 초록 위 빨간 글씨는 안 보여서 도장 바탕을 크림으로.
               decoration: BoxDecoration(
-                color: AppColors.bg,
+                color: AppColors.ink,
                 border: Border.all(color: AppColors.alert, width: 2),
               ),
               child: const Column(
@@ -477,11 +478,11 @@ class OrderRevealPage extends StatelessWidget {
     );
   }
 
-  /// 굳은 돈 — 결제바와 같은 잉크 블랙 블록.
+  /// 굳은 돈 — 결제바와 같은 가장 깊은 초록에 금테.
   Widget _savedBlock() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-      color: AppColors.ink,
+      decoration: BoxDecoration(color: AppColors.deep, border: Border.all(color: AppColors.accentDeep, width: AppStroke.hair)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -494,12 +495,7 @@ class OrderRevealPage extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.centerLeft,
-                  child: MonoText(
-                    formatWon(receipt.total),
-                    size: 34,
-                    color: AppColors.invert,
-                    weight: FontWeight.w800,
-                  ),
+                  child: PriceText(formatWon(receipt.total), size: 38, color: AppColors.accentBright),
                 ),
               ),
               const SizedBox(width: 12),
@@ -529,8 +525,8 @@ class _OrderBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.bg,
-        border: Border(top: BorderSide(color: AppColors.line)),
+        color: AppColors.potDeep,
+        border: Border(top: BorderSide(color: AppColors.accentDeep, width: AppStroke.hair)),
       ),
       child: SafeArea(
         top: false,

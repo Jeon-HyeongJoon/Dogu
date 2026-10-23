@@ -12,8 +12,8 @@ class NeutralImageSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.bg,
-        border: Border.all(color: AppColors.line),
+        color: AppColors.bgAlt,
+        border: Border.all(color: AppColors.line, width: AppStroke.hair),
       ),
       child: Stack(
         fit: StackFit.expand,
@@ -22,7 +22,7 @@ class NeutralImageSurface extends StatelessWidget {
             child: Opacity(
               opacity: 0.14,
               // 워터마크는 단색 — 액센트 도트도 잉크로 눌러 은은하게.
-              child: DoguBrandMark(size: 52, bag: AppColors.ink3, dot: AppColors.ink3),
+              child: DoguBrandMark(size: 52, bag: AppColors.accent, dot: AppColors.accent),
             ),
           ),
           if (child != null) child!,

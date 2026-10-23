@@ -20,12 +20,12 @@ class CategoryListRow extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad, vertical: 14),
-        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
+        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair))),
         child: Row(
           children: [
             SizedBox(
               width: 28,
-              child: MonoText(index.toString().padLeft(2, '0'), size: 11, color: AppColors.ink4),
+              child: MonoText(index.toString().padLeft(2, '0'), size: 11, color: AppColors.accent),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -38,7 +38,7 @@ class CategoryListRow extends StatelessWidget {
                 ],
               ),
             ),
-            const Text('→'),
+            const Text('→', style: TextStyle(color: AppColors.accent)),
           ],
         ),
       ),

@@ -10,7 +10,7 @@ Widget host(Widget child) {
     bundle: PackageAssetBundle(),
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, scaffoldBackgroundColor: AppColors.bg, fontFamily: doguFontFamily),
+      theme: buildDoguTheme(),
       home: Scaffold(body: Center(child: child)),
     ),
   );

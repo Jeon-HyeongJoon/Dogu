@@ -9,7 +9,7 @@ class SectionBorder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line, width: AppStroke.hair))),
       child: child,
     );
   }

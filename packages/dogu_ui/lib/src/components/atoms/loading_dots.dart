@@ -5,7 +5,7 @@ import '../../tokens/tokens.dart';
 /// 점 세 개 로딩 표시 — 세 점이 차례로 밝아진다. 점은 글리프가 아니라 도형으로 그린다
 /// (서브셋 폰트에 없는 글자를 늘리지 않으려고). 애니메이션 끄기 설정이면 멈춘 점.
 class LoadingDots extends StatefulWidget {
-  const LoadingDots({this.color = AppColors.ink3, super.key});
+  const LoadingDots({this.color = AppColors.accent, super.key});
   final Color color;
 
   @override

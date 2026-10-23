@@ -19,11 +19,11 @@ void main() {
     final brandTitle = tester.widget<Text>(find.text('욕망의 장바구니'));
     expect(brandTitle.style?.fontFamily, doguTitleFontFamily);
 
-    // 광고 메인 문구(44px 헤드라인)는 각진 기본 본문체
-    final heroHeadline = tester
-        .widgetList<Text>(find.byType(Text))
-        .firstWhere((t) => t.style?.fontSize == 44);
+    // 광고 한글 문구는 본문체(크림) — 금색 세리프는 'DESIRE' 워드마크 같은 라틴 글자에만 쓴다.
+    final heroHeadline = tester.widget<Text>(find.textContaining('가볍게 담아두세요'));
     expect(heroHeadline.style?.fontFamily, doguFontFamily);
+    expect(heroHeadline.style?.color, AppColors.ink);
+    expect(find.bySemanticsLabel('DESIRE'), findsOneWidget);
   });
 
   testWidgets('category and promo surfaces use neutral placeholders without pattern boxes', (tester) async {
@@ -273,11 +273,13 @@ void main() {
     await tester.pumpWidget(
       AppStateScope(
         store: store,
-        child: const MaterialApp(home: Scaffold(body: HeroBlock())),
+        // 광고는 앱에서 스크롤 안에 놓인다(워드마크·메달까지 한 화면보다 길다).
+        child: const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: HeroBlock()))),
       ),
     );
 
-    expect(find.text('● TEST DROP'), findsOneWidget);
+    // '● '는 글자 대신 빨간 점으로 그린다(Tag) — 문구는 점 뒤만 남는다.
+    expect(find.text('TEST DROP'), findsOneWidget);
     expect(find.text('06.01 — 06.15'), findsOneWidget);
     expect(find.text('관리페이지에서 바꾼\n광고 문구'), findsOneWidget);
     expect(find.text('관리페이지 수정 내용이 앱에도 반영됩니다.'), findsOneWidget);
@@ -332,7 +334,7 @@ void main() {
 
   testWidgets('more products button expands the locally visible product count', (tester) async {
     tester.view.devicePixelRatio = 1;
-    tester.view.physicalSize = const Size(800, 3600); // 8개 상품(4행) + 버튼을 뷰포트에 담기 위해 높이 증가
+    tester.view.physicalSize = const Size(800, 3600); // 처음 보이는 상품 전부 + 버튼을 뷰포트에 담는다
     addTearDown(() {
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
@@ -340,8 +342,9 @@ void main() {
 
     final store = AppStore(repository: FakeRepository(results: const []));
     store.usingFallback = false; // 스켈레톤 대신 실제 카드 표시
+    const shown = ProductSection.initialVisibleCount;
     store.newProducts = List<ProductItem>.generate(
-      9, // initialVisibleCount=8 이므로 9번째(index 8) 상품이 처음엔 숨겨져야 함
+      shown + 1, // 처음 보이는 수 다음 상품(index shown)은 처음엔 숨겨져야 함
       (index) => ProductItem(
         id: 'local-product-$index',
         brand: 'LOCAL',
@@ -367,13 +370,14 @@ void main() {
       ),
     );
 
-    expect(find.text('로컬 상품 8'), findsNothing); // 9번째 항목(index 8)은 초기에 숨겨짐
+    expect(find.text('로컬 상품 $shown'), findsNothing); // 처음 보이는 수 다음 항목은 숨겨짐
 
-    final moreButton = find.text('더 보기  +8');
+    final moreButton = find.text('더 보기  +${ProductSection.loadMoreCount}');
+    await tester.ensureVisible(moreButton);
     await tester.tap(moreButton);
     await tester.pumpAndSettle();
 
-    expect(find.text('로컬 상품 8'), findsOneWidget);
+    expect(find.text('로컬 상품 $shown'), findsOneWidget);
   });
 
   testWidgets('home new-arrivals show every product without the legacy category chips, skeleton while loading', (tester) async {
@@ -581,9 +585,9 @@ void main() {
     }
   });
 
-  // ── TDD: initialVisibleCount 4 → 8 ────────────────────────────────────────
+  // ── 처음 보이는 수: 4 → 8 → 12(3·4열 격자에서 줄이 꽉 차게) ────────────────
 
-  testWidgets('product section shows 8 items initially', (tester) async {
+  testWidgets('product section shows initialVisibleCount (12) items initially', (tester) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(800, 2200);
     addTearDown(() {
@@ -593,8 +597,10 @@ void main() {
 
     final store = AppStore(repository: FakeRepository(results: const []));
     store.usingFallback = false; // 스켈레톤 대신 실제 카드 표시
+    const shown = ProductSection.initialVisibleCount;
+    expect(shown, 12);
     store.newProducts = List<ProductItem>.generate(
-      9,
+      shown + 1,
       (index) => ProductItem(
         id: 'vis-product-$index',
         brand: 'VIS',
@@ -618,12 +624,12 @@ void main() {
       ),
     );
 
-    // 8번째(index 7)는 보여야 하고
-    expect(find.text('표시 상품 7'), findsOneWidget);
-    // 9번째(index 8)는 안 보여야 함
-    expect(find.text('표시 상품 8'), findsNothing);
+    // 마지막으로 보이는 상품은 보이고
+    expect(find.text('표시 상품 ${shown - 1}'), findsOneWidget);
+    // 그다음은 안 보여야 함
+    expect(find.text('표시 상품 $shown'), findsNothing);
     // '더 보기' 버튼도 있어야 함
-    expect(find.text('더 보기  +8'), findsOneWidget);
+    expect(find.text('더 보기  +${ProductSection.loadMoreCount}'), findsOneWidget);
   });
 
   // ── TDD P2-1: 스켈레톤 로딩 UI ───────────────────────────────────────────────

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../atoms/mono_text.dart';
 import '../../tokens/tokens.dart';
 
 // 매초 카운트다운 텍스트만 업데이트 — DealSection 전체 rebuild 방지
@@ -46,7 +45,22 @@ class _CountdownTimerState extends State<CountdownTimer> {
     return ValueListenableBuilder<int>(
       valueListenable: _seconds,
       builder: (_, remaining, __) =>
-          MonoText(_format(remaining), size: 18, color: AppColors.invert, weight: FontWeight.w600),
+          // 마감 시계는 빨간 면 — 딜의 '지금 아니면 없다'. 자릿수 폭이 고른 숫자로 초가 바뀌어도 흔들리지 않는다.
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            color: AppColors.alert,
+            child: Text(
+              _format(remaining),
+              style: const TextStyle(
+                fontFamily: doguFontFamily,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.6,
+                color: AppColors.ink,
+                fontFeatures: [FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
     );
   }
 }
