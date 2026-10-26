@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/testing.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:dogu_mobile_shop/main.dart';
 
@@ -764,4 +766,40 @@ void main() {
     expect(find.text('헤븐센스').hitTestable(), findsNothing);
     expect(tester.getSize(find.byType(BrandSection)).height, loadedHeight, reason: '브랜드가 나타날 때 밀리지 않는다');
   });
+
+  test('subscribeNewsletter throws when the backend rejects the address', () async {
+    final rejecting = DoguRepository(client: MockClient((_) async => http.Response('{"detail":"Invalid email address"}', 422)));
+    await expectLater(rejecting.subscribeNewsletter('abc'), throwsA(isA<ApiStatusError>().having((e) => e.statusCode, 'statusCode', 422)));
+    final accepting = DoguRepository(client: MockClient((_) async => http.Response('{"accepted":true}', 202)));
+    await accepting.subscribeNewsletter('test@example.com');
+  });
+
+  testWidgets('newsletter shows the rejection instead of success, and Enter submits', (tester) async {
+    // 운영에서 'abc'를 넣어도 '구독 요청을 보냈습니다.'가 떴다(응답 코드를 보지 않았다). Enter는 아무 일도 없었다.
+    final repository = _NewsletterRepository();
+    final store = AppStore(repository: repository);
+    await tester.pumpWidget(AppStateScope(store: store, child: const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: NewsletterSection())))));
+
+    await tester.enterText(find.byType(TextField), 'abc');
+    await tester.tap(find.text('구독'));
+    await tester.pumpAndSettle();
+    expect(find.text('이메일 주소를 다시 확인해주세요.'), findsOneWidget);
+    expect(find.text('구독 요청을 보냈습니다.'), findsNothing);
+
+    await tester.enterText(find.byType(TextField), 'test@example.com');
+    await tester.testTextInput.receiveAction(TextInputAction.send);
+    await tester.pumpAndSettle();
+    expect(repository.subscribed, ['abc', 'test@example.com']);
+    expect(find.text('구독 요청을 보냈습니다.'), findsOneWidget);
+  });
+}
+
+class _NewsletterRepository extends FakeRepository {
+  final subscribed = <String>[];
+
+  @override
+  Future<void> subscribeNewsletter(String email) async {
+    subscribed.add(email);
+    if (!email.contains('@')) throw ApiStatusError('/api/newsletter/subscribe', 422, method: 'POST');
+  }
 }

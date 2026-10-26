@@ -235,4 +235,38 @@ void main() {
     expect(find.textContaining('// '), findsNothing);
     await tester.pumpWidget(const SizedBox());
   });
+
+  testWidgets('payment sheet: outside tap cancels before paying, waits while paying, and continues to the delivery notice after', (tester) async {
+    // 운영에서 결제가 끝난 뒤(또는 결제 중) 바깥을 누르면 장바구니만 비고 배송 안내·참은 돈 적립이 건너뛰어졌다.
+    final store = AppStore(repository: FakeRepository(results: const []));
+    store.newProducts = const [
+      ProductItem(id: 'cart-a', brand: 'CART', name: '선택 상품', price: '₩10,000', oldPrice: '₩20,000', discount: '-50%', pattern: PatternKind.dots),
+    ];
+    store.cartQuantities = {'cart-a': 1};
+    await tester.pumpWidget(DoguApp(store: store, initializeStore: false, initialTabIndex: 4));
+    const outside = Offset(10, 10);
+
+    await tester.tap(find.text('결제하기 (1)  →'));
+    await tester.pumpAndSettle();
+    await tester.tapAt(outside);
+    await tester.pumpAndSettle();
+    expect(find.byType(PaymentToastOverlay), findsNothing, reason: '결제 전에는 바깥을 누르면 취소');
+    expect(store.cartQuantities, {'cart-a': 1});
+
+    await tester.tap(find.text('결제하기 (1)  →'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('결제하기'));
+    await tester.pump();
+    await tester.tapAt(outside);
+    await tester.pump();
+    expect(find.byType(PaymentToastOverlay), findsOneWidget, reason: '결제 중엔 닫히지 않는다');
+
+    await tester.pumpAndSettle();
+    expect(find.text('결제가 완료되었습니다.'), findsOneWidget);
+    await tester.tapAt(outside);
+    await tester.pumpAndSettle();
+    expect(find.byType(PaymentToastOverlay), findsNothing);
+    expect(find.byType(OrderDeliveryPage), findsOneWidget, reason: "결제 뒤 바깥을 누르면 '확인'처럼 배송 안내로");
+    expect(store.savedInMonth(DateTime.now()), 10000, reason: '참은 돈도 적립된다');
+  });
 }

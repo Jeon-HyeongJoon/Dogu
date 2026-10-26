@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:dogu_mobile_shop/main.dart';
 
@@ -374,5 +375,20 @@ void main() {
     expect(find.byType(PreparingImageSurface), findsOneWidget);
     expect(find.text('이미지 준비 중'), findsOneWidget);
     expect(find.byType(PatternBox), findsNothing, reason: '랜덤 패턴 배경 대신 준비 이미지');
+  });
+
+  testWidgets('product page opened straight from its address has a back button to home', (tester) async {
+    // 운영에서 /product/<id>로 바로 들어오면 뒤로 버튼이 없어 담기 말고는 나갈 길이 없었다.
+    final store = AppStore(repository: FakeRepository(results: const []));
+    await tester.pumpWidget(DoguApp(store: store, initializeStore: false));
+    await tester.pumpAndSettle();
+    GoRouter.of(tester.element(find.byType(AppShell))).go('/product/deep-1');
+    await tester.pumpAndSettle();
+    expect(find.byType(ProductDetailPage), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ProductDetailPage), findsNothing);
+    expect(find.byType(HomePage), findsOneWidget);
   });
 }

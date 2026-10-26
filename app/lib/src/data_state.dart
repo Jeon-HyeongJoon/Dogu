@@ -87,12 +87,17 @@ class DoguRepository {
     };
   }
 
+  /// 구독 요청. 백엔드가 받지 않으면(잘못된 주소 422 등) [ApiStatusError]를 던진다 —
+  /// 예전엔 응답 코드를 보지 않아 'abc' 같은 주소에도 '구독 요청을 보냈습니다.'가 떴다.
   Future<void> subscribeNewsletter(String email) async {
-    await _client.post(
+    final response = await _client.post(
       _uri('/api/newsletter/subscribe'),
       headers: const {'content-type': 'application/json'},
       body: jsonEncode({'email': email}),
     ).timeout(const Duration(seconds: 4));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw ApiStatusError('/api/newsletter/subscribe', response.statusCode, method: 'POST');
+    }
   }
 
   Future<Map<String, dynamic>> submitOrder(List<({ProductItem product, int quantity})> lines) async {
@@ -122,7 +127,7 @@ class DoguRepository {
 /// 네트워크 없이 rootBundle만 사용하며, 백엔드 build_home 변환(ID → 상품 해석)을 재현한다.
 /// 백엔드가 2xx가 아닌 상태로 답했다 — 404(없는 상품)를 네트워크 실패와 구분하려고 쓴다.
 class ApiStatusError extends StateError {
-  ApiStatusError(String path, this.statusCode) : super('GET $path failed: $statusCode');
+  ApiStatusError(String path, this.statusCode, {String method = 'GET'}) : super('$method $path failed: $statusCode');
   final int statusCode;
 }
 
@@ -616,7 +621,9 @@ class AppStore extends ChangeNotifier {
     lastSearchTerm = cleaned;
 
     try {
-      final results = await _repository.searchProducts(cleaned, categoryId: selectedCategoryKey);
+      // 검색은 늘 전체에서 — 예전엔 카테고리 탭에서 고른 카테고리가 화면에 안 보인 채 범위로 따라붙어,
+      // 카테고리를 고른 뒤 브랜드·최근 검색어를 누르면 있는 상품도 '검색 결과가 없습니다'가 떴다.
+      final results = await _repository.searchProducts(cleaned);
       if (requestVersion != _searchRequestVersion) return;
       searchResults = results;
     } catch (_) {
@@ -807,6 +814,8 @@ class AppStore extends ChangeNotifier {
   Future<ProductItem> fetchProductDetail(String productId) {
     return _repository.fetchProduct(productId);
   }
+
+  Future<void> subscribeNewsletter(String email) => _repository.subscribeNewsletter(email);
 
   Future<void> _saveStringList(String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();

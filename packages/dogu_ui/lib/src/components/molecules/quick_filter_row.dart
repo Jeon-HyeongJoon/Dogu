@@ -29,33 +29,36 @@ class _QuickFilterRowState extends State<QuickFilterRow> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad, vertical: 16),
       decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            for (var i = 0; i < widget.items.length; i++)
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  if (widget.onSelectedIndex != null) {
-                    widget.onSelectedIndex!(i);
-                  } else {
-                    setState(() => _activeIndex = i);
-                  }
-                },
-                child: Container(
-                  height: 32,
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: i == activeIndex ? AppColors.accent : AppColors.bg,
-                    border: Border.all(color: i == activeIndex ? AppColors.accent : AppColors.line),
+      child: ScrollConfiguration(
+        behavior: const DoguDragScrollBehavior(),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              for (var i = 0; i < widget.items.length; i++)
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    if (widget.onSelectedIndex != null) {
+                      widget.onSelectedIndex!(i);
+                    } else {
+                      setState(() => _activeIndex = i);
+                    }
+                  },
+                  child: Container(
+                    height: 32,
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: i == activeIndex ? AppColors.accent : AppColors.bg,
+                      border: Border.all(color: i == activeIndex ? AppColors.accent : AppColors.line),
+                    ),
+                    child: Text(widget.items[i], style: TextStyle(fontSize: 12.5, color: i == activeIndex ? AppColors.invert : AppColors.ink2)),
                   ),
-                  child: Text(widget.items[i], style: TextStyle(fontSize: 12.5, color: i == activeIndex ? AppColors.invert : AppColors.ink2)),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

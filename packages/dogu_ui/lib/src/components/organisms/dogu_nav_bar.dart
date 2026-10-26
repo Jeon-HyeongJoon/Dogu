@@ -37,20 +37,23 @@ class DoguNavBar extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AppColors.line))),
       padding: const EdgeInsets.fromLTRB(AppSpace.pad, 12, AppSpace.pad, 14),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (var i = 0; i < cells.length; i++) ...[
-              cells[i],
-              if (i != cells.length - 1)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 11),
-                  child: Text('|', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w300, color: AppColors.ink4)),
-                ),
+      child: ScrollConfiguration(
+        behavior: const DoguDragScrollBehavior(),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < cells.length; i++) ...[
+                cells[i],
+                if (i != cells.length - 1)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 11),
+                    child: Text('|', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w300, color: AppColors.ink4)),
+                  ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

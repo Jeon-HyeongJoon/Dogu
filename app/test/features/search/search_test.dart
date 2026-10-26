@@ -309,4 +309,25 @@ void main() {
     expect(find.text('검색 결과'), findsNothing);
     expect(find.text('검색 램프'), findsNothing);
   });
+
+  test('performSearch searches the whole catalog even after a category was picked in the category tab', () async {
+    // 운영에서 카테고리를 고른 뒤 '스파클Mart'를 누르면 결과가 0개였다 — 고른 카테고리가 화면에 안 보인 채 범위로 붙었다.
+    final repository = _ScopeRecordingRepository();
+    final store = AppStore(repository: repository);
+    store.selectedCategoryKey = '50000003';
+
+    await store.performSearch('스파클Mart');
+
+    expect(repository.searchedCategoryIds, [null]);
+  });
+}
+
+class _ScopeRecordingRepository extends FakeRepository {
+  final searchedCategoryIds = <String?>[];
+
+  @override
+  Future<List<ProductItem>> searchProducts(String query, {String? categoryId}) async {
+    searchedCategoryIds.add(categoryId);
+    return super.searchProducts(query, categoryId: categoryId);
+  }
 }
