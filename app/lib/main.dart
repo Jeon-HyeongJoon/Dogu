@@ -64,12 +64,11 @@ void _onFontLoadError(Object error, StackTrace stack) {
 }
 
 Future<void> loadDoguEssentialFont() async {
-  // 첫 페인트 전에 함께 로드: 본문 한글(Dogu Sans) + 브랜드 타이틀(Dogu Hand Thin) + 가격 세리프(Dogu Serif).
-  // 모두 등록된 뒤 첫 프레임을 그리므로 본문·타이틀에 두부(⊠)가, 가격에 서체 바뀜이 없다.
+  // 첫 페인트 전에 함께 로드: 본문 한글(Dogu Sans Regular) + 브랜드 타이틀(Dogu Hand Thin).
+  // 둘 다 등록된 뒤 첫 프레임을 그리므로 본문·타이틀 어디에도 두부(⊠) 깜빡임이 없다.
   await Future.wait([
     _loadFontFamily(doguFontFamily, doguEssentialFontAssets),
     _loadFontFamily(doguTitleFontFamily, doguTitleEssentialFontAssets),
-    _loadFontFamily(doguSerifFontFamily, doguSerifFontAssets),
   ]);
 }
 

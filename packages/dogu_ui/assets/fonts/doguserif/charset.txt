@@ -1,3 +1,0 @@
-# Dogu Serif(가격·숫자) 커버 문자 — ASCII + 숫자 기호 + 합성한 ₩
-# 생성물 — scripts/build_fonts.sh 가 쓴다. 아래 한 줄이 실제 문자열이다.
- !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~·×−₩

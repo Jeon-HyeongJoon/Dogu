@@ -16,6 +16,13 @@ void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     await loadCatalogFonts();
+    // MonoText의 'monospace'는 테스트 환경에서 Ahem(모든 글리프를 사각형으로 그리는 테스트 폰트)으로 잡힌다.
+    // 앱 골든과 같게 본문체를 그 이름으로 등록한다.
+    final mono = FontLoader('monospace');
+    for (final asset in doguFontAssets) {
+      mono.addFont(rootBundle.load(asset));
+    }
+    await mono.load();
     // 머티리얼 아이콘 등 매니페스트 폰트.
     final manifest = json.decode(await rootBundle.loadString('FontManifest.json')) as List<dynamic>;
     for (final entry in manifest.cast<Map<String, dynamic>>()) {
@@ -42,12 +49,8 @@ void main() {
           theme: buildDoguTheme(),
           home: CatalogFrame(useCase: useCase),
         ));
-        // 로고·메달은 이미지 에셋이라 디코딩을 강제해야 골든에 찍힌다.
-        await tester.runAsync(() async {
-          final context = tester.element(find.byType(CatalogFrame));
-          await precacheImage(const AssetImage(DoguLogoMark.assetKey), context);
-          await precacheImage(const AssetImage(DoguMedal.assetKey), context);
-        });
+        // 로고는 PNG 에셋이라 디코딩을 강제해야 골든에 찍힌다.
+        await tester.runAsync(() => precacheImage(const AssetImage(DoguLogoMark.assetKey), tester.element(find.byType(CatalogFrame))));
         await tester.pump();
 
         await expectLater(

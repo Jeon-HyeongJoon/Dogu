@@ -13,14 +13,13 @@ void main() {
   final html = File('web/index.html').readAsStringSync();
   final preloads = RegExp(r'<link rel="preload"[^>]*>').allMatches(html).map((m) => m.group(0)!).toList();
 
-  test('index.html preloads exactly the fonts registered before first paint, plus the hero medal', () {
+  test('index.html preloads exactly the fonts registered before first paint', () {
     final hrefs = preloads.map((tag) => RegExp(r'href="([^"]+)"').firstMatch(tag)!.group(1)!).toSet();
     final expected = {
-      for (final asset in [...doguEssentialFontAssets, ...doguTitleEssentialFontAssets, ...doguSerifFontAssets]) 'assets/$asset',
-      'assets/${DoguMedal.assetKey}', // 첫 화면 광고의 메달 그림
+      for (final asset in [...doguEssentialFontAssets, ...doguTitleEssentialFontAssets]) 'assets/$asset',
     };
     expect(hrefs, expected);
-    for (final asset in [...doguEssentialFontAssets, ...doguTitleEssentialFontAssets, ...doguSerifFontAssets, DoguMedal.assetKey]) {
+    for (final asset in [...doguEssentialFontAssets, ...doguTitleEssentialFontAssets]) {
       expect(File(assetFile(asset)).existsSync(), isTrue, reason: '$asset 가 없다');
     }
   });

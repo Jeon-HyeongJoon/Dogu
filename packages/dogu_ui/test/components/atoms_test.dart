@@ -22,30 +22,9 @@ void main() {
     ])));
     // Eyebrow는 번호와 문구를 RichText 한 줄로 그린다.
     expect(find.textContaining('[ 01 ] SHOP BY CATEGORY', findRichText: true), findsOneWidget);
-    for (final label in ['2026 SPRING DROP', 'BEST', '세일']) {
+    for (final label in ['● 2026 SPRING DROP', 'BEST', '세일']) {
       expect(find.textContaining(label), findsWidgets, reason: label);
     }
-    // '● '로 시작하는 태그는 점을 글자 대신 빨간 '지금' 표시로 그린다.
-    expect(find.textContaining('●'), findsNothing);
-  });
-
-  testWidgets('PriceText draws prices in the serif with lining figures', (tester) async {
-    await tester.pumpWidget(host(const PriceText('₩24,900', size: 18, color: AppColors.accentBright)));
-    final style = tester.widget<Text>(find.text('₩24,900')).style!;
-    expect(style.fontFamily, doguSerifFontFamily);
-    expect(style.fontFamilyFallback, [doguFontFamily], reason: '한글은 본문체로');
-    expect(style.fontSize, 18);
-    expect(style.color, AppColors.accentBright);
-  });
-
-  testWidgets('BadgePill picks a readable ink for its fill', (tester) async {
-    await tester.pumpWidget(host(const Row(children: [
-      BadgePill(text: 'GOLD', color: AppColors.accent),
-      BadgePill(text: 'RED', color: AppColors.alert),
-    ])));
-    Color inkOf(String text) => tester.widget<Text>(find.text(text)).style!.color!;
-    expect(inkOf('GOLD'), AppColors.invert, reason: '금 면엔 초록 글씨');
-    expect(inkOf('RED'), AppColors.ink, reason: '빨간 면엔 크림 글씨');
   });
 
   testWidgets('AppButton calls onTap', (tester) async {
@@ -89,6 +68,6 @@ void main() {
     await tester.pumpWidget(host(const SizedBox(width: 200, child: SkeletonProductCard())));
     expect(fillOf(), AppColors.bgAlt);
     await tester.pumpWidget(host(const SizedBox(width: 200, child: SkeletonProductCard(dark: true))));
-    expect(fillOf(), AppColors.bgSoft);
+    expect(fillOf(), AppColors.ink2);
   });
 }

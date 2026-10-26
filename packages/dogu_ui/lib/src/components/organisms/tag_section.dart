@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../tokens/tokens.dart';
 import '../atoms/loading_dots.dart';
+import '../atoms/mono_text.dart';
 import '../atoms/tag.dart';
 import '../molecules/recent_search_tag.dart';
 
@@ -40,7 +41,7 @@ class TagSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _title(),
+              MonoText(title, size: 10, weight: FontWeight.w700),
               if (action != null && tags.isNotEmpty) GestureDetector(onTap: onAction, child: Text(action!, style: const TextStyle(fontSize: 11, color: AppColors.ink4))),
             ],
           ),
@@ -68,22 +69,6 @@ class TagSection extends StatelessWidget {
                         ),
               ],
             ),
-        ],
-      ),
-    );
-  }
-
-  /// '[ 01 ] 최근 검색' — 대괄호 번호만 금, 한글 이름은 크림(금색 한글은 쓰지 않는다).
-  Widget _title() {
-    final close = title.indexOf(']');
-    final style = monoStyle.copyWith(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.ink2, letterSpacing: 1.2);
-    if (!title.startsWith('[') || close < 0) return Text(title, style: style);
-    return Text.rich(
-      TextSpan(
-        style: style,
-        children: [
-          TextSpan(text: title.substring(0, close + 1), style: const TextStyle(color: AppColors.accent)),
-          TextSpan(text: title.substring(close + 1)),
         ],
       ),
     );

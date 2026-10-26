@@ -9,12 +9,12 @@ class SkeletonProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fill = dark ? AppColors.bgSoft : AppColors.bgAlt; // 깊은 띠 위에선 한 단 밝게, 페이지 위에선 한 단 깊게
+    final fill = dark ? AppColors.ink2 : AppColors.bgAlt;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AspectRatio(aspectRatio: 1, child: ColoredBox(color: fill)),
-        Container(height: AppStroke.hair, color: dark ? AppColors.deepLine : AppColors.line),
+        Container(height: 1, color: dark ? AppColors.heroLine : AppColors.line),
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 10, 4, 4),
           child: Column(
