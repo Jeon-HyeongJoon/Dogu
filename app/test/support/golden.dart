@@ -19,7 +19,9 @@ Future<void> loadGoldenFonts() async {
   await _loadFont(doguFontFamily, doguFontAssets);
   await _loadFont(doguTitleFontFamily, doguTitleEssentialFontAssets);
   await _loadFont(doguJokeFontFamily, doguJokeFontAssets);
-  await _loadFont(doguSerifFontFamily, doguSerifFontAssets);
+  // MonoText의 'monospace'는 테스트 환경에서 Ahem(모든 글리프를 사각형으로 그리는 테스트 폰트)으로
+  // 잡혀 폴백이 걸리지 않는다. 실제 기기의 시스템 고정폭 폰트를 대신해 본문체를 그 이름으로 등록한다.
+  await _loadFont('monospace', doguFontAssets);
   final manifest = json.decode(await rootBundle.loadString('FontManifest.json')) as List<dynamic>;
   for (final entry in manifest.cast<Map<String, dynamic>>()) {
     final loader = FontLoader(entry['family'] as String);
@@ -61,11 +63,10 @@ Widget goldenMaterialApp(AppStore store, Widget home) {
   );
 }
 
-/// 헤더·푸터 로고와 광고 메달은 이미지 에셋이라 디코딩을 강제해야 골든에 실제로 찍힌다.
+/// 헤더·푸터 로고는 PNG 에셋이라 디코딩을 강제해야 골든에 실제로 찍힌다.
 Future<void> precacheLogo(WidgetTester tester, Finder context) async {
   await tester.runAsync(() async {
     await precacheImage(const AssetImage(DoguLogoMark.assetKey), tester.element(context));
-    await precacheImage(const AssetImage(DoguMedal.assetKey), tester.element(context));
   });
   await tester.pump();
 }

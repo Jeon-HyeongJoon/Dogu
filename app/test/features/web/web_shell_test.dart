@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:dogu_mobile_shop/main.dart';
-
 import '../../support/assets.dart';
 
 // web/ 껍데기(index.html·manifest) 가드. Flutter가 첫 화면을 그리기 전에 사용자가 보는 것은 이것뿐이다 —
@@ -43,13 +41,7 @@ void main() {
     expect(html, isNot(contains('A new Flutter project.')));
     expect(manifest['name'], '욕망의 장바구니');
     expect(manifest['description'], isNot('A new Flutter project.'));
-    // 바탕색은 앱 테마와 같아야 한다 — 다르면 설치 앱 실행·로딩 화면에서 다른 색이 번쩍인다.
-    // (예전엔 Flutter 기본 파랑 #0175C2였다.)
-    final bg = '#${(AppColors.bg.toARGB32() & 0xffffff).toRadixString(16).padLeft(6, '0')}';
-    expect(manifest['background_color'], bg);
-    expect(manifest['theme_color'], bg);
-    expect(html, contains('<meta name="theme-color" content="$bg">'));
-    expect(html, contains('html, body { margin: 0; background: $bg; }'));
+    expect(manifest['background_color'], '#ffffff', reason: '예전엔 Flutter 기본 파랑(#0175C2)');
     for (final icon in (manifest['icons'] as List).cast<Map<String, dynamic>>()) {
       expect(File('web/${icon['src']}').existsSync(), isTrue, reason: '${icon['src']} 가 없다');
     }

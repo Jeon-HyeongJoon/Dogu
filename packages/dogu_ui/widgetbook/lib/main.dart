@@ -18,7 +18,6 @@ Future<void> loadCatalogFonts() => Future.wait([
       _loadFontFamily(doguFontFamily, doguFontAssets),
       _loadFontFamily(doguTitleFontFamily, doguTitleEssentialFontAssets),
       _loadFontFamily(doguJokeFontFamily, doguJokeFontAssets),
-      _loadFontFamily(doguSerifFontFamily, doguSerifFontAssets),
     ]);
 
 Future<void> _loadFontFamily(String family, List<String> assets) {
@@ -63,7 +62,7 @@ class DoguCatalog extends StatelessWidget {
   }
 }
 
-/// 사례를 그 바탕(페이지 초록 / 가장 깊은 초록 띠) 위 가운데에 놓는다 — 골든도 같은 틀로 찍는다.
+/// 사례를 그 바탕(밝음/어두움) 위 가운데에 놓는다 — 골든도 같은 틀로 찍는다.
 class CatalogFrame extends StatelessWidget {
   const CatalogFrame({required this.useCase, super.key});
 
@@ -73,7 +72,7 @@ class CatalogFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     // Material — 앱 화면의 Scaffold처럼 기본 글자 스타일을 준다(없으면 글자에 노란 경고 밑줄이 붙는다).
     return Material(
-      color: useCase.dark ? AppColors.deep : AppColors.bg,
+      color: useCase.dark ? AppColors.ink : AppColors.bg,
       child: Center(child: Builder(builder: useCase.build)),
     );
   }

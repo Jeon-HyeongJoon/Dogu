@@ -14,9 +14,9 @@ class Eyebrow extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: RichText(
         text: TextSpan(
-          style: monoStyle.copyWith(fontSize: 10, color: inverted ? AppColors.ink4 : AppColors.ink3, letterSpacing: 1.8, fontWeight: FontWeight.w600),
+          style: monoStyle.copyWith(fontSize: 10, color: inverted ? AppColors.ink4 : AppColors.ink3, letterSpacing: 0.4),
           children: [
-            TextSpan(text: '[ $index ] ', style: const TextStyle(color: AppColors.accent, fontWeight: FontWeight.w700)),
+            TextSpan(text: '[ $index ] ', style: const TextStyle(color: AppColors.accent)),
             TextSpan(text: text),
           ],
         ),

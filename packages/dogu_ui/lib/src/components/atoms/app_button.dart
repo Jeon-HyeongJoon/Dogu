@@ -15,11 +15,23 @@ class AppButton extends StatelessWidget {
     final Color bgColor;
     final Color borderColor;
     final Color textColor;
-    // 주 버튼은 금 면에 초록 글씨, 보조 버튼은 금 테두리에 밝은 금 글씨 — 페이지·광고 바탕 어디서나 같다.
-    // (onDark는 광고 위 주 버튼의 글씨를 키우는 데만 쓴다.)
-    bgColor = primary ? AppColors.accent : Colors.transparent;
-    borderColor = AppColors.accent;
-    textColor = primary ? AppColors.invert : AppColors.accentBright;
+    if (onDark) {
+      // 검은 광고 배경 위에서 테마색(accent)을 또렷하게 보여주는 버튼
+      if (primary) {
+        bgColor = AppColors.accentDeep;
+        borderColor = AppColors.accentDeep;
+        textColor = Colors.white;
+      } else {
+        // 노트 버튼: 밝은 회색 배경 + 검은 글씨 + 검은 테두리
+        bgColor = AppColors.heroChip;
+        borderColor = AppColors.ink;
+        textColor = AppColors.ink;
+      }
+    } else {
+      bgColor = primary ? AppColors.accent : AppColors.bg;
+      borderColor = primary ? AppColors.accent : AppColors.line;
+      textColor = primary ? AppColors.invert : AppColors.ink;
+    }
     return Semantics(
       button: true,
       enabled: onTap != null,
@@ -32,9 +44,9 @@ class AppButton extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: bgColor,
-            border: Border.all(color: borderColor, width: AppStroke.control),
+            border: Border.all(color: borderColor),
           ),
-          child: Text(text, style: TextStyle(fontSize: (large ? 13.5 : 13) + (onDark && primary ? 2 : 0), fontWeight: FontWeight.w700, letterSpacing: 0.6, color: textColor)),
+          child: Text(text, style: TextStyle(fontSize: (large ? 13.5 : 13) + (onDark && primary ? 2 : 0), fontWeight: FontWeight.w600, color: textColor)),
         ),
       ),
     );

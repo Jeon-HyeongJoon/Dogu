@@ -5,7 +5,6 @@
 #   app/web/favicon.png                 브라우저 탭(로딩 중에도 보인다)
 #   app/web/icons/Icon-{192,512}.png    PWA·홈 화면 아이콘
 #   app/web/icons/Icon-maskable-*.png   가장자리가 잘려도 되게 로고를 80%로 줄이고 로고 바탕색으로 여백
-#   packages/dogu_ui/assets/logo-medal.jpg  홈 광고의 항아리 메달(DoguMedal) — 정본 design/assets/logo.jpg(가로형 엠블럼)
 # 예전 웹 아이콘은 Flutter 기본 로고(파란 F)였다. 로고를 바꾸면 정본을 교체하고 이 스크립트를 다시 돌린다.
 #   scripts/sync_logo.sh          # 정본 -> 파생본
 #   scripts/sync_logo.sh --check  # 파생본이 정본과 같은지 검증(CI 가드)
@@ -14,13 +13,12 @@ set -eu
 cd "$(dirname "$0")/.."
 
 SRC="design/assets/logo-square.png"
-MEDAL_SRC="design/assets/logo.jpg"
 # 정본 로고의 바탕색(거의 흰색) — 마스커블 아이콘 여백을 이 색으로 채워 사각 테두리가 안 보이게 한다.
 BG="F9F8F8"
 
-TARGETS="packages/dogu_ui/assets/logo-square.png packages/dogu_ui/assets/logo-medal.jpg app/web/favicon.png app/web/icons/Icon-192.png app/web/icons/Icon-512.png app/web/icons/Icon-maskable-192.png app/web/icons/Icon-maskable-512.png"
+TARGETS="packages/dogu_ui/assets/logo-square.png app/web/favicon.png app/web/icons/Icon-192.png app/web/icons/Icon-512.png app/web/icons/Icon-maskable-192.png app/web/icons/Icon-maskable-512.png"
 
-if [ ! -f "$SRC" ] || [ ! -f "$MEDAL_SRC" ]; then
+if [ ! -f "$SRC" ]; then
   # 정본은 git-ignored라 CI 체크아웃에는 없다 — 그때는 커밋된 파생본을 그대로 신뢰한다.
   echo "canonical $SRC not present (design/ is git-ignored) — keeping committed derivatives"
   for target in $TARGETS; do
@@ -38,11 +36,11 @@ sips -Z 96 "$SRC" --out "$TMP/packages/dogu_ui/assets/logo-square.png" >/dev/nul
 
 # 웹 아이콘 — 로고는 녹색 선 + 흰 바탕이라 32색 팔레트로 줄여도 티가 안 난다(Icon-512 461KB → 95KB).
 # 브라우저가 페이지를 열 때 manifest 아이콘을 받으므로 크기가 곧 첫 로딩 부담이다. PIL이 필요하다.
-python3 - "$SRC" "$TMP" "$BG" "$MEDAL_SRC" <<'ICONS'
+python3 - "$SRC" "$TMP" "$BG" <<'ICONS'
 import os, sys
 from PIL import Image
 
-src_path, out, bg, medal_path = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+src_path, out, bg = sys.argv[1], sys.argv[2], sys.argv[3]
 src = Image.open(src_path).convert('RGB')
 
 def save(img, target):
@@ -65,11 +63,6 @@ plain(192, 'app/web/icons/Icon-192.png')
 plain(512, 'app/web/icons/Icon-512.png')
 maskable(192, 'app/web/icons/Icon-maskable-192.png')
 maskable(512, 'app/web/icons/Icon-maskable-512.png')
-
-# 메달 — 화면에서 타원으로 잘라 넓어야 약 360pt로 그린다. 720px(2배)이면 충분하다(원본 1024px 70KB).
-medal = Image.open(medal_path).convert('RGB')
-medal = medal.resize((720, round(720 * medal.height / medal.width)), Image.Resampling.LANCZOS)
-medal.save(os.path.join(out, 'packages/dogu_ui/assets/logo-medal.jpg'), quality=82, optimize=True, progressive=True)
 ICONS
 
 if [ "${1:-}" = "--check" ]; then

@@ -20,21 +20,10 @@ class DoguBrandLockup extends StatelessWidget {
       children: [
         Transform.translate(
           offset: const Offset(0, -2),
-          // 로고에 금테 — 시안의 메달처럼 테두리 바깥에 옅은 금빛 고리를 한 겹 더 둔다.
-          child: SizedBox(
+          child: const SizedBox(
             width: 36,
             height: 36,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.all(1.5),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.accent,
-                  boxShadow: [BoxShadow(color: AppColors.accent.withValues(alpha: 0.25), spreadRadius: 2)],
-                ),
-                child: const DoguLogoMark(size: 30),
-              ),
-            ),
+            child: Center(child: DoguLogoMark(size: 30)),
           ),
         ),
         const SizedBox(width: 6),
@@ -45,7 +34,7 @@ class DoguBrandLockup extends StatelessWidget {
             style: TextStyle(
               fontFamily: doguTitleFontFamily,
               fontFamilyFallback: [doguFontFamily],
-              color: AppColors.ink,
+              color: AppColors.accent,
               fontSize: 24,
               fontWeight: FontWeight.w100,
               height: 1.0,

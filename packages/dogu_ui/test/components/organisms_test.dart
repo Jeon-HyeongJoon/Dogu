@@ -43,7 +43,7 @@ void main() {
     )));
     expect(tester.getSize(find.byType(DoguTabBar)).height, DoguTabBar.barHeight + 10);
     Color colorOf(String label) => tester.widget<Text>(find.text(label)).style!.color!;
-    expect(colorOf('카테고리'), AppColors.ink, reason: '한글 라벨은 크림 — 금은 아이콘과 표시선');
+    expect(colorOf('카테고리'), AppColors.ink);
     expect(colorOf('홈'), AppColors.ink4);
     expect(tester.widget<BadgePill>(find.widgetWithText(BadgePill, '5')).color, AppColors.alert);
     expect(find.text('2'), findsOneWidget);
@@ -57,7 +57,7 @@ void main() {
     await tester.pumpWidget(host(DoguNavBar(items: items, onTap: (i) => tapped = i)));
     expect(find.text('|'), findsNWidgets(2));
     expect(tester.widget<Text>(find.text('신상품')).style!.color, AppColors.ink);
-    expect(tester.widget<Text>(find.text('SALE')).style!.color, AppColors.alertBright, reason: 'SALE은 빨간 포인트');
+    expect(tester.widget<Text>(find.text('SALE')).style!.color, AppColors.accent);
     await tester.tap(find.text('SALE'));
     expect(tapped, 2, reason: '로딩 자리와 무관하게 항목 번호로 알린다');
 

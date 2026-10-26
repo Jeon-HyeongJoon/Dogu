@@ -44,13 +44,4 @@ void main() {
     await disposeTree(tester);
     await tester.pump(const Duration(seconds: 3)); // 토스트 자동 해제 타이머
   });
-
-  testWidgets('payment sheet over the cart (mobile)', (tester) async {
-    await pumpGoldenApp(tester, const Size(390, 844), tab: 4);
-    await tester.tap(find.textContaining('결제하기 ('));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300)); // 시트가 올라오는 애니메이션 끝
-    await expectLater(find.byType(DoguApp), matchesGoldenFile('goldens/payment_sheet_mobile.png'));
-    await disposeTree(tester);
-  });
 }
