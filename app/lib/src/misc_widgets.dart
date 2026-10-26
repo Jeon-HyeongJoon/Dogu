@@ -39,6 +39,13 @@ class _PaymentToastOverlayState extends State<PaymentToastOverlay> {
     }
   }
 
+  /// 확인 — 시트를 닫고 완료된 주문을 배송 안내 흐름으로 넘긴다.
+  void _confirm() {
+    final response = _response!;
+    Navigator.of(context).pop();
+    widget.onConfirm?.call(response);
+  }
+
   @override
   Widget build(BuildContext context) {
     final items = (widget.orderSummary['items'] as List<dynamic>? ?? const []).cast<String>();
@@ -47,72 +54,80 @@ class _PaymentToastOverlayState extends State<PaymentToastOverlay> {
 
     // 하단 네비게이션 바 높이만큼 띄워 바로 위에 밀착(이어져 올라오는 느낌)
     final navBarHeight = AppLayout.tabHeight + MediaQuery.viewPaddingOf(context).bottom;
-    return Material(
-      color: Colors.transparent,
+    // 결제 전엔 바깥(배리어)을 누르면 닫힌다(취소). 결제를 시작하면 그냥 닫지 않고, 끝난 뒤 바깥을 누르거나
+    // 뒤로 가면 '확인'과 같이 배송 안내로 잇는다 — 장바구니만 비고 배송 안내·참은 돈 적립이 건너뛰지 않게.
+    return PopScope(
+      canPop: !_submitting && _response == null,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && _response != null) _confirm();
+      },
       child: Align(
         alignment: Alignment.bottomCenter,
-        child: Container(
-          width: double.infinity,
-          margin: EdgeInsets.only(bottom: navBarHeight),
-          decoration: BoxDecoration(
-            color: AppColors.bg,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            boxShadow: const [BoxShadow(color: Color(0x26000000), blurRadius: 24, offset: Offset(0, -2))],
-          ),
-            padding: const EdgeInsets.fromLTRB(AppSpace.pad, 14, AppSpace.pad, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_response == null) ...[
-                  const Text('결제 진행', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 6),
-                  Text('선택 상품 $count개 · ${formatWon(total)}', style: const TextStyle(fontSize: 13, color: AppColors.ink3)),
-                  if (items.isNotEmpty) ...[
+        child: Padding(
+          padding: EdgeInsets.only(bottom: navBarHeight),
+          // Material은 시트에만 — 예전엔 화면 전체를 덮는 투명 Material이 바깥 누름을 삼켜,
+          // 시트를 열면 결제하기 말고는 닫을 방법이 없었다(닫기 버튼도 없다).
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.bg,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                boxShadow: const [BoxShadow(color: Color(0x26000000), blurRadius: 24, offset: Offset(0, -2))],
+              ),
+              padding: const EdgeInsets.fromLTRB(AppSpace.pad, 14, AppSpace.pad, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_response == null) ...[
+                    const Text('결제 진행', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 6),
+                    Text('선택 상품 $count개 · ${formatWon(total)}', style: const TextStyle(fontSize: 13, color: AppColors.ink3)),
+                    if (items.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                    ],
+                    for (final item in items.take(2))
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(item, style: const TextStyle(fontSize: 13.5, color: AppColors.ink2)),
+                      ),
+                    if (items.length > 2)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text('외 ${items.length - 2}개 상품', style: const TextStyle(fontSize: 12, color: AppColors.ink4)),
+                      ),
+                    const SizedBox(height: 12),
+                    if (_submitting)
+                      const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator()))
+                    else
+                      AppButton(text: '결제하기', primary: true, large: true, onTap: _completePayment),
+                  ] else ...[
+                    const Text('결제가 완료되었습니다.', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 6),
+                    Text('주문번호: ${_response!['order_id']}', style: const TextStyle(fontSize: 13, color: AppColors.ink3)),
                     const SizedBox(height: 10),
+                    for (final item in (_response!['items'] as List<dynamic>).take(2))
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text('${item['name']} × ${item['quantity']}', style: const TextStyle(fontSize: 13.5, color: AppColors.ink2)),
+                      ),
+                    if ((_response!['items'] as List<dynamic>).length > 2)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text('외 ${(_response!['items'] as List<dynamic>).length - 2}개 상품', style: const TextStyle(fontSize: 12, color: AppColors.ink4)),
+                      ),
+                    const SizedBox(height: 12),
+                    AppButton(text: '확인', primary: true, large: true, onTap: _confirm),
                   ],
-                  for (final item in items.take(2))
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(item, style: const TextStyle(fontSize: 13.5, color: AppColors.ink2)),
-                    ),
-                  if (items.length > 2)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text('외 ${items.length - 2}개 상품', style: const TextStyle(fontSize: 12, color: AppColors.ink4)),
-                    ),
-                  const SizedBox(height: 12),
-                  if (_submitting)
-                    const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator()))
-                  else
-                    AppButton(text: '결제하기', primary: true, large: true, onTap: _completePayment),
-                ] else ...[
-                  const Text('결제가 완료되었습니다.', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 6),
-                  Text('주문번호: ${_response!['order_id']}', style: const TextStyle(fontSize: 13, color: AppColors.ink3)),
-                  const SizedBox(height: 10),
-                  for (final item in (_response!['items'] as List<dynamic>).take(2))
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text('${item['name']} × ${item['quantity']}', style: const TextStyle(fontSize: 13.5, color: AppColors.ink2)),
-                    ),
-                  if ((_response!['items'] as List<dynamic>).length > 2)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text('외 ${(_response!['items'] as List<dynamic>).length - 2}개 상품', style: const TextStyle(fontSize: 12, color: AppColors.ink4)),
-                    ),
-                  const SizedBox(height: 12),
-                  AppButton(text: '확인', primary: true, large: true, onTap: () {
-                    final response = _response!;
-                    Navigator.of(context).pop();
-                    widget.onConfirm?.call(response);
-                  }),
                 ],
-              ],
+              ),
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 }
 

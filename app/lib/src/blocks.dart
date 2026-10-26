@@ -419,15 +419,18 @@ class RecommendedCartBlock extends StatelessWidget {
         children: [
           const MonoText('[ → ] 함께 담으면 좋은', size: 10, weight: FontWeight.w700),
           const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(children: [
-              // 백엔드 응답 전엔 seed 상품 대신 스켈레톤.
-              if (store.catalogLoading)
-                for (var i = 0; i < 2; i++) const Padding(padding: EdgeInsets.only(right: 12), child: SizedBox(width: 160, child: SkeletonProductCard()))
-              else
-                for (final item in recos) Padding(padding: const EdgeInsets.only(right: 12), child: SizedBox(width: 160, child: ProductCard(product: item))),
-            ]),
+          ScrollConfiguration(
+            behavior: const DoguDragScrollBehavior(),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(children: [
+                // 백엔드 응답 전엔 seed 상품 대신 스켈레톤.
+                if (store.catalogLoading)
+                  for (var i = 0; i < 2; i++) const Padding(padding: EdgeInsets.only(right: 12), child: SizedBox(width: 160, child: SkeletonProductCard()))
+                else
+                  for (final item in recos) Padding(padding: const EdgeInsets.only(right: 12), child: SizedBox(width: 160, child: ProductCard(product: item))),
+              ]),
+            ),
           ),
         ],
       ),

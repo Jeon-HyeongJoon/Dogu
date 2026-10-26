@@ -81,6 +81,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         scrolledUnderElevation: 0,
         title: const Text('상품 정보', style: TextStyle(color: AppColors.ink, fontSize: 18, fontWeight: FontWeight.w700)),
         iconTheme: const IconThemeData(color: AppColors.ink),
+        // 상품 주소로 바로 들어오면 돌아갈 화면이 없어 뒤로 버튼이 사라졌다 — 그때는 홈으로 보내는 뒤로 버튼을 둔다.
+        leading: Navigator.of(context).canPop() || GoRouter.maybeOf(context) == null
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                onPressed: () => context.go(kTabPaths.first),
+              ),
       ),
       // 상품 주소로 바로 들어와 아직 정보가 없으면 로딩 → 실패 시 안내(엉뚱한 상품 대신).
       body: _product.isPending
@@ -329,17 +337,20 @@ class BrandRow extends StatelessWidget {
         ),
       ),
       padding: const EdgeInsets.symmetric(vertical: 16),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            const SizedBox(width: AppSpace.pad),
-            for (final item in [...items, ...items])
-              Padding(
-                padding: const EdgeInsets.only(right: 28),
-                child: Text(item, style: const TextStyle(fontSize: 20, color: AppColors.ink3, fontWeight: FontWeight.w600, letterSpacing: -0.5)),
-              ),
-          ],
+      child: ScrollConfiguration(
+        behavior: const DoguDragScrollBehavior(),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              const SizedBox(width: AppSpace.pad),
+              for (final item in [...items, ...items])
+                Padding(
+                  padding: const EdgeInsets.only(right: 28),
+                  child: Text(item, style: const TextStyle(fontSize: 20, color: AppColors.ink3, fontWeight: FontWeight.w600, letterSpacing: -0.5)),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -366,12 +377,16 @@ class _NewsletterSectionState extends State<NewsletterSection> {
   Future<void> _subscribe() async {
     final email = _controller.text.trim();
     if (email.isEmpty) return;
+    String message;
     try {
-      await DoguRepository().subscribeNewsletter(email);
-      setState(() => _message = '구독 요청을 보냈습니다.');
+      await AppStateScope.read(context).subscribeNewsletter(email);
+      message = '구독 요청을 보냈습니다.';
+    } on ApiStatusError catch (e) {
+      message = e.statusCode == 422 ? '이메일 주소를 다시 확인해주세요.' : '지금은 구독을 받을 수 없어요. 잠시 뒤 다시 시도해주세요.';
     } catch (_) {
-      setState(() => _message = '오프라인 상태라 구독은 나중에 다시 시도해주세요.');
+      message = '오프라인 상태라 구독은 나중에 다시 시도해주세요.';
     }
+    if (mounted) setState(() => _message = message);
   }
 
   @override
@@ -395,6 +410,8 @@ class _NewsletterSectionState extends State<NewsletterSection> {
                   child: TextField(
                     controller: _controller,
                     keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: (_) => _subscribe(),
                     decoration: const InputDecoration.collapsed(hintText: 'you@email.com', hintStyle: TextStyle(fontSize: 13, color: Color(0xff555555), fontFamily: 'monospace')),
                     style: const TextStyle(fontSize: 13, color: AppColors.invert, fontFamily: 'monospace'),
                   ),

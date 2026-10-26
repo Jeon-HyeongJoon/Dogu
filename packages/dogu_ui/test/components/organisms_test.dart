@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/gestures.dart';
 
 import 'package:dogu_ui/dogu_ui.dart';
 
@@ -74,5 +75,17 @@ void main() {
     expect(find.text('03'), findsOneWidget);
     await tester.tap(find.text('반려동물용품'));
     expect(taps, 1);
+  });
+
+  testWidgets('DoguNavBar scrolls sideways with a mouse drag (web mice have no horizontal wheel)', (tester) async {
+    // 운영(넓은 화면)에서 마우스로는 화면 밖 칸에 닿을 수 없었다 — 웹 기본 스크롤은 마우스 끌기를 막는다.
+    final items = [for (var i = 0; i < 12; i++) DoguNavItem(label: '카테고리$i')];
+    await tester.pumpWidget(host(SizedBox(width: 320, child: DoguNavBar(items: items, onTap: (_) {}))));
+    final position = tester.state<ScrollableState>(find.byType(Scrollable)).position;
+    expect(position.pixels, 0);
+
+    await tester.drag(find.text('카테고리1'), const Offset(-200, 0), kind: PointerDeviceKind.mouse);
+    await tester.pumpAndSettle();
+    expect(position.pixels, greaterThan(100));
   });
 }

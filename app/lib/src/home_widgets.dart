@@ -613,23 +613,26 @@ class DealSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad),
-            child: Row(
-              children: [
-                // 백엔드 응답 전엔 seed 상품 대신 스켈레톤 — 빠르게 넘기다 곧 바뀔 카드를 누르지 않게.
-                if (store.catalogLoading)
-                  for (var i = 0; i < 3; i++) ...[
-                    const SizedBox(width: 200, child: SkeletonProductCard(dark: true)),
-                    const SizedBox(width: 12),
-                  ]
-                else
-                  for (final product in items) ...[
-                    SizedBox(width: 200, child: ProductCard(product: product, dark: true)),
-                    const SizedBox(width: 12),
-                  ],
-              ],
+          ScrollConfiguration(
+            behavior: const DoguDragScrollBehavior(), // 마우스로도 끌어 넘긴다(넓은 화면에서 화면 밖 딜 카드)
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpace.pad),
+              child: Row(
+                children: [
+                  // 백엔드 응답 전엔 seed 상품 대신 스켈레톤 — 빠르게 넘기다 곧 바뀔 카드를 누르지 않게.
+                  if (store.catalogLoading)
+                    for (var i = 0; i < 3; i++) ...[
+                      const SizedBox(width: 200, child: SkeletonProductCard(dark: true)),
+                      const SizedBox(width: 12),
+                    ]
+                  else
+                    for (final product in items) ...[
+                      SizedBox(width: 200, child: ProductCard(product: product, dark: true)),
+                      const SizedBox(width: 12),
+                    ],
+                ],
+              ),
             ),
           ),
         ],
